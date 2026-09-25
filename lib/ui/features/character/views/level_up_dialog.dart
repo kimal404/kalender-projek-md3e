@@ -128,7 +128,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
       child: FadeTransition(
         opacity: _fadeAnim,
         child: ScaleTransition(
-          scale: _scaleAnim,
+          scale: Tween<double>(begin: 0.85, end: 1.0).animate(_scaleAnim),
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -172,7 +172,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                       animation: Listenable.merge([_glowAnim, _breatheAnim]),
                       builder: (context, child) {
                         return Transform.scale(
-                          scale: _breatheAnim.value,
+                          scale: Tween<double>(begin: 0.92, end: 1.0).animate(_breatheAnim),
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(

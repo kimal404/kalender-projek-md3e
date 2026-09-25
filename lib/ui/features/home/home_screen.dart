@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final questVM = context.watch<QuestViewModel>();
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppTheme.darkBackground,
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(MediaQuery.paddingOf(context).top + 88),
@@ -92,6 +92,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: CircularProgressIndicator(color: AppTheme.primaryGold),
               )
             : AnimatedSwitcher(
+                duration: const Duration(milliseconds: 320),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(
+                      scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
+                duration: const Duration(milliseconds: 320),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(
+                      scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
+                      child: child,
+                    ),
+                  );
+                },
                 duration: const Duration(milliseconds: 280),
                 switchInCurve: Curves.easeOutCubic,
                 switchOutCurve: Curves.easeInCubic,

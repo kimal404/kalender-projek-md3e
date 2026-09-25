@@ -29,7 +29,10 @@ class CalendarWidget extends StatelessWidget {
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
             transitionBuilder: (child, animation) {
-              return FadeTransition(opacity: animation, child: child);
+              return FadeTransition(
+                opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
+                child: child,
+              );
             },
             child: KeyedSubtree(
               key: ValueKey<String>(viewModel.calendarViewMode),
@@ -316,6 +319,8 @@ class CalendarWidget extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
+              child: AnimatedContainer(
+              child: AnimatedContainer(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(

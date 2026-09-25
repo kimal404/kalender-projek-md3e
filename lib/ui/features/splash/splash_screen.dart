@@ -35,7 +35,10 @@ class _SplashScreenState extends State<SplashScreen>
         transitionDuration: const Duration(milliseconds: 450),
         pageBuilder: (_, animation, _) => const HomeScreen(),
         transitionsBuilder: (_, animation, _, child) {
-          return FadeTransition(opacity: animation, child: child);
+          return FadeTransition(
+            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
+            child: child,
+          );
         },
       ),
     );
