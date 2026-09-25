@@ -12,6 +12,12 @@ class UserProfile {
   final int vitality;
   final int completedQuestsCount;
 
+  /// ID avatar bawaan, misalnya `guardian`. Kosong jika memakai foto sendiri.
+  final String avatarId;
+
+  /// Path file foto yang dipilih pengguna di perangkat.
+  final String? customAvatarPath;
+
   const UserProfile({
     this.name = 'Petualang',
     this.title = 'F-Rank Novice',
@@ -25,6 +31,8 @@ class UserProfile {
     this.discipline = 1,
     this.vitality = 1,
     this.completedQuestsCount = 0,
+    this.avatarId = 'guardian',
+    this.customAvatarPath,
   });
 
   int get maxExp => calculateMaxExp(level);
@@ -57,6 +65,9 @@ class UserProfile {
     int? discipline,
     int? vitality,
     int? completedQuestsCount,
+    String? avatarId,
+    String? customAvatarPath,
+    bool clearCustomAvatar = false,
   }) {
     return UserProfile(
       name: name ?? this.name,
@@ -71,6 +82,10 @@ class UserProfile {
       discipline: discipline ?? this.discipline,
       vitality: vitality ?? this.vitality,
       completedQuestsCount: completedQuestsCount ?? this.completedQuestsCount,
+      avatarId: avatarId ?? this.avatarId,
+      customAvatarPath: clearCustomAvatar
+          ? null
+          : (customAvatarPath ?? this.customAvatarPath),
     );
   }
 
@@ -88,6 +103,8 @@ class UserProfile {
       'discipline': discipline,
       'vitality': vitality,
       'completedQuestsCount': completedQuestsCount,
+      'avatarId': avatarId,
+      'customAvatarPath': customAvatarPath,
     };
   }
 
@@ -107,6 +124,8 @@ class UserProfile {
       discipline: (map['discipline'] as int?) ?? 1,
       vitality: (map['vitality'] as int?) ?? 1,
       completedQuestsCount: (map['completedQuestsCount'] as int?) ?? 0,
+      avatarId: (map['avatarId'] as String?) ?? 'guardian',
+      customAvatarPath: map['customAvatarPath'] as String?,
     );
   }
 }

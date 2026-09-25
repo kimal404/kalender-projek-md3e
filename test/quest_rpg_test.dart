@@ -90,5 +90,27 @@ void main() {
       expect(charVM.profile.coins, equals(50));
       expect(charVM.profile.intellect, equals(2)); // INT meningkat
     });
+
+    test('Avatar bawaan tersimpan dan foto sendiri bisa diganti', () async {
+      final charVM = CharacterViewModel();
+      expect(charVM.profile.avatarId, equals('guardian'));
+      expect(charVM.profile.customAvatarPath, isNull);
+
+      await charVM.updateAvatar(avatarId: 'mage');
+      expect(charVM.profile.avatarId, equals('mage'));
+
+      await charVM.updateAvatar(
+        avatarId: 'mage',
+        customAvatarPath: '/data/user_avatar.jpg',
+      );
+      expect(charVM.profile.customAvatarPath, equals('/data/user_avatar.jpg'));
+
+      await charVM.updateAvatar(avatarId: 'knight');
+      expect(charVM.profile.avatarId, equals('knight'));
+      expect(charVM.profile.customAvatarPath, isNull);
+
+      final restored = UserProfile.fromMap(charVM.profile.toMap());
+      expect(restored.avatarId, equals('knight'));
+    });
   });
 }

@@ -7,6 +7,8 @@ import 'package:quest_kalender/ui/core/themes/app_theme.dart';
 import 'package:quest_kalender/ui/core/widgets/guild_backdrop.dart';
 import 'package:quest_kalender/ui/features/calendar/views/calendar_widget.dart';
 import 'package:quest_kalender/ui/features/character/view_models/character_view_model.dart';
+import 'package:quest_kalender/ui/features/character/views/avatar_picker_sheet.dart';
+import 'package:quest_kalender/ui/features/character/views/avatar_view.dart';
 import 'package:quest_kalender/ui/features/character/views/level_up_dialog.dart';
 import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 import 'package:quest_kalender/ui/features/quests/views/add_quest_dialog.dart';
@@ -79,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
+        preferredSize: Size.fromHeight(MediaQuery.paddingOf(context).top + 88),
         child: _buildTopRpgHeader(charVM.profile),
       ),
       body: GuildBackdrop(
@@ -123,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Status Karakter',
+            label: 'Profil Saya',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shield),
@@ -173,46 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              // Badge Level dengan animasi transisi angka
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.primaryGold, AppTheme.accentAmber],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryGold.withAlpha(80),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) {
-                      return ScaleTransition(
-                        scale: CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.easeOutBack,
-                        ),
-                        child: child,
-                      );
-                    },
-                    child: Text(
-                      '${profile.level}',
-                      key: ValueKey<int>(profile.level),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              AvatarView(profile: profile, size: 44),
               const SizedBox(width: 12),
 
               // Nama & Gelar Petualang
@@ -708,28 +671,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Column(
               children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.surfaceLighter,
-                    border: Border.all(color: AppTheme.primaryGold, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryGold.withAlpha(50),
-                        blurRadius: 12,
-                        spreadRadius: 1,
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'DASHBOARD SAYA',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
+                      color: AppTheme.primaryGold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                GestureDetector(
+                  onTap: () => AvatarPickerSheet.show(context, charVM),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AvatarView(profile: profile, size: 96),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: AppTheme.primaryGold,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.photo_camera,
+                            size: 16,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.shield_moon,
-                    size: 40,
-                    color: AppTheme.primaryGold,
-                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => AvatarPickerSheet.show(context, charVM),
+                  child: const Text('Ganti avatar'),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1221,7 +1205,9 @@ class _EditNameDialogState extends State<_EditNameDialog> {
           child: const Text('Batal'),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGold),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryGold,
+          ),
           onPressed: _saving ? null : _save,
           child: const Text('Simpan', style: TextStyle(color: Colors.black)),
         ),

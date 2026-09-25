@@ -114,4 +114,17 @@ class CharacterViewModel extends ChangeNotifier {
     await _storageService.saveProfile(_profile);
     notifyListeners();
   }
+
+  Future<void> updateAvatar({
+    required String avatarId,
+    String? customAvatarPath,
+  }) async {
+    _profile = _profile.copyWith(
+      avatarId: avatarId,
+      customAvatarPath: customAvatarPath,
+      clearCustomAvatar: customAvatarPath == null,
+    );
+    await _storageService.saveProfile(_profile);
+    notifyListeners();
+  }
 }

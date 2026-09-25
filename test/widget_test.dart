@@ -41,7 +41,7 @@ void main() {
 
     // Pastikan UI utama ter-render
     expect(find.text('Kalender & Quest'), findsOneWidget);
-    expect(find.text('Status Karakter'), findsOneWidget);
+    expect(find.text('Profil Saya'), findsOneWidget);
     expect(find.text('Papan Guild'), findsOneWidget);
   });
 }
