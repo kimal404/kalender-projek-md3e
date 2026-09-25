@@ -61,47 +61,54 @@ class CalendarWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // Bulan & Tahun
-                  Flexible(
-                    child: Text(
-                      monthYearStr,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        // Bulan & Tahun tampil lengkap penuh tanpa "..."
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              monthYearStr,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // Tombol Kembali ke Hari Ini
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            backgroundColor: AppTheme.primaryGold.withAlpha(25),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () => viewModel.selectDate(DateTime.now()),
+                          child: const Text(
+                            'Hari Ini',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.primaryGold,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 6),
-
-                  // Tombol Kembali ke Hari Ini
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      backgroundColor: AppTheme.primaryGold.withAlpha(25),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () => viewModel.selectDate(DateTime.now()),
-                    child: const Text(
-                      'Hari Ini',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.primaryGold,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  const Spacer(),
 
                   // Tombol Prev & Next Bulan
                   IconButton(
