@@ -123,5 +123,34 @@ void main() {
       final restored = UserProfile.fromMap(charVM.profile.toMap());
       expect(restored.notificationSoundId, equals('chime'));
     });
+
+    test('Batas maksimal EXP harian (500 EXP/hari) tidak bisa dilewati', () async {
+      final charVM = CharacterViewModel();
+      final today = DateTime(2026, 9, 25);
+
+      // Klaim pertama: 350 EXP -> berhasil penuh 350 EXP
+      final granted1 = await charVM.addExpAndCoins(
+        exp: 350,
+        questDate: today,
+      );
+      expect(granted1, equals(350));
+      expect(charVM.profile.dailyExpForDate(today), equals(350));
+
+      // Klaim kedua di hari yang sama: minta 350 EXP -> dipotong sisa kuota 150 EXP (total 500 EXP)
+      final granted2 = await charVM.addExpAndCoins(
+        exp: 350,
+        questDate: today,
+      );
+      expect(granted2, equals(150));
+      expect(charVM.profile.dailyExpForDate(today), equals(500));
+
+      // Klaim ketiga di hari yang sama: kuota habis -> 0 EXP
+      final granted3 = await charVM.addExpAndCoins(
+        exp: 100,
+        questDate: today,
+      );
+      expect(granted3, equals(0));
+      expect(charVM.profile.dailyExpForDate(today), equals(500));
+    });
   });
 }

@@ -288,6 +288,19 @@ class _QuestCardState extends State<QuestCard>
                                         color: AppTheme.neonPurple,
                                         isDone: isDone,
                                       ),
+                                      const SizedBox(width: 6),
+                                      _RewardBadge(
+                                        icon: isDone
+                                            ? Icons.lock_outline_rounded
+                                            : Icons.verified_user_outlined,
+                                        label: isDone
+                                            ? 'Terkunci (1x Pakai)'
+                                            : '1x Pakai',
+                                        color: isDone
+                                            ? const Color(0xFF69F0AE)
+                                            : AppTheme.neonCyan,
+                                        isDone: false,
+                                      ),
                                       const Spacer(),
                                       PopupMenuButton<String>(
                                         icon: const Icon(
@@ -305,20 +318,21 @@ class _QuestCardState extends State<QuestCard>
                                           }
                                         },
                                         itemBuilder: (ctx) => [
-                                          const PopupMenuItem(
-                                            value: 'edit',
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.edit,
-                                                  size: 16,
-                                                  color: Colors.white,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text('Ubah Quest'),
-                                              ],
+                                          if (!isDone)
+                                            const PopupMenuItem(
+                                              value: 'edit',
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.edit,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                  SizedBox(width: 8),
+                                                  Text('Ubah Quest'),
+                                                ],
+                                              ),
                                             ),
-                                          ),
                                           const PopupMenuItem(
                                             value: 'delete',
                                             child: Row(

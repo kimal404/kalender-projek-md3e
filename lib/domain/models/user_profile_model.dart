@@ -1,4 +1,7 @@
 class UserProfile {
+  /// Batas maksimal EXP yang bisa diperoleh dalam 1 hari.
+  static const int maxDailyExp = 500;
+
   final String name;
   final String title;
   final int level;
@@ -11,6 +14,12 @@ class UserProfile {
   final int discipline;
   final int vitality;
   final int completedQuestsCount;
+
+  /// Jumlah EXP yang sudah diklaim pada tanggal [dailyExpDate].
+  final int dailyExpEarned;
+
+  /// Tanggal terakhir pencatatan [dailyExpEarned].
+  final DateTime? dailyExpDate;
 
   /// ID avatar bawaan, misalnya `guardian`. Kosong jika memakai foto sendiri.
   final String avatarId;
@@ -34,12 +43,30 @@ class UserProfile {
     this.discipline = 1,
     this.vitality = 1,
     this.completedQuestsCount = 0,
+    this.dailyExpEarned = 0,
+    this.dailyExpDate,
     this.avatarId = 'guardian',
     this.customAvatarPath,
     this.notificationSoundId = 'default',
   });
 
   int get maxExp => calculateMaxExp(level);
+
+  /// Mengembalikan jumlah EXP yang sudah diklaim pada tanggal [date].
+  int dailyExpForDate(DateTime date) {
+    final ref = dailyExpDate ?? lastActiveDate;
+    if (ref.year == date.year &&
+        ref.month == date.month &&
+        ref.day == date.day) {
+      return dailyExpEarned;
+    }
+    return 0;
+  }
+
+  /// Sisa kuota EXP harian yang masih bisa diklaim pada tanggal [date].
+  int remainingDailyExp(DateTime date) {
+    return (maxDailyExp - dailyExpForDate(date)).clamp(0, maxDailyExp);
+  }
 
   static int calculateMaxExp(int lvl) {
     return 100 + (lvl - 1) * 75;
@@ -69,6 +96,8 @@ class UserProfile {
     int? discipline,
     int? vitality,
     int? completedQuestsCount,
+    int? dailyExpEarned,
+    DateTime? dailyExpDate,
     String? avatarId,
     String? customAvatarPath,
     bool clearCustomAvatar = false,
@@ -87,6 +116,8 @@ class UserProfile {
       discipline: discipline ?? this.discipline,
       vitality: vitality ?? this.vitality,
       completedQuestsCount: completedQuestsCount ?? this.completedQuestsCount,
+      dailyExpEarned: dailyExpEarned ?? this.dailyExpEarned,
+      dailyExpDate: dailyExpDate ?? this.dailyExpDate,
       avatarId: avatarId ?? this.avatarId,
       customAvatarPath: clearCustomAvatar
           ? null
@@ -109,6 +140,8 @@ class UserProfile {
       'discipline': discipline,
       'vitality': vitality,
       'completedQuestsCount': completedQuestsCount,
+      'dailyExpEarned': dailyExpEarned,
+      'dailyExpDate': dailyExpDate?.toIso8601String(),
       'avatarId': avatarId,
       'customAvatarPath': customAvatarPath,
       'notificationSoundId': notificationSoundId,
@@ -131,6 +164,10 @@ class UserProfile {
       discipline: (map['discipline'] as int?) ?? 1,
       vitality: (map['vitality'] as int?) ?? 1,
       completedQuestsCount: (map['completedQuestsCount'] as int?) ?? 0,
+      dailyExpEarned: (map['dailyExpEarned'] as int?) ?? 0,
+      dailyExpDate: map['dailyExpDate'] != null
+          ? DateTime.parse(map['dailyExpDate'] as String)
+          : null,
       avatarId: (map['avatarId'] as String?) ?? 'guardian',
       customAvatarPath: map['customAvatarPath'] as String?,
       notificationSoundId: (map['notificationSoundId'] as String?) ?? 'default',

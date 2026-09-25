@@ -62,6 +62,7 @@ class Quest {
   final int expReward;
   final int coinReward;
   final bool isCompleted;
+  final bool expClaimed;
   final DateTime? completedAt;
 
   Quest({
@@ -76,9 +77,11 @@ class Quest {
     int? expReward,
     int? coinReward,
     this.isCompleted = false,
+    bool? expClaimed,
     this.completedAt,
   }) : expReward = expReward ?? rank.defaultExp,
-       coinReward = coinReward ?? rank.defaultCoins;
+       coinReward = coinReward ?? rank.defaultCoins,
+       expClaimed = expClaimed ?? isCompleted;
 
   Quest copyWith({
     String? id,
@@ -92,6 +95,7 @@ class Quest {
     int? expReward,
     int? coinReward,
     bool? isCompleted,
+    bool? expClaimed,
     DateTime? completedAt,
   }) {
     return Quest(
@@ -106,6 +110,7 @@ class Quest {
       expReward: expReward ?? this.expReward,
       coinReward: coinReward ?? this.coinReward,
       isCompleted: isCompleted ?? this.isCompleted,
+      expClaimed: expClaimed ?? this.expClaimed,
       completedAt: completedAt ?? this.completedAt,
     );
   }
@@ -123,11 +128,13 @@ class Quest {
       'expReward': expReward,
       'coinReward': coinReward,
       'isCompleted': isCompleted,
+      'expClaimed': expClaimed,
       'completedAt': completedAt?.toIso8601String(),
     };
   }
 
   factory Quest.fromMap(Map<String, dynamic> map) {
+    final completed = (map['isCompleted'] as bool?) ?? false;
     return Quest(
       id: map['id'] as String,
       title: map['title'] as String,
@@ -141,7 +148,8 @@ class Quest {
       ),
       expReward: map['expReward'] as int?,
       coinReward: map['coinReward'] as int?,
-      isCompleted: (map['isCompleted'] as bool?) ?? false,
+      isCompleted: completed,
+      expClaimed: (map['expClaimed'] as bool?) ?? completed,
       completedAt: map['completedAt'] != null
           ? DateTime.parse(map['completedAt'] as String)
           : null,

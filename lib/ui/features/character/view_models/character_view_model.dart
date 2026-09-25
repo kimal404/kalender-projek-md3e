@@ -42,44 +42,67 @@ class CharacterViewModel extends ChangeNotifier {
     );
 
     final differenceInDays = today.difference(lastActive).inDays;
+    final currentDailyExp = _profile.dailyExpForDate(now);
 
     if (differenceInDays == 1) {
       // Login hari berikutnya berturut-turut
       _profile = _profile.copyWith(
         streakDays: _profile.streakDays + 1,
+        dailyExpEarned: currentDailyExp,
+        dailyExpDate: now,
         lastActiveDate: now,
       );
       _storageService.saveProfile(_profile);
     } else if (differenceInDays > 1) {
       // Streak putus
-      _profile = _profile.copyWith(streakDays: 1, lastActiveDate: now);
+      _profile = _profile.copyWith(
+        streakDays: 1,
+        dailyExpEarned: currentDailyExp,
+        dailyExpDate: now,
+        lastActiveDate: now,
+      );
       _storageService.saveProfile(_profile);
     } else {
       // Masih di hari yang sama
-      _profile = _profile.copyWith(lastActiveDate: now);
+      _profile = _profile.copyWith(
+        dailyExpEarned: currentDailyExp,
+        dailyExpDate: now,
+        lastActiveDate: now,
+      );
       _storageService.saveProfile(_profile);
     }
   }
 
-  Future<void> addExpAndCoins({
+  /// Menambahkan EXP dengan batas harian [UserProfile.maxDailyExp].
+  /// Mengembalikan jumlah EXP aktual yang berhasil ditambahkan.
+  Future<int> addExpAndCoins({
     required int exp,
-    required int coins,
+    int coins = 0,
     QuestCategory? category,
+    DateTime? questDate,
   }) async {
-    int newExp = _profile.currentExp + exp;
+    final now = DateTime.now();
+    final targetDate = questDate ?? now;
+    final earnedToday = _profile.dailyExpForDate(targetDate);
+    final remainingCap =
+        (UserProfile.maxDailyExp - earnedToday).clamp(0, UserProfile.maxDailyExp);
+    final actualExpGranted = exp.clamp(0, remainingCap);
+
+    int newExp = _profile.currentExp + actualExpGranted;
     int newCoins = _profile.coins + coins;
     int currentLvl = _profile.level;
     bool leveledUp = false;
 
-    // Stat atribut peningkatan sesuai kategori quest
+    // Stat atribut peningkatan sesuai kategori quest (hanya jika masih dalam kuota EXP harian)
+    final attrGain = actualExpGranted > 0 ? 1 : 0;
     int newStr =
-        _profile.strength + (category == QuestCategory.strength ? 1 : 0);
+        _profile.strength + (category == QuestCategory.strength ? attrGain : 0);
     int newInt =
-        _profile.intellect + (category == QuestCategory.intellect ? 1 : 0);
+        _profile.intellect + (category == QuestCategory.intellect ? attrGain : 0);
     int newDis =
-        _profile.discipline + (category == QuestCategory.discipline ? 1 : 0);
+        _profile.discipline + (category == QuestCategory.discipline ? attrGain : 0);
     int newVit =
-        _profile.vitality + (category == QuestCategory.vitality ? 1 : 0);
+        _profile.vitality + (category == QuestCategory.vitality ? attrGain : 0);
 
     // Kalkulasi kenaikan level (bisa naik lebih dari 1 level jika EXP besar)
     while (newExp >= UserProfile.calculateMaxExp(currentLvl)) {
@@ -100,7 +123,9 @@ class CharacterViewModel extends ChangeNotifier {
       discipline: newDis,
       vitality: newVit,
       completedQuestsCount: _profile.completedQuestsCount + 1,
-      lastActiveDate: DateTime.now(),
+      dailyExpEarned: earnedToday + actualExpGranted,
+      dailyExpDate: targetDate,
+      lastActiveDate: now,
     );
 
     await _storageService.saveProfile(_profile);
@@ -109,6 +134,8 @@ class CharacterViewModel extends ChangeNotifier {
     if (leveledUp && onLevelUp != null) {
       onLevelUp!(currentLvl, newTitle);
     }
+
+    return actualExpGranted;
   }
 
   Future<void> updateName(String newName) async {

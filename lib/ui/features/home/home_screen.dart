@@ -410,8 +410,42 @@ class _HomeScreenState extends State<HomeScreen> {
                         key: ValueKey(quest.id),
                         quest: quest,
                         index: idx,
-                        onToggleComplete: () =>
-                            questVM.toggleQuestCompletion(quest),
+                        onToggleComplete: () async {
+                          final result = await questVM.toggleQuestCompletion(
+                            quest,
+                          );
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          if (result.status ==
+                              QuestCompletionStatus.alreadyCompleted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Quest sudah diselesaikan & terkunci! Setiap tugas hanya bisa digunakan 1 kali.',
+                                ),
+                              ),
+                            );
+                          } else if (result.status ==
+                              QuestCompletionStatus.dailyLimitReached) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Quest selesai! Batas maksimal EXP harian (500 EXP/hari) telah tercapai.',
+                                ),
+                              ),
+                            );
+                          } else {
+                            final earnedToday = questVM
+                                .getEarnedDailyExpForDate(quest.date);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Quest tuntas! +${result.expGranted} EXP diperoleh (EXP Hari Ini: $earnedToday/${UserProfile.maxDailyExp} EXP)',
+                                ),
+                              ),
+                            );
+                          }
+                        },
                         onEdit: () => _openAddQuestDialog(existingQuest: quest),
                         onDelete: () async {
                           final confirm = await showDialog<bool>(
@@ -457,6 +491,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final progress = total == 0 ? 0.0 : done / total;
     final isClear = total > 0 && done == total;
     final accent = isClear ? const Color(0xFF69F0AE) : AppTheme.primaryGold;
+    final earnedDailyExp = questVM.getEarnedDailyExpForDate(
+      questVM.selectedDate,
+    );
+    final committedDailyExp = questVM.getTotalCommittedExpForDate(
+      questVM.selectedDate,
+    );
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -516,10 +556,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? 'Guild masih sepi. Terbitkan quest pertama untuk hari ini.'
                 : isClear
                 ? 'Semua misi hari ini tuntas. Kamu layak istirahat, petualang.'
-                : 'Selesaikan $total misi untuk menutup kontrak hari ini.',
+                : 'Selesaikan $total misi untuk menutup kontrak hari ini (1x pakai per misi).',
             style: const TextStyle(fontSize: 13, color: Colors.white70),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(Icons.bolt, size: 15, color: AppTheme.neonCyan),
+              const SizedBox(width: 4),
+              Text(
+                'Limit EXP Harian: $earnedDailyExp / ${UserProfile.maxDailyExp} EXP Diklaim',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.neonCyan,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'Terjadwal: $committedDailyExp/${UserProfile.maxDailyExp}',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppTheme.textMuted,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: TweenAnimationBuilder<double>(

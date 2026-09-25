@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
+import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
+import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 
 class AddQuestDialog extends StatefulWidget {
   final DateTime initialDate;
@@ -141,7 +144,7 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
     }
   }
 
-  void _save() {
+  void _save(int effectiveExp) {
     if (!_formKey.currentState!.validate()) return;
 
     final quest = Quest(
@@ -153,9 +156,10 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
       endTime: _endTime,
       rank: _selectedRank,
       category: _selectedCategory,
-      expReward: _selectedRank.defaultExp,
-      coinReward: _selectedRank.defaultCoins,
+      expReward: effectiveExp,
+      coinReward: 0,
       isCompleted: widget.existingQuest?.isCompleted ?? false,
+      expClaimed: widget.existingQuest?.expClaimed ?? false,
       completedAt: widget.existingQuest?.completedAt,
     );
 
@@ -165,6 +169,19 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.existingQuest != null;
+    final questVM = context.watch<QuestViewModel>();
+    final committedExp = questVM.getTotalCommittedExpForDate(
+      _selectedDate,
+      excludeQuestId: widget.existingQuest?.id,
+    );
+    final remainingQuota = questVM.getRemainingExpQuotaForDate(
+      _selectedDate,
+      excludeQuestId: widget.existingQuest?.id,
+    );
+    final effectiveExp = _selectedRank.defaultExp.clamp(0, remainingQuota);
+    final isQuotaFull = remainingQuota <= 0;
+    final isRankCapped =
+        _selectedRank.defaultExp > remainingQuota && remainingQuota > 0;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -451,39 +468,125 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Ringkasan Reward
+                    // Ringkasan Reward & Kuota EXP Harian
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,
-                        vertical: 10,
+                        vertical: 12,
                       ),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceLighter,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isQuotaFull
+                              ? Colors.redAccent.withAlpha(140)
+                              : AppTheme.neonPurple.withAlpha(80),
+                        ),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Hadiah Misi:',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.textMuted,
+                          Row(
+                            children: [
+                              const Text(
+                                'Hadiah Misi (1x Pakai):',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.textMuted,
+                                ),
+                              ),
+                              const Spacer(),
+                              Icon(
+                                Icons.bolt,
+                                size: 16,
+                                color: isQuotaFull
+                                    ? Colors.redAccent
+                                    : AppTheme.neonPurple,
+                              ),
+                              Text(
+                                ' +$effectiveExp EXP',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isQuotaFull
+                                      ? Colors.redAccent
+                                      : AppTheme.neonPurple,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (isRankCapped) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              '* Disesuaikan sisa limit harian ($remainingQuota EXP tersisa dari ${UserProfile.maxDailyExp} EXP/hari)',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.primaryGold,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Limit EXP Harian:',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Text(
+                                '${committedExp + effectiveExp} / ${UserProfile.maxDailyExp} EXP',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isQuotaFull
+                                      ? Colors.redAccent
+                                      : AppTheme.neonCyan,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: ((committedExp + effectiveExp) /
+                                      UserProfile.maxDailyExp)
+                                  .clamp(0.0, 1.0),
+                              minHeight: 6,
+                              backgroundColor: AppTheme.darkBackground,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isQuotaFull
+                                    ? Colors.redAccent
+                                    : AppTheme.neonCyan,
+                              ),
                             ),
                           ),
-                          const Spacer(),
-                          const Icon(
-                            Icons.bolt,
-                            size: 16,
-                            color: AppTheme.neonPurple,
-                          ),
-                          Text(
-                            ' +${_selectedRank.defaultExp} EXP',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.neonPurple,
+                          if (isQuotaFull) ...[
+                            const SizedBox(height: 8),
+                            const Row(
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_rounded,
+                                  size: 15,
+                                  color: Colors.redAccent,
+                                ),
+                                SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    'Limit EXP harian (500 EXP) pada tanggal ini sudah penuh! Tidak dapat menambah quest baru di tanggal ini.',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
@@ -495,17 +598,22 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryGold,
+                          disabledBackgroundColor: AppTheme.surfaceLighter,
                           foregroundColor: Colors.black,
+                          disabledForegroundColor: AppTheme.textMuted,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: _save,
+                        onPressed:
+                            isQuotaFull ? null : () => _save(effectiveExp),
                         child: Text(
-                          isEditing
-                              ? 'Simpan Perubahan'
-                              : 'Terbitkan Quest ke Guild',
+                          isQuotaFull
+                              ? 'Limit EXP Harian Penuh (${UserProfile.maxDailyExp} EXP)'
+                              : (isEditing
+                                    ? 'Simpan Perubahan'
+                                    : 'Terbitkan Quest ke Guild'),
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,

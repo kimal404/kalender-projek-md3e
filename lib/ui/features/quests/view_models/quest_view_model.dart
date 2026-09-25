@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quest_kalender/data/repositories/quest_repository.dart';
 import 'package:quest_kalender/data/services/notification_service.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
+import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/features/character/view_models/character_view_model.dart';
 
 class QuestViewModel extends ChangeNotifier {
@@ -139,24 +140,106 @@ class QuestViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleQuestCompletion(Quest quest) async {
-    final bool newCompletionStatus = !quest.isCompleted;
+  /// Total EXP yang sudah diklaim pada tanggal [date].
+  int getEarnedDailyExpForDate(DateTime date) {
+    final completedQuestsExp = _repository
+        .getQuestsForDate(date)
+        .where((q) => q.isCompleted || q.expClaimed)
+        .fold<int>(0, (sum, q) => sum + q.expReward);
+
+    final profileDailyExp =
+        _characterViewModel?.profile.dailyExpForDate(date) ?? 0;
+
+    final rawMax = completedQuestsExp > profileDailyExp
+        ? completedQuestsExp
+        : profileDailyExp;
+    return rawMax.clamp(0, UserProfile.maxDailyExp);
+  }
+
+  /// Total EXP dari seluruh quest (baik yang sudah diklaim maupun yang masih terjadwal) pada [date].
+  int getTotalCommittedExpForDate(DateTime date, {String? excludeQuestId}) {
+    final earnedExp = getEarnedDailyExpForDate(date);
+    final pendingExp = _repository
+        .getQuestsForDate(date)
+        .where((q) => !q.isCompleted && !q.expClaimed && q.id != excludeQuestId)
+        .fold<int>(0, (sum, q) => sum + q.expReward);
+
+    return (earnedExp + pendingExp).clamp(0, UserProfile.maxDailyExp);
+  }
+
+  /// Sisa kuota EXP harian yang tersedia untuk membuat/mengklaim quest pada [date].
+  int getRemainingExpQuotaForDate(DateTime date, {String? excludeQuestId}) {
+    final committed = getTotalCommittedExpForDate(
+      date,
+      excludeQuestId: excludeQuestId,
+    );
+    return (UserProfile.maxDailyExp - committed).clamp(
+      0,
+      UserProfile.maxDailyExp,
+    );
+  }
+
+  /// Menyelesaikan quest (1 kali pakai, tidak bisa di-uncheck lagi).
+  Future<QuestCompletionResult> toggleQuestCompletion(Quest quest) async {
+    // Tugas hanya bisa 1 kali pakai: jika sudah selesai / sudah klaim EXP, kunci!
+    if (quest.isCompleted || quest.expClaimed) {
+      return const QuestCompletionResult(
+        status: QuestCompletionStatus.alreadyCompleted,
+        expGranted: 0,
+      );
+    }
+
+    // Cek sisa limit EXP harian berdasarkan quest yang sudah diklaim pada tanggal tersebut
+    final earnedOnDate = getEarnedDailyExpForDate(quest.date);
+    final remainingForDate = (UserProfile.maxDailyExp - earnedOnDate).clamp(
+      0,
+      UserProfile.maxDailyExp,
+    );
+    final cappedExp = quest.expReward.clamp(0, remainingForDate);
+
+    int grantedExp = cappedExp;
+    if (_characterViewModel != null) {
+      grantedExp = await _characterViewModel!.addExpAndCoins(
+        exp: cappedExp,
+        coins: 0,
+        category: quest.category,
+        questDate: quest.date,
+      );
+    }
+
     final updatedQuest = quest.copyWith(
-      isCompleted: newCompletionStatus,
-      completedAt: newCompletionStatus ? DateTime.now() : null,
+      isCompleted: true,
+      expClaimed: true,
+      expReward: grantedExp,
+      completedAt: DateTime.now(),
     );
 
     await _repository.addOrUpdateQuest(updatedQuest);
     await _notifications.syncQuest(updatedQuest);
 
-    if (newCompletionStatus && _characterViewModel != null) {
-      await _characterViewModel!.addExpAndCoins(
-        exp: quest.expReward,
-        coins: quest.coinReward,
-        category: quest.category,
-      );
-    }
-
     notifyListeners();
+
+    return QuestCompletionResult(
+      status: grantedExp > 0
+          ? QuestCompletionStatus.completed
+          : QuestCompletionStatus.dailyLimitReached,
+      expGranted: grantedExp,
+    );
   }
+}
+
+enum QuestCompletionStatus {
+  completed,
+  alreadyCompleted,
+  dailyLimitReached,
+}
+
+class QuestCompletionResult {
+  final QuestCompletionStatus status;
+  final int expGranted;
+
+  const QuestCompletionResult({
+    required this.status,
+    required this.expGranted,
+  });
 }
