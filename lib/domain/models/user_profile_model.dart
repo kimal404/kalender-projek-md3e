@@ -18,6 +18,9 @@ class UserProfile {
   /// Path file foto yang dipilih pengguna di perangkat.
   final String? customAvatarPath;
 
+  /// ID suara pengingat. `default` memakai nada sistem.
+  final String notificationSoundId;
+
   const UserProfile({
     this.name = 'Petualang',
     this.title = 'F-Rank Novice',
@@ -33,6 +36,7 @@ class UserProfile {
     this.completedQuestsCount = 0,
     this.avatarId = 'guardian',
     this.customAvatarPath,
+    this.notificationSoundId = 'default',
   });
 
   int get maxExp => calculateMaxExp(level);
@@ -68,6 +72,7 @@ class UserProfile {
     String? avatarId,
     String? customAvatarPath,
     bool clearCustomAvatar = false,
+    String? notificationSoundId,
   }) {
     return UserProfile(
       name: name ?? this.name,
@@ -86,6 +91,7 @@ class UserProfile {
       customAvatarPath: clearCustomAvatar
           ? null
           : (customAvatarPath ?? this.customAvatarPath),
+      notificationSoundId: notificationSoundId ?? this.notificationSoundId,
     );
   }
 
@@ -105,6 +111,7 @@ class UserProfile {
       'completedQuestsCount': completedQuestsCount,
       'avatarId': avatarId,
       'customAvatarPath': customAvatarPath,
+      'notificationSoundId': notificationSoundId,
     };
   }
 
@@ -126,6 +133,7 @@ class UserProfile {
       completedQuestsCount: (map['completedQuestsCount'] as int?) ?? 0,
       avatarId: (map['avatarId'] as String?) ?? 'guardian',
       customAvatarPath: map['customAvatarPath'] as String?,
+      notificationSoundId: (map['notificationSoundId'] as String?) ?? 'default',
     );
   }
 }

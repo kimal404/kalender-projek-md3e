@@ -129,6 +129,10 @@ class QuestViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> rescheduleNotifications() async {
+    await _notifications.syncAll(_repository.getAllQuests());
+  }
+
   Future<void> deleteQuest(String id) async {
     await _repository.deleteQuest(id);
     await _notifications.cancelQuest(id);

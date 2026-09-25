@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:quest_kalender/domain/models/notification_sound.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -12,10 +13,11 @@ class NotificationService {
 
   static final NotificationService instance = NotificationService._();
 
-  static const String channelId = 'quest_reminders';
   static const String channelName = 'Pengingat Quest';
   static const String channelDescription =
       'Notifikasi saat waktu mulai quest tiba';
+
+  String _soundId = 'default';
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -46,6 +48,57 @@ class NotificationService {
     await _plugin.initialize(settings: settings);
     await _requestPermissions();
     _initialized = true;
+  }
+
+  void setSound(String soundId) {
+    _soundId = NotificationSounds.byId(soundId).id;
+  }
+
+  Future<void> previewCurrentSound() async {
+    if (!_initialized) return;
+    final sound = NotificationSounds.byId(_soundId);
+    if (sound.id == 'silent') return;
+
+    final details = _detailsFor(sound);
+    try {
+      await _plugin.show(
+        id: 91001,
+        title: 'Contoh suara quest',
+        body: sound.label,
+        notificationDetails: details,
+      );
+    } catch (error) {
+      debugPrint('Gagal memutar contoh suara: $error');
+    }
+  }
+
+  NotificationDetails _detailsFor(NotificationSoundOption sound) {
+    final AndroidNotificationSound? androidSound = sound.id == 'silent'
+        ? null
+        : sound.rawResource == null
+        ? null
+        : RawResourceAndroidNotificationSound(sound.rawResource!);
+
+    return NotificationDetails(
+      android: AndroidNotificationDetails(
+        NotificationSounds.channelIdFor(sound.id),
+        '$channelName · ${sound.label}',
+        channelDescription: channelDescription,
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: '@mipmap/ic_launcher',
+        playSound: sound.id != 'silent',
+        sound: androidSound,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentSound: sound.id != 'silent',
+        sound: sound.rawResource == null ? null : '${sound.rawResource}.wav',
+      ),
+      macOS: DarwinNotificationDetails(
+        presentSound: sound.id != 'silent',
+        sound: sound.rawResource == null ? null : '${sound.rawResource}.wav',
+      ),
+    );
   }
 
   Future<void> _requestPermissions() async {
@@ -96,18 +149,7 @@ class NotificationService {
         title: 'Quest dimulai: ${quest.title}',
         body: body,
         scheduledDate: when,
-        notificationDetails: const NotificationDetails(
-          android: AndroidNotificationDetails(
-            channelId,
-            channelName,
-            channelDescription: channelDescription,
-            importance: Importance.high,
-            priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
-          ),
-          iOS: DarwinNotificationDetails(),
-          macOS: DarwinNotificationDetails(),
-        ),
+        notificationDetails: _detailsFor(NotificationSounds.byId(_soundId)),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         payload: quest.id,
       );
@@ -118,16 +160,7 @@ class NotificationService {
           title: 'Quest dimulai: ${quest.title}',
           body: body,
           scheduledDate: when,
-          notificationDetails: const NotificationDetails(
-            android: AndroidNotificationDetails(
-              channelId,
-              channelName,
-              channelDescription: channelDescription,
-              importance: Importance.high,
-              priority: Priority.high,
-              icon: '@mipmap/ic_launcher',
-            ),
-          ),
+          notificationDetails: _detailsFor(NotificationSounds.byId(_soundId)),
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           payload: quest.id,
         );

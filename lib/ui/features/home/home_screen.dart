@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:quest_kalender/data/services/notification_service.dart';
+import 'package:quest_kalender/domain/models/notification_sound.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
@@ -1071,6 +1073,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 16),
 
+        _buildSoundCard(charVM),
+        const SizedBox(height: 16),
+
         // Sinkronisasi Cloud (Firebase / Supabase)
         Container(
           padding: const EdgeInsets.all(18),
@@ -1123,6 +1128,68 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSoundCard(CharacterViewModel charVM) {
+    final selected = NotificationSounds.byId(
+      charVM.profile.notificationSoundId,
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppTheme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.surfaceLighter),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.music_note, color: AppTheme.primaryGold),
+              SizedBox(width: 8),
+              Text(
+                'Suara Pengingat',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Pilih nada yang berbunyi saat quest dimulai. Quest yang masih menunggu ikut memakai nada baru.',
+            style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+          ),
+          const SizedBox(height: 12),
+          ...NotificationSounds.options.map((sound) {
+            final isSelected = sound.id == selected.id;
+            return ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                color: isSelected ? AppTheme.primaryGold : AppTheme.textMuted,
+              ),
+              title: Text(
+                sound.label,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+              onTap: () async {
+                await charVM.updateNotificationSound(sound.id);
+                if (!context.mounted) return;
+                await context.read<QuestViewModel>().rescheduleNotifications();
+                await NotificationService.instance.previewCurrentSound();
+              },
+            );
+          }),
+        ],
+      ),
     );
   }
 

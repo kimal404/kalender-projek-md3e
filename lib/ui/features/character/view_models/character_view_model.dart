@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quest_kalender/data/services/notification_service.dart';
 import 'package:quest_kalender/data/services/storage_service.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
@@ -24,6 +25,7 @@ class CharacterViewModel extends ChangeNotifier {
     notifyListeners();
 
     _profile = await _storageService.loadProfile();
+    NotificationService.instance.setSound(_profile.notificationSoundId);
     _checkDailyStreak();
     _isReady = true;
     _isLoading = false;
@@ -124,6 +126,13 @@ class CharacterViewModel extends ChangeNotifier {
       customAvatarPath: customAvatarPath,
       clearCustomAvatar: customAvatarPath == null,
     );
+    await _storageService.saveProfile(_profile);
+    notifyListeners();
+  }
+
+  Future<void> updateNotificationSound(String soundId) async {
+    _profile = _profile.copyWith(notificationSoundId: soundId);
+    NotificationService.instance.setSound(soundId);
     await _storageService.saveProfile(_profile);
     notifyListeners();
   }

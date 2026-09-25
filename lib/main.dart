@@ -24,8 +24,10 @@ void main() async {
     characterViewModel: characterViewModel,
   );
 
-  // Muat data sebelum dashboard dibuka supaya tidak muncul layar kosong.
-  await Future.wait([characterViewModel.init(), questViewModel.init()]);
+  // Muat profil dulu supaya suara notifikasi sudah terpasang
+  // sebelum quest dijadwalkan ulang.
+  await characterViewModel.init();
+  await questViewModel.init();
 
   runApp(
     MultiProvider(

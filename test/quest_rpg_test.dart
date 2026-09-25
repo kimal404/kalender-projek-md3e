@@ -112,5 +112,16 @@ void main() {
       final restored = UserProfile.fromMap(charVM.profile.toMap());
       expect(restored.avatarId, equals('knight'));
     });
+
+    test('Pilihan suara notifikasi tersimpan di profil', () async {
+      final charVM = CharacterViewModel();
+      expect(charVM.profile.notificationSoundId, equals('default'));
+
+      await charVM.updateNotificationSound('chime');
+      expect(charVM.profile.notificationSoundId, equals('chime'));
+
+      final restored = UserProfile.fromMap(charVM.profile.toMap());
+      expect(restored.notificationSoundId, equals('chime'));
+    });
   });
 }
