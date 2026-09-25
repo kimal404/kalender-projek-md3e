@@ -35,10 +35,10 @@ Alur buka aplikasi:
 | Tab | Isi |
 | --- | --- |
 | Kalender & Quest | Kontrak harian, kalender, filter kategori/rank, daftar quest tanggal terpilih, tombol quest baru |
-| Status Karakter | Nama, gelar, level, statistik, empat atribut, tombol ubah nama |
-| Papan Guild | Total, selesai, menunggu, sebaran rank, dan tombol periksa sinkronisasi |
+| Profil Saya | Dashboard pengguna: avatar, nama, gelar, level, statistik, dan empat atribut |
+| Papan Guild | Total, selesai, menunggu, sebaran rank, suara pengingat, dan tombol periksa sinkronisasi |
 
-Header menampilkan level, nama, gelar, streak, koin, dan bar EXP.
+Header menampilkan avatar, nama, gelar, streak, koin, dan bar EXP.
 
 Quest kosong menampilkan ajakan menambah quest. Quest yang ada bisa ditandai selesai, diubah, atau dihapus. Hapus meminta konfirmasi.
 
@@ -47,7 +47,7 @@ Quest kosong menampilkan ajakan menambah quest. Quest yang ada bisa ditandai sel
 ```text
 lib/
   main.dart                         titik masuk, provider, locale
-  domain/models/                    Quest, UserProfile, rank, kategori
+  domain/models/                    Quest, profil, avatar, suara notifikasi
   data/services/                    penyimpanan, notifikasi, stub sinkronisasi
   data/repositories/                cache dan akses quest
   ui/core/                          tema dan latar bintang
@@ -55,9 +55,10 @@ lib/
   ui/features/home/                 dashboard dan dialog nama
   ui/features/calendar/             kalender
   ui/features/quests/               kartu, dialog, dan state quest
-  ui/features/character/            state karakter dan dialog level up
+  ui/features/character/            state karakter, avatar, dialog level up
+assets/avatars/                     tujuh avatar bawaan SVG
 test/                               tes widget dan aturan RPG
-android/                            proyek Android
+android/                            proyek Android, termasuk nada di res/raw
 web/                                splash HTML, manifest, ikon web
 ```
 
@@ -68,7 +69,7 @@ UI  ->  ViewModel  ->  Repository / Service  ->  SharedPreferences
                      ->  NotificationService ->  notifikasi perangkat
 ```
 
-`main.dart` membuat satu `StorageService`, satu `QuestRepository`, satu `CharacterViewModel`, dan satu `QuestViewModel`. Keduanya di-`init()` sebelum `runApp`, lalu `HomeScreen` memanggil `init()` lagi. Pemanggilan kedua aman karena `_isReady` menghentikan pemuatan ulang.
+`main.dart` membuat satu `StorageService`, satu `QuestRepository`, satu `CharacterViewModel`, dan satu `QuestViewModel`. Profil di-`init()` lebih dulu supaya suara notifikasi sudah terpasang sebelum quest dijadwalkan. `HomeScreen` memanggil `init()` lagi. Pemanggilan kedua aman karena `_isReady` menghentikan pemuatan ulang.
 
 ## 4. Quest
 
@@ -139,7 +140,27 @@ Streak dihitung saat profil dimuat:
 - selisih lebih dari 1 hari: streak kembali ke 1;
 - hari yang sama: tanggal aktif hanya diperbarui.
 
-Nama diubah dari tab Status Karakter. Dialog `_EditNameDialog` memiliki controller sendiri dan menutupnya hanya setelah widget dialog dibuang. Nama kosong ditolak. Nama tersimpan lewat `CharacterViewModel.updateName`.
+Nama diubah dari tab Profil Saya. Dialog `_EditNameDialog` memiliki controller sendiri dan menutupnya hanya setelah widget dialog dibuang. Nama kosong ditolak. Nama tersimpan lewat `CharacterViewModel.updateName`.
+
+### Avatar
+
+Tab Profil Saya adalah dashboard pengguna. Avatar besar bisa diketuk untuk membuka `AvatarPickerSheet`.
+
+Tujuh avatar bawaan ada di `assets/avatars/` dan `AvatarCatalog`:
+
+| ID | Label |
+| --- | --- |
+| `guardian` | Penjaga |
+| `mage` | Penyihir |
+| `scout` | Pengintai |
+| `knight` | Ksatria |
+| `scholar` | Cendekia |
+| `ranger` | Pemanah |
+| `healer` | Penyembuh |
+
+Nilai awal adalah `guardian`. Foto sendiri diambil dari galeri atau kamera lewat `image_picker`, disalin ke dokumen aplikasi sebagai `user_avatar.jpg`, lalu path-nya disimpan di `customAvatarPath`. Memilih avatar bawaan menghapus path foto. Jika file foto hilang, tampilan kembali ke avatar bawaan.
+
+Profil juga menyimpan `notificationSoundId`, dengan nilai awal `default`.
 
 ## 6. Kalender dan filter
 
@@ -166,15 +187,30 @@ Tanggal ditulis sebagai ISO-8601. JSON rusak tidak menjatuhkan aplikasi: quest k
 
 `NotificationService` adalah singleton. Inisialisasi dilakukan di `main()` sebelum UI.
 
-- Channel Android: `quest_reminders` / "Pengingat Quest".
-- Izin yang diminta: notifikasi, alarm presisi di Android, serta alert, badge, dan suara di iOS/macOS.
+- Setiap nada memakai channel Android sendiri, `quest_reminders_<id>`, karena Android mengunci suara channel setelah dibuat.
+- Izin yang diminta: notifikasi, alarm presisi, dan kamera di Android, serta alert, badge, dan suara di iOS/macOS.
 - Waktu gabungan dari tanggal quest dan `startTime` pada zona waktu perangkat.
 - Quest tanpa jam, jam tidak valid, sudah lewat, atau sudah selesai tidak dijadwalkan.
 - Mode utama `exactAllowWhileIdle`. Jika izin alarm presisi ditolak, jadwal diulang sebagai `inexactAllowWhileIdle`.
 - ID notifikasi adalah `questId.hashCode` 31-bit positif.
 - `init()` juga menjadwalkan ulang semua quest yang tersimpan.
 
-Izin Android yang dideklarasikan: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, `VIBRATE`, dan `SCHEDULE_EXACT_ALARM`.
+Izin Android yang dideklarasikan: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, `VIBRATE`, `SCHEDULE_EXACT_ALARM`, dan `CAMERA`.
+
+### Suara yang bisa dipilih
+
+Kartu "Suara Pengingat" ada di tab Papan Guild. Pilihan disimpan di profil dan langsung menjadwalkan ulang quest yang masih menunggu. Memilih nada juga menampilkan satu notifikasi contoh.
+
+| ID | Label | Sumber |
+| --- | --- | --- |
+| `default` | Nada sistem | suara channel Android |
+| `silent` | Senyap | tanpa suara |
+| `bell` | Lonceng | `res/raw/bell.wav` |
+| `chime` | Lonceng angin | `res/raw/chime.wav` |
+| `horn` | Terompet guild | `res/raw/horn.wav` |
+| `pulse` | Denyut | `res/raw/pulse.wav` |
+
+ID yang tidak dikenal kembali menjadi `default`. File WAV dibuat sebagai nada pendek, bukan rekaman pihak ketiga.
 
 ## 9. Sinkronisasi
 
@@ -199,7 +235,7 @@ Tema gelap ada di `lib/ui/core/themes/app_theme.dart`.
 
 `GuildBackdrop` menggambar gradasi, dua cahaya radial, dan 28 bintang. Angka bintang tetap karena memakai seed, bukan acak setiap frame.
 
-Material 3 dipakai. Tidak ada font kustom atau aset gambar di `pubspec.yaml`; ikon UI berasal dari Material dan Cupertino.
+Material 3 dipakai. Tidak ada font kustom. Aset gambar yang didaftarkan adalah `assets/avatars/`. Ikon UI berasal dari Material dan Cupertino. Avatar bawaan digambar dengan `flutter_svg`.
 
 ## 11. Ketergantungan
 
@@ -214,6 +250,9 @@ Runtime:
 | `flutter_local_notifications` | pengingat |
 | `timezone` dan `flutter_timezone` | jadwal zona lokal |
 | `cupertino_icons` | ikon iOS |
+| `image_picker` | galeri dan kamera untuk foto profil |
+| `path_provider` | lokasi penyimpanan foto profil |
+| `flutter_svg` | avatar bawaan SVG |
 
 Dev: `flutter_test` dan `flutter_lints`.
 
@@ -252,9 +291,11 @@ Build rilis saat ini masih memakai signing config debug. Sebelum distribusi, app
 - hadiah bawaan rank E dan S;
 - serialisasi quest;
 - rumus EXP level 1–3;
-- kenaikan level saat EXP melebihi ambang.
+- kenaikan level saat EXP melebihi ambang;
+- avatar bawaan, penggantian foto sendiri, dan pemulihan avatar bawaan;
+- penyimpanan ID suara notifikasi di profil.
 
-Belum ada tes untuk dialog nama, notifikasi pada perangkat, kalender, atau pembatalan quest.
+Belum ada tes untuk dialog nama, bunyi notifikasi pada perangkat, kalender, atau pembatalan quest.
 
 ## 14. Git dan file yang diabaikan
 
@@ -277,9 +318,13 @@ Belum ada tes untuk dialog nama, notifikasi pada perangkat, kalender, atau pemba
 - Membatalkan quest tidak mengembalikan hadiah.
 - Pencarian quest ada di state, tetapi belum ditampilkan.
 - Nama aplikasi di launcher Android masih `quest_kalender`, sedangkan judul Flutter adalah "Quest Kalender".
+- Empat nada kustom baru terdengar setelah aplikasi dipasang ulang, karena channel Android dibuat bersama pemasangan itu.
+- Nada kustom belum disalin ke bundel iOS. Pilihan tetap tersimpan, tetapi perangkat Apple memakai suara sistem atau senyap.
 - Plugin `flutter_timezone` masih memakai Kotlin Gradle Plugin lama. Flutter memperingatkan bahwa versi mendatang dapat menolak build sampai plugin itu diperbarui.
 - Kesalahan penyimpanan hanya dicatat dengan kembali ke data awal, tanpa laporan ke pengguna.
 
 ## 16. Riwayat perilaku penting
 
 Dialog ubah nama sempat error karena `TextEditingController` dihancurkan saat dialog masih membongkar field-nya. Controller sekarang dimiliki `_EditNameDialog` dan dihancurkan di `dispose()`.
+
+Pita kuning-hitam "overflowed" sempat muncul di pemilih avatar karena isinya lebih tinggi dari layar. Sheet itu sekarang bisa digulir dan tinggi selnya dibatasi.

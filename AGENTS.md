@@ -28,8 +28,11 @@ Branch kerja: `master`
 3. Widget dialog yang memegang `TextEditingController` harus `StatefulWidget`, dan controller hanya di-`dispose` di `dispose()` widget itu.
 4. Quest dan profil disimpan sebagai JSON di `SharedPreferences`. Pertahankan kunci `quest_kalender_quests_v1` dan `quest_kalender_profile_v1`, atau sediakan migrasi jika formatnya berubah.
 5. Notifikasi dijadwalkan dari jam mulai quest (`HH:mm`) lewat `NotificationService`. Quest selesai, tanpa jam, atau yang waktunya sudah lewat tidak boleh tetap terjadwal.
-6. UI baru harus memakai warna di `AppTheme`, bukan warna acak di luar palet yang sudah ada.
-7. Salinan untuk pengguna tetap bahasa Indonesia.
+6. Suara pengingat memakai ID di `NotificationSounds`. Jangan memakai satu channel Android untuk semua nada: Android mengunci suara channel saat pertama dibuat. Nada baru butuh file di `android/app/src/main/res/raw/` dan entri katalog.
+7. Avatar bawaan ada di `assets/avatars/` dan `AvatarCatalog`. Foto pengguna disalin ke dokumen aplikasi, bukan disimpan dari path galeri sementara.
+8. UI baru harus memakai warna di `AppTheme`, bukan warna acak di luar palet yang sudah ada.
+9. Salinan untuk pengguna tetap bahasa Indonesia.
+10. Bottom sheet yang isinya bisa lebih tinggi dari layar harus bisa digulir. Jangan biarkan overflow pita kuning-hitam.
 
 ## Perintah
 
