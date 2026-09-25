@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
+import 'package:quest_kalender/ui/core/widgets/animated_tap_menu.dart';
 import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 
 class AddQuestDialog extends StatefulWidget {
@@ -28,12 +29,22 @@ class AddQuestDialog extends StatefulWidget {
         opaque: false,
         barrierDismissible: true,
         barrierColor: const Color(0x8A000000),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
+        transitionDuration: const Duration(milliseconds: 200),
+        reverseTransitionDuration: const Duration(milliseconds: 160),
         pageBuilder: (context, animation, secondaryAnimation) {
-          return AddQuestDialog(
-            initialDate: initialDate,
-            existingQuest: existingQuest,
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.95, end: 1.0).animate(curved),
+              child: AddQuestDialog(
+                initialDate: initialDate,
+                existingQuest: existingQuest,
+              ),
+            ),
           );
         },
       ),
@@ -398,27 +409,11 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                       runSpacing: 8,
                       children: QuestRank.values.map((rank) {
                         final isSelected = _selectedRank == rank;
-                        return ChoiceChip(
-                          selectedColor: rank.color.withAlpha(60),
-                          backgroundColor: AppTheme.surfaceLighter,
-                          side: BorderSide(
-                            color: isSelected ? rank.color : Colors.transparent,
-                            width: 1.5,
-                          ),
-                          label: Text(
-                            'Rank ${rank.code} (${rank.label})',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected ? rank.color : Colors.white70,
-                            ),
-                          ),
+                        return AnimatedMenuChip(
+                          label: 'Rank ${rank.code} (${rank.label})',
+                          activeColor: rank.color,
                           selected: isSelected,
-                          onSelected: (selected) {
-                            if (selected) setState(() => _selectedRank = rank);
-                          },
+                          onTap: () => setState(() => _selectedRank = rank),
                         );
                       }).toList(),
                     ),
@@ -439,30 +434,12 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                       runSpacing: 8,
                       children: QuestCategory.values.map((cat) {
                         final isSelected = _selectedCategory == cat;
-                        return ChoiceChip(
-                          avatar: Icon(cat.icon, size: 14, color: cat.color),
-                          selectedColor: cat.color.withAlpha(60),
-                          backgroundColor: AppTheme.surfaceLighter,
-                          side: BorderSide(
-                            color: isSelected ? cat.color : Colors.transparent,
-                            width: 1.5,
-                          ),
-                          label: Text(
-                            cat.label,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected ? cat.color : Colors.white70,
-                            ),
-                          ),
+                        return AnimatedMenuChip(
+                          icon: cat.icon,
+                          label: cat.label,
+                          activeColor: cat.color,
                           selected: isSelected,
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() => _selectedCategory = cat);
-                            }
-                          },
+                          onTap: () => setState(() => _selectedCategory = cat),
                         );
                       }).toList(),
                     ),

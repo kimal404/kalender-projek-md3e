@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
+import 'package:quest_kalender/ui/core/widgets/animated_tap_menu.dart';
 import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 
 class CalendarWidget extends StatelessWidget {
@@ -231,12 +232,13 @@ class CalendarWidget extends StatelessWidget {
 
   Widget _buildModeButton(String mode, String label, {bool expand = false}) {
     final isSelected = viewModel.calendarViewMode == mode;
-    return InkWell(
+    return AnimatedPressScale(
+      isSelected: false,
+      pressedScale: 0.93,
       onTap: () => viewModel.setCalendarViewMode(mode),
-      borderRadius: BorderRadius.circular(7),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 190),
+        curve: Curves.easeOutCubic,
         alignment: expand ? Alignment.center : null,
         padding: EdgeInsets.symmetric(
           horizontal: expand ? 4 : 10,
@@ -246,13 +248,17 @@ class CalendarWidget extends StatelessWidget {
           color: isSelected ? AppTheme.primaryGold : Colors.transparent,
           borderRadius: BorderRadius.circular(7),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 190),
+          curve: Curves.easeOutCubic,
           style: TextStyle(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             color: isSelected ? Colors.black : Colors.white70,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
           ),
         ),
       ),
@@ -325,11 +331,13 @@ class CalendarWidget extends StatelessWidget {
       final questsOnDay = viewModel.getQuestsForDate(date);
 
       dayWidgets.add(
-        InkWell(
+        AnimatedPressScale(
+          isSelected: isSelected,
+          selectedScale: 1.04,
+          pressedScale: 0.91,
           onTap: () => viewModel.selectDate(date),
-          borderRadius: BorderRadius.circular(10),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
             margin: const EdgeInsets.all(2),
             decoration: BoxDecoration(
@@ -391,7 +399,7 @@ class CalendarWidget extends StatelessWidget {
         headerRow,
         const SizedBox(height: 6),
         AnimatedSwitcher(
-          duration: const Duration(milliseconds: 240),
+          duration: const Duration(milliseconds: 200),
           switchInCurve: Curves.easeOutCubic,
           switchOutCurve: Curves.easeInCubic,
           child: GridView.count(
@@ -430,11 +438,13 @@ class CalendarWidget extends StatelessWidget {
         final dayName = DateFormat('E').format(date);
 
         return Expanded(
-          child: InkWell(
+          child: AnimatedPressScale(
+            isSelected: isSelected,
+            selectedScale: 1.03,
+            pressedScale: 0.92,
             onTap: () => viewModel.selectDate(date),
-            borderRadius: BorderRadius.circular(10),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 180),
               curve: Curves.easeOutCubic,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),

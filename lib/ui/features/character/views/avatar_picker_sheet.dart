@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:quest_kalender/domain/models/avatar_catalog.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
+import 'package:quest_kalender/ui/core/widgets/animated_tap_menu.dart';
 import 'package:quest_kalender/ui/features/character/view_models/character_view_model.dart';
 import 'package:quest_kalender/ui/features/character/views/avatar_view.dart';
 
@@ -165,38 +166,60 @@ class _AvatarChoice extends StatelessWidget {
       avatarId: avatar.id,
     );
 
-    return InkWell(
+    return AnimatedPressScale(
+      isSelected: selected,
+      selectedScale: 1.05,
+      pressedScale: 0.92,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              AvatarView(profile: preview, size: 52),
-              if (selected)
-                const Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Icon(
-                    Icons.check_circle,
-                    color: AppTheme.primaryGold,
-                    size: 18,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppTheme.primaryGold.withAlpha(28)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? AppTheme.primaryGold : Colors.transparent,
+            width: 1.2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                AvatarView(profile: preview, size: 48),
+                if (selected)
+                  const Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Icon(
+                      Icons.check_circle,
+                      color: AppTheme.primaryGold,
+                      size: 16,
+                    ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            avatar.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 11,
-              color: selected ? AppTheme.primaryGold : Colors.white70,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              style: TextStyle(
+                fontSize: 11,
+                color: selected ? AppTheme.primaryGold : Colors.white70,
+                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              ),
+              child: Text(
+                avatar.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:quest_kalender/domain/models/notification_sound.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
+import 'package:quest_kalender/ui/core/widgets/animated_tap_menu.dart';
 import 'package:quest_kalender/ui/core/widgets/guild_backdrop.dart';
 import 'package:quest_kalender/ui/features/calendar/views/calendar_widget.dart';
 import 'package:quest_kalender/ui/features/character/view_models/character_view_model.dart';
@@ -92,14 +93,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: CircularProgressIndicator(color: AppTheme.primaryGold),
               )
             : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 320),
+                duration: const Duration(milliseconds: 210),
                 switchInCurve: Curves.easeOutCubic,
                 switchOutCurve: Curves.easeInCubic,
                 transitionBuilder: (child, animation) {
                   return FadeTransition(
                     opacity: animation,
-                    child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.015),
+                        end: Offset.zero,
+                      ).animate(animation),
                       child: child,
                     ),
                   );
@@ -114,20 +118,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: AnimatedRpgBottomNav(
         currentIndex: _currentTabIndex,
-        onTap: (index) => setState(() => _currentTabIndex = index),
+        onTap: (index) {
+          if (_currentTabIndex != index) {
+            setState(() => _currentTabIndex = index);
+          }
+        },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
+          AnimatedNavItem(
+            icon: Icons.calendar_month,
             label: 'Kalender & Quest',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+          AnimatedNavItem(
+            icon: Icons.person,
             label: 'Profil Saya',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shield),
+          AnimatedNavItem(
+            icon: Icons.shield,
             label: 'Papan Guild',
           ),
         ],
@@ -605,21 +613,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildFilterChips(QuestViewModel questVM) {
+    final isAllSelected =
+        questVM.selectedCategory == null && questVM.selectedRank == null;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
           // Filter Semua
-          FilterChip(
-            label: const Text('Semua'),
-            selected:
-                questVM.selectedCategory == null &&
-                questVM.selectedRank == null,
-            onSelected: (_) {
+          AnimatedMenuChip(
+            label: 'Semua',
+            icon: Icons.apps_rounded,
+            activeColor: AppTheme.primaryGold,
+            selected: isAllSelected,
+            onTap: () {
               questVM.setCategoryFilter(null);
               questVM.setRankFilter(null);
             },
-            selectedColor: AppTheme.primaryGold.withAlpha(60),
           ),
           const SizedBox(width: 8),
 
@@ -628,13 +639,13 @@ class _HomeScreenState extends State<HomeScreen> {
             final isSelected = questVM.selectedCategory == cat;
             return Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: FilterChip(
-                avatar: Icon(cat.icon, size: 14, color: cat.color),
-                label: Text(cat.label),
+              child: AnimatedMenuChip(
+                icon: cat.icon,
+                label: cat.label,
+                activeColor: cat.color,
                 selected: isSelected,
-                selectedColor: cat.color.withAlpha(60),
-                onSelected: (val) {
-                  questVM.setCategoryFilter(val ? cat : null);
+                onTap: () {
+                  questVM.setCategoryFilter(isSelected ? null : cat);
                 },
               ),
             );
@@ -645,12 +656,12 @@ class _HomeScreenState extends State<HomeScreen> {
             final isSelected = questVM.selectedRank == rank;
             return Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: FilterChip(
-                label: Text('Rank ${rank.code}'),
+              child: AnimatedMenuChip(
+                label: 'Rank ${rank.code}',
+                activeColor: rank.color,
                 selected: isSelected,
-                selectedColor: rank.color.withAlpha(60),
-                onSelected: (val) {
-                  questVM.setRankFilter(val ? rank : null);
+                onTap: () {
+                  questVM.setRankFilter(isSelected ? null : rank);
                 },
               ),
             );
@@ -1182,44 +1193,96 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           ...NotificationSounds.options.map((sound) {
             final isSelected = sound.id == selected.id;
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(
-                isSelected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_off,
-                color: isSelected ? AppTheme.primaryGold : AppTheme.textMuted,
-              ),
-              title: Text(
-                sound.label,
-                style: TextStyle(
-                  color: isSelected ? AppTheme.primaryGold : Colors.white,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 14,
-                ),
-              ),
-              trailing: IconButton(
-                tooltip: sound.id == 'silent'
-                    ? 'Mode senyap'
-                    : 'Putar suara ${sound.label}',
-                icon: Icon(
-                  sound.id == 'silent'
-                      ? Icons.volume_off_rounded
-                      : Icons.volume_up_rounded,
-                  size: 20,
-                  color: isSelected ? AppTheme.primaryGold : AppTheme.textMuted,
-                ),
-                onPressed: () {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: AnimatedPressScale(
+                isSelected: isSelected,
+                selectedScale: 1.01,
+                pressedScale: 0.97,
+                onTap: () async {
+                  final questVM = context.read<QuestViewModel>();
                   NotificationService.instance.previewCurrentSound(sound.id);
+                  await charVM.updateNotificationSound(sound.id);
+                  await questVM.rescheduleNotifications();
                 },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppTheme.primaryGold.withAlpha(28)
+                        : AppTheme.surfaceLighter.withAlpha(110),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppTheme.primaryGold.withAlpha(160)
+                          : Colors.transparent,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      AnimatedScale(
+                        scale: isSelected ? 1.12 : 1.0,
+                        duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOutCubic,
+                        child: Icon(
+                          isSelected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          size: 20,
+                          color: isSelected
+                              ? AppTheme.primaryGold
+                              : AppTheme.textMuted,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
+                          style: TextStyle(
+                            fontFamily: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.fontFamily,
+                            color: isSelected
+                                ? AppTheme.primaryGold
+                                : Colors.white,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            fontSize: 14,
+                          ),
+                          child: Text(sound.label),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: sound.id == 'silent'
+                            ? 'Mode senyap'
+                            : 'Putar suara ${sound.label}',
+                        icon: Icon(
+                          sound.id == 'silent'
+                              ? Icons.volume_off_rounded
+                              : Icons.volume_up_rounded,
+                          size: 20,
+                          color: isSelected
+                              ? AppTheme.primaryGold
+                              : AppTheme.textMuted,
+                        ),
+                        onPressed: () {
+                          NotificationService.instance.previewCurrentSound(
+                            sound.id,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              onTap: () async {
-                final questVM = context.read<QuestViewModel>();
-                // Putar suara langsung seketika saat dipilih
-                NotificationService.instance.previewCurrentSound(sound.id);
-                await charVM.updateNotificationSound(sound.id);
-                await questVM.rescheduleNotifications();
-              },
             );
           }),
         ],
