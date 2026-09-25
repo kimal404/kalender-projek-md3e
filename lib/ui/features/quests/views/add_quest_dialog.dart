@@ -442,8 +442,9 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                           ),
                           selected: isSelected,
                           onSelected: (selected) {
-                            if (selected)
+                            if (selected) {
                               setState(() => _selectedCategory = cat);
+                            }
                           },
                         );
                       }).toList(),

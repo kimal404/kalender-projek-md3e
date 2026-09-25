@@ -78,10 +78,7 @@ class _QuestCardState extends State<QuestCard>
     return FadeTransition(
       opacity: _fadeAnim,
       child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, 0.05),
-          end: Offset.zero,
-        ).animate(_fadeAnim),
+        position: _slideAnim,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 380),
           curve: Curves.easeOutCubic,

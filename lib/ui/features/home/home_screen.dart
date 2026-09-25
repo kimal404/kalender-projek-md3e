@@ -104,33 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
-                duration: const Duration(milliseconds: 320),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                duration: const Duration(milliseconds: 280),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.02),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
                 child: KeyedSubtree(
                   key: ValueKey<int>(_currentTabIndex),
                   child: [
@@ -1205,9 +1178,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
               onTap: () async {
+                final questVM = context.read<QuestViewModel>();
                 await charVM.updateNotificationSound(sound.id);
-                if (!context.mounted) return;
-                await context.read<QuestViewModel>().rescheduleNotifications();
+                await questVM.rescheduleNotifications();
                 await NotificationService.instance.previewCurrentSound();
               },
             );

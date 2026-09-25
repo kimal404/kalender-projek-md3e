@@ -172,7 +172,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                       animation: Listenable.merge([_glowAnim, _breatheAnim]),
                       builder: (context, child) {
                         return Transform.scale(
-                          scale: Tween<double>(begin: 0.92, end: 1.0).animate(_breatheAnim),
+                          scale: Tween<double>(begin: 0.92, end: 1.0).animate(_breatheAnim).value,
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(

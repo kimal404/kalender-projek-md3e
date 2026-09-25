@@ -319,8 +319,6 @@ class CalendarWidget extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
-              child: AnimatedContainer(
-              child: AnimatedContainer(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
