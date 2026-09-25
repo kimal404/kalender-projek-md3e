@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Quest Kalender — kalender quest bergaya RPG.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Quest Kalender">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Quest Kalender</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #121420;
+      color: #fff;
+      font-family: "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    #boot-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 82% 8%, rgba(255, 179, 0, 0.22), transparent 34%),
+        radial-gradient(circle at 12% 78%, rgba(213, 0, 249, 0.18), transparent 36%),
+        linear-gradient(180deg, #1c1833 0%, #121420 46%, #0c0e16 100%);
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #boot-splash.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .stars, .stars::before, .stars::after {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow:
+        8vw 12vh #fff, 18vw 28vh #fff8, 27vw 8vh #fff6,
+        41vw 18vh #fff, 55vw 9vh #fff7, 63vw 24vh #fff,
+        74vw 14vh #fff8, 88vw 22vh #fff, 12vw 46vh #fff6,
+        22vw 62vh #fff, 36vw 71vh #fff8, 49vw 58vh #fff,
+        67vw 66vh #fff7, 81vw 74vh #fff, 92vw 52vh #fff6,
+        6vw 84vh #fff, 31vw 88vh #fff8, 58vw 91vh #fff,
+        77vw 86vh #fff7, 94vw 90vh #fff6;
+      animation: twinkle 2.8s ease-in-out infinite;
+    }
+
+    .stars::before, .stars::after { content: ""; }
+    .stars::before { transform: translate(4vw, 6vh) scale(0.7); animation-delay: 0.6s; }
+    .stars::after { transform: translate(-6vw, -4vh) scale(1.2); animation-delay: 1.2s; }
+
+    .stage {
+      position: relative;
+      width: 280px;
+      text-align: center;
+    }
+
+    .orbit {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      margin: 0 auto 28px;
+    }
+
+    .ring, .ring-inner {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #ffb300;
+      border-right-color: rgba(255, 179, 0, 0.35);
+      animation: spin 1.6s linear infinite;
+    }
+
+    .ring-inner {
+      inset: 14px;
+      border-top-color: #00e5ff;
+      border-left-color: rgba(0, 229, 255, 0.4);
+      animation-direction: reverse;
+      animation-duration: 1.1s;
+    }
+
+    .emblem {
+      position: absolute;
+      inset: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #ffb300, #ff8f00);
+      box-shadow: 0 0 28px rgba(255, 179, 0, 0.55);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .emblem svg { width: 42px; height: 42px; }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.22em;
+      font-weight: 900;
+      background: linear-gradient(90deg, #ffb300, #ffe082, #ffb300);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 2.2s linear infinite;
+    }
+
+    #boot-status {
+      margin: 10px 0 22px;
+      min-height: 20px;
+      color: #9e9e9e;
+      font-size: 14px;
+    }
+
+    .bar {
+      width: 190px;
+      height: 4px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #2b304a;
+    }
+
+    .bar span {
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, transparent, #ffb300, #fff3c4, #ffb300, transparent);
+      animation: slide 1.15s ease-in-out infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.96); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes shimmer { to { background-position: 200% center; } }
+    @keyframes slide {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(280%); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="boot-splash">
+    <div class="stars"></div>
+    <div class="stage">
+      <div class="orbit">
+        <div class="ring"></div>
+        <div class="ring-inner"></div>
+        <div class="emblem">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4Z" fill="#121420"/>
+            <path d="M12 7.2 9.2 12h2.1V16l2.7-4.8h-2.1V7.2Z" fill="#ffb300"/>
+          </svg>
+        </div>
+      </div>
+      <h1>QUEST KALENDER</h1>
+      <p id="boot-status">Membuka gerbang guild...</p>
+      <div class="bar"><span></span></div>
+    </div>
+  </div>
+
+  <script>
+    const status = document.getElementById('boot-status');
+    const lines = [
+      'Membuka gerbang guild...',
+      'Menyusun kalender quest...',
+      'Menyiapkan papan status...',
+      'Memanggil petualang...'
+    ];
+    let line = 0;
+    const statusTimer = setInterval(() => {
+      line = (line + 1) % lines.length;
+      if (status) status.textContent = lines[line];
+    }, 1400);
+
+    function dismissSplash() {
+      const splash = document.getElementById('boot-splash');
+      if (!splash || splash.classList.contains('hide')) return;
+      clearInterval(statusTimer);
+      splash.classList.add('hide');
+      setTimeout(() => splash.remove(), 500);
+    }
+
+    window.addEventListener('flutter-first-frame', dismissSplash);
+    // Cadangan jika frame pertama tidak mengirim sinyal.
+    setTimeout(dismissSplash, 20000);
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
