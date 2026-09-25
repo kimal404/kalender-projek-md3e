@@ -44,8 +44,21 @@ class AvatarPickerSheet extends StatelessWidget {
       if (photo == null) return;
 
       final directory = await getApplicationDocumentsDirectory();
-      final saved = File('${directory.path}/user_avatar.jpg');
+      final prevPath = characterViewModel.profile.customAvatarPath;
+      final saved = File(
+        '${directory.path}/user_avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
       await File(photo.path).copy(saved.path);
+
+      if (prevPath != null && prevPath.isNotEmpty && prevPath != saved.path) {
+        final oldFile = File(prevPath);
+        if (oldFile.existsSync()) {
+          try {
+            await oldFile.delete();
+          } catch (_) {}
+        }
+      }
+      await FileImage(saved).evict();
 
       await characterViewModel.updateAvatar(
         avatarId: characterViewModel.profile.avatarId,
