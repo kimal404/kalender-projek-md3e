@@ -51,89 +51,199 @@ class CalendarWidget extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final monthYearStr = DateFormat('MMMM yyyy').format(viewModel.currentMonth);
 
-    return Row(
-      children: [
-        // Bulan & Tahun
-        Text(
-          monthYearStr,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(width: 4),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 460;
 
-        // Tombol Kembali ke Hari Ini
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          onPressed: () => viewModel.selectDate(DateTime.now()),
-          child: const Text(
-            'Hari Ini',
-            style: TextStyle(
-              fontSize: 12,
-              color: AppTheme.primaryGold,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-
-        const Spacer(),
-
-        // Tombol Prev & Next Bulan
-        IconButton(
-          icon: const Icon(Icons.chevron_left, size: 20),
-          visualDensity: VisualDensity.compact,
-          onPressed: viewModel.previousMonth,
-        ),
-        IconButton(
-          icon: const Icon(Icons.chevron_right, size: 20),
-          visualDensity: VisualDensity.compact,
-          onPressed: viewModel.nextMonth,
-        ),
-
-        const SizedBox(width: 4),
-
-        // Pilihan Mode (Bulan, Minggu, Hari)
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceLighter,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.all(2),
-          child: Row(
+        if (isCompact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildModeButton('month', 'Bulan'),
-              _buildModeButton('week', 'Minggu'),
-              _buildModeButton('day', 'Hari'),
+              Row(
+                children: [
+                  // Bulan & Tahun
+                  Flexible(
+                    child: Text(
+                      monthYearStr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+
+                  // Tombol Kembali ke Hari Ini
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      backgroundColor: AppTheme.primaryGold.withAlpha(25),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () => viewModel.selectDate(DateTime.now()),
+                    child: const Text(
+                      'Hari Ini',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.primaryGold,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // Tombol Prev & Next Bulan
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, size: 20),
+                    visualDensity: VisualDensity.compact,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onPressed: viewModel.previousMonth,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, size: 20),
+                    visualDensity: VisualDensity.compact,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onPressed: viewModel.nextMonth,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Pilihan Mode (Bulan, Minggu, Hari) Full Width di Portrait
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceLighter,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.all(3),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildModeButton('month', 'Bulan', expand: true),
+                    ),
+                    Expanded(
+                      child: _buildModeButton('week', 'Minggu', expand: true),
+                    ),
+                    Expanded(
+                      child: _buildModeButton('day', 'Hari', expand: true),
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ),
-        ),
-      ],
+          );
+        }
+
+        // Tampilan Landscape / Layar Lebar
+        return Row(
+          children: [
+            // Bulan & Tahun
+            Text(
+              monthYearStr,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 6),
+
+            // Tombol Kembali ke Hari Ini
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              onPressed: () => viewModel.selectDate(DateTime.now()),
+              child: const Text(
+                'Hari Ini',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.primaryGold,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            // Tombol Prev & Next Bulan
+            IconButton(
+              icon: const Icon(Icons.chevron_left, size: 20),
+              visualDensity: VisualDensity.compact,
+              onPressed: viewModel.previousMonth,
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right, size: 20),
+              visualDensity: VisualDensity.compact,
+              onPressed: viewModel.nextMonth,
+            ),
+
+            const SizedBox(width: 4),
+
+            // Pilihan Mode (Bulan, Minggu, Hari)
+            Container(
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceLighter,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.all(2),
+              child: Row(
+                children: [
+                  _buildModeButton('month', 'Bulan'),
+                  _buildModeButton('week', 'Minggu'),
+                  _buildModeButton('day', 'Hari'),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildModeButton(String mode, String label) {
+  Widget _buildModeButton(String mode, String label, {bool expand = false}) {
     final isSelected = viewModel.calendarViewMode == mode;
     return InkWell(
       onTap: () => viewModel.setCalendarViewMode(mode),
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(7),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        alignment: expand ? Alignment.center : null,
+        padding: EdgeInsets.symmetric(
+          horizontal: expand ? 4 : 10,
+          vertical: expand ? 6 : 4,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.primaryGold : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(7),
         ),
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             color: isSelected ? Colors.black : Colors.white70,
           ),
