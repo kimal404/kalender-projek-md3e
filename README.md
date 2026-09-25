@@ -1,34 +1,49 @@
 # Quest Kalender
 
-Kalender tugas harian bergaya RPG. Quest yang selesai memberi EXP, koin, atribut, level, dan streak. Semua data tersimpan di perangkat, dalam bahasa Indonesia.
+Kalender tugas harian bergaya RPG. Setiap quest yang diselesaikan memberikan **EXP**, meningkatkan **Atribut Karakter (STR / INT / DIS / VIT)**, menaikkan **Level & Gelar**, serta menjaga **Streak Harian**. Seluruh data tersimpan secara lokal di perangkat dalam bahasa Indonesia.
 
-Versi `1.0.0+1` · Flutter · Android dan Web · [Dokumentasi lengkap](docs/DOKUMENTASI.md)
+Versi `1.0.0+1` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
 
-## Fitur
+## Fitur Utama
 
-- Kalender bulan dengan quest per tanggal, filter kategori, dan filter rank E sampai S.
-- Kontrak harian yang menandai hari selesai bila semua quest tuntas.
-- Profil petualang: nama, gelar, level, EXP, koin, streak, dan empat atribut.
-- Tujuh avatar bawaan, plus foto sendiri dari galeri atau kamera.
-- Pengingat pada jam mulai quest, dengan enam pilihan suara.
-- Papan guild untuk ringkasan misi dan sebaran rank.
+- **Kalender Responsif (`Bulan | Minggu | Hari`)**: Tampilan nama bulan lengkap tanpa terpotong baik di mode portrait maupun landscape, dilengkapi indikator dot quest per tanggal, filter kategori, dan filter Rank `E` sampai `S`.
+- **Tugas 1 Kali Pakai (Terkunci Saat Selesai)**: Setiap quest yang sudah di-checklist otomatis terkunci (`Terkunci • 1x Pakai`) dan tidak dapat di-uncheck kembali untuk mencegah *farming* EXP berulang.
+- **Sistem Limit EXP Harian (`500 EXP / Hari`)**: Setiap tanggal memiliki kuota maksimal **500 EXP/hari**. Dialog tambah quest menampilkan sisa kuota EXP harian secara *real-time*, menyesuaikan hadiah EXP bila mendekati batas, dan mengunci penambahan quest baru jika kuota tanggal tersebut sudah penuh.
+- **Kontrak Harian Guild**: Menampilkan progres ketuntasan misi harian serta pantauan **Limit EXP Harian (`X / 500 EXP Diklaim` & `Terjadwal`)**.
+- **Profil Petualang & Kustomisasi Avatar**: Nama, gelar otomatis berdasarkan level, bar EXP, level karakter, streak aktif, empat atribut RPG (`STR`, `INT`, `DIS`, `VIT`), 7 avatar SVG bawaan, serta dukungan unggah foto dari Galeri atau Kamera.
+- **Suara Pengingat Kustom (Native Audio & Notifikasi)**: Pengingat tepat pada jam mulai quest dengan 6 pilihan nada (`Default`, `Lonceng`, `Lonceng Angin`, `Terompet Guild`, `Denyut`, `Senyap`) yang dapat langsung diputar (*preview*) dari tab **Papan Guild**.
+- **Animasi Menu Smooth & Ringan (`60fps+` GPU-Accelerated)**: Seluruh menu, navigasi bawah (`AnimatedRpgBottomNav`), chip filter/pilihan (`AnimatedMenuChip`), sel tanggal kalender, hingga checkbox menggunakan animasi transformasi ringan tanpa membebani perangkat.
 
-## Cara bermain
+## Cara Bermain & Aturan RPG
 
-Membuat quest memilih tanggal, jam, rank, dan kategori. Rank menentukan hadiah bawaan: E memberi 25 EXP, S memberi 500 EXP. Menyelesaikan quest menaikkan satu atribut sesuai kategorinya.
+Saat membuat quest baru, pengguna memilih tanggal, jam mulai/selesai, tingkat kesulitan (**Rank**), dan **Kategori Atribut**. Rank menentukan hadiah EXP dasar (sebelum disesuaikan sisa kuota harian):
+
+| Rank | Label | Hadiah Dasar EXP |
+| :---: | --- | ---: |
+| **E** | Novice | `25 EXP` |
+| **D** | Apprentice | `50 EXP` |
+| **C** | Adept | `100 EXP` |
+| **B** | Expert | `200 EXP` |
+| **A** | Master | `350 EXP` |
+| **S** | Legendary | `500 EXP` |
+
+Menyelesaikan quest dalam kuota harian menaikkan `+1` poin atribut sesuai kategorinya:
 
 | Kategori | Atribut |
 | --- | --- |
-| Kekuatan | STR |
-| Kecerdasan | INT |
-| Disiplin | DIS |
-| Kebugaran | VIT |
+| Kekuatan | **STR** (*Strength*) |
+| Kecerdasan | **INT** (*Intellect*) |
+| Disiplin | **DIS** (*Discipline*) |
+| Kebugaran | **VIT** (*Vitality*) |
 
-EXP untuk naik level adalah `100 + (level - 1) × 75`. Gelar berubah dari F-Rank Novice hingga Mythic Grandmaster di level 50. Streak bertambah jika aplikasi dibuka pada hari berikutnya, dan kembali ke 1 jika putus. Membatalkan quest yang sudah selesai tidak menarik kembali hadiahnya.
+- **Rumus Kebutuhan EXP Naik Level**: `100 + (level - 1) × 75`
+- **Batas Maksimal EXP Harian**: `500 EXP / hari` (tercatat permanen di profil untuk hari tersebut meskipun quest yang sudah selesai dihapus).
+- **Gelar Petualang**: Naik bertahap dari *F-Rank Novice* (Lv. 1) hingga *Mythic Grandmaster* (Lv. 50+).
+- **Streak Harian**: Bertambah `+1` jika aplikasi dibuka pada hari berturut-turut, dan kembali ke `1` jika terlewat lebih dari satu hari.
 
-## Menjalankan
+## Menjalankan & Membangun Aplikasi
 
-Perlu Flutter SDK yang sesuai `pubspec.yaml` (`Dart ^3.13.4`).
+Pastikan Flutter SDK terpasang sesuai `pubspec.yaml` (`Dart ^3.13.4`).
 
 ```powershell
 flutter pub get
@@ -37,25 +52,28 @@ flutter test
 flutter run -d <device-id>
 ```
 
-Perangkat USB dicek dengan `flutter devices`. Debug APK terbentuk di `build/app/outputs/flutter-apk/`.
+Untuk membangun APK Release Android:
 
-## Susunan
-
-```text
-lib/domain      model quest, profil, avatar, dan suara
-lib/data        penyimpanan lokal, notifikasi, dan repositori
-lib/ui          tema, kalender, profil, dan papan guild
-assets/avatars  tujuh avatar SVG
-android         aplikasi Android dan nada di res/raw
+```powershell
+flutter build apk --release
 ```
 
-State memakai `provider`. Quest dan profil disimpan sebagai JSON di `SharedPreferences`. Suara kustom berada di channel notifikasi terpisah karena Android mengunci suara channel setelah dibuat.
+Hasil build APK Release tersedia di `build/app/outputs/flutter-apk/app-release.apk`.
 
-## Batasan
+## Susunan Proyek
 
-- Belum ada sinkronisasi cloud sungguhan. Tombol periksa sinkronisasi hanya mengonfirmasi penyimpanan lokal.
-- Application ID masih `com.example.quest_kalender`, dan build rilis masih memakai kunci debug.
-- Ikon launcher masih ikon bawaan Flutter.
-- Nada kustom tersedia di Android. Di Apple, pilihan tersimpan tetapi suara bawaan aplikasi belum dibundel.
+```text
+lib/domain      model quest, profil (termasuk limit EXP harian), avatar, dan suara
+lib/data        penyimpanan lokal (SharedPreferences), notifikasi, dan repositori
+lib/ui          tema, widget animasi ringan, kalender, profil, dan papan guild
+assets/avatars  tujuh avatar SVG bawaan
+android         aplikasi Android, MainActivity MethodChannel audio, dan nada WAV di res/raw
+```
 
-Panduan untuk pengembang dan agen kode ada di [AGENTS.md](AGENTS.md).
+## Batasan Saat Ini
+
+- Penyimpanan dan sinkronisasi masih berjalan secara lokal (`SharedPreferences`). Tombol periksa sinkronisasi hanya mengonfirmasi status penyimpanan offline.
+- Application ID masih `com.example.quest_kalender`, dan build rilis masih menggunakan konfigurasi signing debug.
+- Pemutaran langsung nada kustom menggunakan native Android (`MediaPlayer` & `RingtoneManager`).
+
+Panduan teknis untuk pengembang dan agen kode tersedia di [AGENTS.md](AGENTS.md) dan [docs/DOKUMENTASI.md](docs/DOKUMENTASI.md).

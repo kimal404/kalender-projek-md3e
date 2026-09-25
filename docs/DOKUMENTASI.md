@@ -1,10 +1,10 @@
 # Dokumentasi Quest Kalender
 
-Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, data, build, dan batasan yang ada di kode saat ini.
+Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data, audio/notifikasi, animasi UI, proses build, dan batasan yang ada di kode saat ini.
 
 ## 1. Ringkasan
 
-Quest Kalender adalah aplikasi Flutter untuk mencatat tugas harian sebagai quest RPG. Pengguna memilih tanggal, membuat misi, menandainya selesai, lalu karakter mendapat pengalaman, koin, dan kenaikan atribut.
+**Quest Kalender** adalah aplikasi Flutter untuk mencatat jadwal dan tugas harian sebagai misi (*quest*) bergaya RPG. Pengguna memilih tanggal, menerbitkan quest dengan tingkat kesulitan (*Rank*) dan kategori atribut, lalu menandainya selesai untuk memperoleh **EXP**, menaikkan **Level & Gelar**, meningkatkan **Atribut Karakter (`STR`, `INT`, `DIS`, `VIT`)**, serta mempertahankan **Streak Harian**.
 
 | Item | Nilai |
 | --- | --- |
@@ -21,44 +21,43 @@ Quest Kalender adalah aplikasi Flutter untuk mencatat tugas harian sebagai quest
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 
-## 2. Yang dilihat pengguna
+## 2. Yang Dilihat Pengguna
 
 Alur buka aplikasi:
 
-1. Web menampilkan splash HTML `#boot-splash` sampai frame Flutter pertama, paling lama 20 detik.
-2. Android memakai warna latar `launch_background` tanpa gambar logo.
-3. `SplashScreen` Flutter menampilkan lambang perisai, teks "QUEST KALENDER", dan progress sekitar 900 milidetik, lalu berpindah ke `HomeScreen`.
+1. Web menampilkan splash HTML `#boot-splash` sampai frame Flutter pertama selesai dimuat.
+2. Android memakai warna latar `launch_background`.
+3. `SplashScreen` Flutter menampilkan lambang perisai dengan animasi *elastic scale*, efek kilau (*shimmer*), teks **"QUEST KALENDER"**, dan bilah progres halus, lalu berpindah ke `HomeScreen`.
 4. Pita debug Flutter dimatikan lewat `debugShowCheckedModeBanner: false`.
 
-`HomeScreen` punya header karakter dan tiga tab:
+`HomeScreen` memiliki header RPG di bagian atas dan tiga tab utama pada navigasi bawah beranimasi (`AnimatedRpgBottomNav`):
 
 | Tab | Isi |
 | --- | --- |
-| Kalender & Quest | Kontrak harian, kalender, filter kategori/rank, daftar quest tanggal terpilih, tombol quest baru |
-| Profil Saya | Dashboard pengguna: avatar, nama, gelar, level, statistik, dan empat atribut |
-| Papan Guild | Total, selesai, menunggu, sebaran rank, suara pengingat, dan tombol periksa sinkronisasi |
+| **Kalender & Quest** | Kontrak harian (beserta status Limit EXP Harian), kalender responsif (`Bulan \| Minggu \| Hari`), chip filter kategori/rank, daftar quest pada tanggal terpilih, dan tombol `Quest Baru` |
+| **Profil Saya** | Dashboard karakter: avatar, nama, gelar, level karakter, quest tuntas, streak aktif, dan empat atribut RPG (`STR`, `INT`, `DIS`, `VIT`) |
+| **Papan Guild** | Ringkasan total misi (Total, Terselesaikan, Menunggu), grafik sebaran quest per rank, pengaturan **Suara Pengingat** (dengan tombol *preview* langsung), dan status sinkronisasi lokal |
 
-Header menampilkan avatar, nama, gelar, streak, koin, dan bar EXP.
+Header atas menampilkan avatar, nama, gelar, badge streak harian dengan efek *pulse*, serta bilah progres EXP & Level.
 
-Quest kosong menampilkan ajakan menambah quest. Quest yang ada bisa ditandai selesai, diubah, atau dihapus. Hapus meminta konfirmasi.
-
-## 3. Struktur kode
+## 3. Struktur Kode
 
 ```text
 lib/
-  main.dart                         titik masuk, provider, locale
-  domain/models/                    Quest, profil, avatar, suara notifikasi
-  data/services/                    penyimpanan, notifikasi, stub sinkronisasi
-  data/repositories/                cache dan akses quest
-  ui/core/                          tema dan latar bintang
-  ui/features/splash/               splash dalam aplikasi
-  ui/features/home/                 dashboard dan dialog nama
-  ui/features/calendar/             kalender
-  ui/features/quests/               kartu, dialog, dan state quest
-  ui/features/character/            state karakter, avatar, dialog level up
-assets/avatars/                     tujuh avatar bawaan SVG
-test/                               tes widget dan aturan RPG
-android/                            proyek Android, termasuk nada di res/raw
+  main.dart                         titik masuk, MultiProvider, inisialisasi locale & notifikasi
+  domain/models/                    Quest, UserProfile, AvatarCatalog, NotificationSound
+  data/services/                    StorageService, NotificationService, AuthSyncService
+  data/repositories/                QuestRepository (cache memori & persistensi)
+  ui/core/themes/                   AppTheme (palet warna RPG dark mode)
+  ui/core/widgets/                  GuildBackdrop (latar bintang) & animated_tap_menu.dart (animasi menu 60fps)
+  ui/features/splash/               SplashScreen dengan animasi shimmer
+  ui/features/home/                 HomeScreen dan _EditNameDialog
+  ui/features/calendar/             CalendarWidget (mode Bulan, Minggu, Hari responsif)
+  ui/features/quests/               QuestCard, AddQuestDialog, dan QuestViewModel
+  ui/features/character/            CharacterViewModel, AvatarView, AvatarPickerSheet, LevelUpDialog
+assets/avatars/                     tujuh avatar bawaan berformat SVG
+test/                               unit test aturan RPG, limit EXP harian, dan widget test
+android/                            proyek Android, MainActivity (MethodChannel audio), dan nada WAV di res/raw
 web/                                splash HTML, manifest, ikon web
 ```
 
@@ -66,62 +65,67 @@ Alur data:
 
 ```text
 UI  ->  ViewModel  ->  Repository / Service  ->  SharedPreferences
-                     ->  NotificationService ->  notifikasi perangkat
+                     ->  NotificationService ->  notifikasi & MethodChannel audio perangkat
 ```
 
-`main.dart` membuat satu `StorageService`, satu `QuestRepository`, satu `CharacterViewModel`, dan satu `QuestViewModel`. Profil di-`init()` lebih dulu supaya suara notifikasi sudah terpasang sebelum quest dijadwalkan. `HomeScreen` memanggil `init()` lagi. Pemanggilan kedua aman karena `_isReady` menghentikan pemuatan ulang.
+## 4. Sistem Quest, Penguncian 1x Pakai, dan Limit EXP Harian
 
-## 4. Quest
+Model quest berada di `lib/domain/models/quest_model.dart`.
 
-Model ada di `lib/domain/models/quest_model.dart`.
+Field pada `Quest`:
+`id`, `title`, `description`, `date`, `startTime`, `endTime`, `rank`, `category`, `expReward`, `coinReward`, `isCompleted`, `expClaimed`, `completedAt`.
 
-Field: `id`, `title`, `description`, `date`, `startTime`, `endTime`, `rank`, `category`, `expReward`, `coinReward`, `isCompleted`, `completedAt`.
+### Rank dan Hadiah Dasar EXP
 
-Jam disimpan sebagai teks `HH:mm`, bukan `DateTime`. ID baru dibuat dengan paket `uuid`.
+| Rank | Label | EXP Dasar |
+| :---: | --- | ---: |
+| **E** | Novice | 25 |
+| **D** | Apprentice | 50 |
+| **C** | Adept | 100 |
+| **B** | Expert | 200 |
+| **A** | Master | 350 |
+| **S** | Legendary | 500 |
 
-### Rank dan hadiah bawaan
+### Kategori dan Atribut
 
-| Rank | Label | EXP | Koin |
-| --- | --- | ---: | ---: |
-| E | Novice | 25 | 5 |
-| D | Apprentice | 50 | 10 |
-| C | Adept | 100 | 25 |
-| B | Expert | 200 | 50 |
-| A | Master | 350 | 100 |
-| S | Legendary | 500 | 200 |
-
-Jika `expReward` atau `coinReward` tidak diisi, nilainya diambil dari rank. Rank yang tidak dikenal saat dibaca dari penyimpanan kembali menjadi D.
-
-### Kategori
-
-| Kode | Label | Atribut yang naik |
+| Kode | Label | Atribut yang Naik |
 | --- | --- | --- |
-| `strength` | Kekuatan | STR |
-| `intellect` | Kecerdasan | INT |
-| `discipline` | Disiplin | DIS |
-| `vitality` | Kebugaran | VIT |
+| `strength` | Kekuatan | **STR** |
+| `intellect` | Kecerdasan | **INT** |
+| `discipline` | Disiplin | **DIS** |
+| `vitality` | Kebugaran | **VIT** |
 
-Kategori yang tidak dikenal kembali menjadi `discipline`.
+### Aturan 1 Kali Pakai (Anti-Farming EXP)
 
-Menyelesaikan quest memberi hadiah satu kali lewat `toggleQuestCompletion`. Membatalkan centang tidak menarik kembali EXP, koin, atribut, atau jumlah quest tuntas. Ini perilaku kode saat ini, bukan kelalaian dokumentasi.
+- Setiap quest hanya dapat diselesaikan **1 kali pakai**.
+- Saat pengguna menekan checkbox pada quest yang belum selesai, `QuestViewModel.toggleQuestCompletion` mengubah `isCompleted: true` dan `expClaimed: true`, memberikan EXP sesuai sisa kuota harian, menampilkan badge **`Terkunci (1x Pakai)`**, serta menyembunyikan menu **Ubah Quest**.
+- Menekan kembali checkbox pada quest yang sudah selesai **tidak akan membatalkan status selesai** dan tidak akan memberikan EXP berulang. Aplikasi menampilkan snackbar informasi bahwa setiap tugas hanya bisa digunakan 1 kali.
 
-Quest bawaan dibuat hanya jika penyimpanan quest masih kosong: satu quest disiplin yang sudah selesai, plus latihan, belajar, dan hidrasi untuk hari ini.
+### Sistem Limit EXP Harian (`500 EXP / Hari`)
 
-## 5. Karakter
+- Konstanta `UserProfile.maxDailyExp` menetapkan batas maksimal **`500 EXP`** per hari.
+- `UserProfile` menyimpan `dailyExpEarned` dan `dailyExpDate` di `SharedPreferences`. Dengan demikian, walaupun pengguna menghapus quest yang sudah selesai pada hari tersebut, jumlah EXP yang sudah diklaim hari itu tetap tercatat dan tidak me-reset kuota harian.
+- Pada dialog pembuatan/pengubahan quest (`AddQuestDialog`), aplikasi menghitung:
+  - `committedExp`: gabungan EXP yang sudah diklaim pada tanggal tersebut ditambah total EXP dari quest yang masih menunggu pada tanggal tersebut.
+  - `remainingQuota`: `500 - committedExp`.
+  - Jika `defaultExp` dari Rank yang dipilih melebihi `remainingQuota` (saat `remainingQuota > 0`), maka `expReward` otomatis disesuaikan dengan `remainingQuota`.
+  - Jika `remainingQuota == 0` (`500 / 500 EXP` terpakai), tombol **Terbitkan Quest** dikunci untuk tanggal tersebut dan menampilkan peringatan bahwa Limit EXP Harian telah penuh.
 
-Model ada di `lib/domain/models/user_profile_model.dart`.
+## 5. Karakter dan Level
 
-Nilai awal: nama "Petualang", gelar "F-Rank Novice", level 1, EXP 0, koin 0, streak 1, dan semua atribut 1.
+Model karakter berada di `lib/domain/models/user_profile_model.dart`.
 
-EXP maksimum level saat ini:
+Nilai awal: nama `"Petualang"`, gelar `"F-Rank Novice"`, level `1`, EXP `0`, streak `1`, dan seluruh atribut (`STR`, `INT`, `DIS`, `VIT`) bernilai `1`.
+
+Rumus EXP maksimum untuk naik level:
 
 ```text
 maxExp = 100 + (level - 1) * 75
 ```
 
-Level 1 butuh 100, level 2 butuh 175, level 3 butuh 250. Jika hadiah melebihi beberapa ambang, level bisa naik lebih dari satu kali. Sisa EXP dipertahankan.
+Level 1 membutuhkan `100 EXP`, Level 2 membutuhkan `175 EXP`, Level 3 membutuhkan `250 EXP`, dan seterusnya.
 
-| Level | Gelar |
+| Rentang Level | Gelar |
 | --- | --- |
 | 1–4 | F-Rank Novice |
 | 5–9 | D-Rank Scout |
@@ -132,199 +136,74 @@ Level 1 butuh 100, level 2 butuh 175, level 3 butuh 250. Jika hadiah melebihi be
 | 40–49 | Legendary Hero |
 | 50+ | Mythic Grandmaster |
 
-Naik level memanggil `onLevelUp`, yang membuka `LevelUpDialog`.
-
-Streak dihitung saat profil dimuat:
-
-- selisih 1 hari: streak bertambah 1;
-- selisih lebih dari 1 hari: streak kembali ke 1;
-- hari yang sama: tanggal aktif hanya diperbarui.
-
-Nama diubah dari tab Profil Saya. Dialog `_EditNameDialog` memiliki controller sendiri dan menutupnya hanya setelah widget dialog dibuang. Nama kosong ditolak. Nama tersimpan lewat `CharacterViewModel.updateName`.
+Saat naik level, `CharacterViewModel.onLevelUp` memicu `LevelUpDialog` yang menampilkan animasi partikel kilau dan kartu kenaikan level.
 
 ### Avatar
 
-Tab Profil Saya adalah dashboard pengguna. Avatar besar bisa diketuk untuk membuka `AvatarPickerSheet`.
+Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
+`guardian` (Penjaga), `mage` (Penyihir), `scout` (Pengintai), `knight` (Ksatria), `scholar` (Cendekia), `ranger` (Pemanah), dan `healer` (Penyembuh). Pengguna juga dapat memilih foto dari Galeri atau Kamera yang disalin ke direktori dokumen aplikasi sebagai `user_avatar.jpg`.
 
-Tujuh avatar bawaan ada di `assets/avatars/` dan `AvatarCatalog`:
+## 6. Kalender Responsif dan Animasi Menu Ringan
 
-| ID | Label |
-| --- | --- |
-| `guardian` | Penjaga |
-| `mage` | Penyihir |
-| `scout` | Pengintai |
-| `knight` | Ksatria |
-| `scholar` | Cendekia |
-| `ranger` | Pemanah |
-| `healer` | Penyembuh |
+### Kalender Responsif (`CalendarWidget`)
 
-Nilai awal adalah `guardian`. Foto sendiri diambil dari galeri atau kamera lewat `image_picker`, disalin ke dokumen aplikasi sebagai `user_avatar.jpg`, lalu path-nya disimpan di `customAvatarPath`. Memilih avatar bawaan menghapus path foto. Jika file foto hilang, tampilan kembali ke avatar bawaan.
+- Menggunakan `LayoutBuilder` untuk mendeteksi lebar layar (`isCompact` saat `< 460px`).
+- Pada mode portrait, baris judul bulan + tombol `Hari Ini` + navigasi `<` `>` dipisahkan di baris atas, sedangkan tombol pemilih mode **`Bulan | Minggu | Hari`** direntangkan penuh (*full-width*) di baris kedua agar tidak terhalang di layar sempit.
+- Nama bulan dan tahun (`MMMM yyyy`) dibungkus dengan `Flexible` + `FittedBox(fit: BoxFit.scaleDown)` sehingga setiap nama bulan (seperti *September 2026*) tampil utuh tanpa terpotong `...`.
 
-Profil juga menyimpan `notificationSoundId`, dengan nilai awal `default`.
+### Animasi Menu Ringan (`lib/ui/core/widgets/animated_tap_menu.dart`)
 
-## 6. Kalender dan filter
+Untuk menjaga performa tetap ringan (`60fps+` / `120fps`) tanpa efek berat seperti *backdrop blur*:
+- **`AnimatedPressScale`**: Memanfaatkan `AnimatedScale` berbasis GPU transform (`Curves.easeOutCubic`, `160ms`) yang mengecil halus (`0.94x`) saat disentuh dan memantul ringan saat dilepas tanpa memicu *layout pass*.
+- **`AnimatedMenuChip`**: Digunakan pada seluruh filter kategori, filter rank, serta pemilih Rank dan Kategori di `AddQuestDialog`.
+- **`AnimatedRpgBottomNav`**: Navigasi bawah khusus dengan kapsul indikator aktif yang bergeser halus (`200ms`) dan transisi konten antar tab menggunakan `FadeTransition` + `SlideTransition` mikro (`210ms`).
 
-`QuestViewModel` menyimpan tanggal terpilih, bulan tampilan, mode `month` / `week` / `day`, filter kategori, filter rank, dan teks pencarian.
+## 7. Penyimpanan Lokal
 
-Daftar di tab kalender hanya memuat quest pada tanggal terpilih, lalu menyaring kategori dan rank. Pencarian membandingkan judul dan deskripsi, tetapi belum ada kolom cari di UI.
-
-Kontrak harian menghitung quest selesai dibagi total quest pada tanggal itu. Jika semua selesai, status berubah menjadi "KONTRAK HARIAN SELESAI".
-
-## 7. Penyimpanan
-
-`StorageService` memakai dua kunci:
+`StorageService` menggunakan dua kunci di `SharedPreferences`:
 
 | Kunci | Isi |
 | --- | --- |
-| `quest_kalender_quests_v1` | JSON daftar quest |
-| `quest_kalender_profile_v1` | JSON satu profil |
+| `quest_kalender_quests_v1` | JSON daftar seluruh quest |
+| `quest_kalender_profile_v1` | JSON objek profil pengguna (termasuk `dailyExpEarned` & `dailyExpDate`) |
 
-Tanggal ditulis sebagai ISO-8601. JSON rusak tidak menjatuhkan aplikasi: quest kembali ke data bawaan, profil kembali ke karakter baru. Karena itu, mengubah nama field tanpa migrasi bisa terlihat seperti data hilang.
+## 8. Notifikasi dan Suara Pengingat Native
 
-`QuestRepository` menyimpan salinan di memori setelah `init()`. Tambah, ubah, dan hapus langsung menulis ulang seluruh daftar.
+`NotificationService` mengelola penjadwalan pengingat quest dan pemutaran contoh suara (*preview*):
 
-## 8. Notifikasi
+- Setiap pilihan suara memiliki channel notifikasi Android tersendiri (`quest_reminders_<id>_v2`) dengan `AudioAttributesUsage.alarm` karena Android mengunci suara channel setelah pertama kali dibuat.
+- Untuk memutar suara secara instan saat pengguna memilih nada di tab **Papan Guild** atau menekan ikon speaker, `NotificationService.previewCurrentSound` memanggil `MethodChannel('quest_kalender/sound')` yang ditangani langsung di `MainActivity.kt` menggunakan `android.media.MediaPlayer` (untuk file `.wav` di `res/raw/`) dan `RingtoneManager` (untuk nada sistem `default`).
+- File `android/app/src/main/res/raw/keep.xml` (`tools:keep="@raw/bell,@raw/chime,@raw/horn,@raw/pulse"`) memastikan file suara `.wav` tidak dihapus oleh resource shrinker R8 saat proses `flutter build apk --release`.
 
-`NotificationService` adalah singleton. Inisialisasi dilakukan di `main()` sebelum UI.
-
-- Setiap nada memakai channel Android sendiri, `quest_reminders_<id>`, karena Android mengunci suara channel setelah dibuat.
-- Izin yang diminta: notifikasi, alarm presisi, dan kamera di Android, serta alert, badge, dan suara di iOS/macOS.
-- Waktu gabungan dari tanggal quest dan `startTime` pada zona waktu perangkat.
-- Quest tanpa jam, jam tidak valid, sudah lewat, atau sudah selesai tidak dijadwalkan.
-- Mode utama `exactAllowWhileIdle`. Jika izin alarm presisi ditolak, jadwal diulang sebagai `inexactAllowWhileIdle`.
-- ID notifikasi adalah `questId.hashCode` 31-bit positif.
-- `init()` juga menjadwalkan ulang semua quest yang tersimpan.
-
-Izin Android yang dideklarasikan: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, `VIBRATE`, `SCHEDULE_EXACT_ALARM`, dan `CAMERA`.
-
-### Suara yang bisa dipilih
-
-Kartu "Suara Pengingat" ada di tab Papan Guild. Pilihan disimpan di profil dan langsung menjadwalkan ulang quest yang masih menunggu. Memilih nada juga menampilkan satu notifikasi contoh.
-
-| ID | Label | Sumber |
+| ID | Label | Sumber Audio |
 | --- | --- | --- |
-| `default` | Nada sistem | suara channel Android |
-| `silent` | Senyap | tanpa suara |
+| `default` | Nada sistem | Nada notifikasi/alarm bawaan Android |
 | `bell` | Lonceng | `res/raw/bell.wav` |
 | `chime` | Lonceng angin | `res/raw/chime.wav` |
 | `horn` | Terompet guild | `res/raw/horn.wav` |
 | `pulse` | Denyut | `res/raw/pulse.wav` |
+| `silent` | Senyap | Tanpa suara |
 
-ID yang tidak dikenal kembali menjadi `default`. File WAV dibuat sebagai nada pendek, bukan rekaman pihak ketiga.
+## 9. Membangun dan Menjalankan Pengujian
 
-## 9. Sinkronisasi
-
-`AuthSyncService` hanya kontrak. `LocalAuthSyncService` meniru login lokal dan mengembalikan sukses setelah penundaan singkat. Tidak ada Firebase, Supabase, akun sungguhan, atau jaringan.
-
-Tombol "Periksa Sinkronisasi" di Papan Guild tidak memanggil layanan itu. Tombol hanya menampilkan snackbar bahwa penyimpanan offline lokal aktif.
-
-## 10. Tampilan
-
-Tema gelap ada di `lib/ui/core/themes/app_theme.dart`.
-
-| Token | Warna |
-| --- | --- |
-| `primaryGold` | `#FFB300` |
-| `accentAmber` | `#FF8F00` |
-| `darkBackground` | `#121420` |
-| `cardBackground` | `#1E2235` |
-| `surfaceLighter` | `#2B304A` |
-| `textMuted` | `#9E9E9E` |
-| `neonCyan` | `#00E5FF` |
-| `neonPurple` | `#D500F9` |
-
-`GuildBackdrop` menggambar gradasi, dua cahaya radial, dan 28 bintang. Angka bintang tetap karena memakai seed, bukan acak setiap frame.
-
-Material 3 dipakai. Tidak ada font kustom. Aset gambar yang didaftarkan adalah `assets/avatars/`. Ikon UI berasal dari Material dan Cupertino. Avatar bawaan digambar dengan `flutter_svg`.
-
-## 11. Ketergantungan
-
-Runtime:
-
-| Paket | Peran |
-| --- | --- |
-| `provider` | state UI |
-| `intl` | tanggal bahasa Indonesia |
-| `shared_preferences` | penyimpanan lokal |
-| `uuid` | ID quest |
-| `flutter_local_notifications` | pengingat |
-| `timezone` dan `flutter_timezone` | jadwal zona lokal |
-| `cupertino_icons` | ikon iOS |
-| `image_picker` | galeri dan kamera untuk foto profil |
-| `path_provider` | lokasi penyimpanan foto profil |
-| `flutter_svg` | avatar bawaan SVG |
-
-Dev: `flutter_test` dan `flutter_lints`.
-
-Android memakai Java/Kotlin 17 dan core library desugaring `desugar_jdk_libs` 2.1.4. `minSdk`, `targetSdk`, dan `compileSdk` mengikuti nilai bawaan Flutter.
-
-## 12. Membangun dan menjalankan
-
-Dari akar repo:
+Dari akar direktori `quest_kalender`:
 
 ```powershell
 flutter pub get
 flutter analyze
 flutter test
-flutter run -d windows
-flutter run -d chrome
-flutter run -d <device-id>
-flutter build apk --debug
+flutter build apk --release
 ```
 
-Perangkat Android lewat USB harus mengizinkan debugging. Perintah perangkat:
+Hasil APK Release berada di `build/app/outputs/flutter-apk/app-release.apk`.
 
-```powershell
-flutter devices
-```
+## 10. Pengujian Otomatis (`test/`)
 
-APK debug terakhir berada di `build/app/outputs/flutter-apk/app-debug.apk`. Folder `build/` tidak masuk Git.
-
-Build rilis saat ini masih memakai signing config debug. Sebelum distribusi, application ID `com.example` dan kunci rilis perlu diganti.
-
-## 13. Tes
-
-`test/widget_test.dart` memastikan tiga label tab tampil.
-
-`test/quest_rpg_test.dart` memeriksa:
-
-- hadiah bawaan rank E dan S;
-- serialisasi quest;
-- rumus EXP level 1–3;
-- kenaikan level saat EXP melebihi ambang;
-- avatar bawaan, penggantian foto sendiri, dan pemulihan avatar bawaan;
-- penyimpanan ID suara notifikasi di profil.
-
-Belum ada tes untuk dialog nama, bunyi notifikasi pada perangkat, kalender, atau pembatalan quest.
-
-## 14. Git dan file yang diabaikan
-
-`.gitignore` Flutter sudah mengabaikan:
-
-- `.dart_tool/`, `.pub/`, `.pub-cache/`;
-- `build/` dan `coverage/`;
-- `.idea/`, `*.iml`;
-- `.widget_preview/`;
-- `.flutter-plugins-dependencies`;
-- artefak debug, profile, dan release Android.
-
-`android/.gitignore` juga mengabaikan `local.properties`, Gradle wrapper jar, dan keystore. Jangan menghapus aturan ini.
-
-## 15. Batasan yang diketahui
-
-- Ikon launcher Android dan ikon web masih ikon bawaan Flutter. Itu disengaja sampai ada permintaan menggantinya.
-- Tidak ada folder iOS, Windows, Linux, atau macOS di repo meskipun Flutter dapat menambahkannya.
-- Tidak ada akun cloud yang benar-benar tersambung.
-- Membatalkan quest tidak mengembalikan hadiah.
-- Pencarian quest ada di state, tetapi belum ditampilkan.
-- Nama aplikasi di launcher Android masih `quest_kalender`, sedangkan judul Flutter adalah "Quest Kalender".
-- Empat nada kustom baru terdengar setelah aplikasi dipasang ulang, karena channel Android dibuat bersama pemasangan itu.
-- Nada kustom belum disalin ke bundel iOS. Pilihan tetap tersimpan, tetapi perangkat Apple memakai suara sistem atau senyap.
-- Plugin `flutter_timezone` masih memakai Kotlin Gradle Plugin lama. Flutter memperingatkan bahwa versi mendatang dapat menolak build sampai plugin itu diperbarui.
-- Kesalahan penyimpanan hanya dicatat dengan kembali ke data awal, tanpa laporan ke pengguna.
-
-## 16. Riwayat perilaku penting
-
-Dialog ubah nama sempat error karena `TextEditingController` dihancurkan saat dialog masih membongkar field-nya. Controller sekarang dimiliki `_EditNameDialog` dan dihancurkan di `dispose()`.
-
-Pita kuning-hitam "overflowed" sempat muncul di pemilih avatar karena isinya lebih tinggi dari layar. Sheet itu sekarang bisa digulir dan tinggi selnya dibatasi.
+- `test/widget_test.dart`: Memastikan aplikasi utama dan ketiga tab (`Kalender & Quest`, `Profil Saya`, `Papan Guild`) ter-render dengan benar.
+- `test/quest_rpg_test.dart`: Menguji:
+  - Hadiah EXP bawaan Rank `E` sampai `S`;
+  - Serialisasi `toMap` dan `fromMap` pada `Quest` (termasuk status `isCompleted` & `expClaimed`);
+  - Rumus kebutuhan EXP kenaikan level (`calculateMaxExp`);
+  - Pemberian EXP, kenaikan atribut, dan pemicu `onLevelUp`;
+  - Penyimpanan avatar bawaan, foto kustom, dan pilihan suara pengingat;
+  - Pembatasan **Limit EXP Harian (`500 EXP/hari`)** agar klaim EXP dalam satu hari tidak dapat melewati batas `500 EXP`.
