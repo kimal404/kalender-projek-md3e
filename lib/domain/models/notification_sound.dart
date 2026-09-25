@@ -41,6 +41,6 @@ class NotificationSounds {
   /// Channel Android mengunci suara saat pertama dibuat, jadi tiap nada punya channel sendiri.
   static String channelIdFor(String soundId) {
     final sound = byId(soundId);
-    return 'quest_reminders_${sound.id}';
+    return 'quest_reminders_v3_${sound.id}';
   }
 }

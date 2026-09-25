@@ -17,6 +17,10 @@ class NotificationService {
   static const String channelDescription =
       'Notifikasi saat waktu mulai quest tiba';
 
+  static const MethodChannel _soundChannel = MethodChannel(
+    'quest_kalender/sound',
+  );
+
   String _soundId = 'default';
 
   final FlutterLocalNotificationsPlugin _plugin =
@@ -46,19 +50,60 @@ class NotificationService {
     );
 
     await _plugin.initialize(settings: settings);
+    await _createAndroidChannels();
     await _requestPermissions();
     _initialized = true;
+  }
+
+  Future<void> _createAndroidChannels() async {
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android == null) return;
+
+    for (final sound in NotificationSounds.options) {
+      final AndroidNotificationSound? androidSound = sound.id == 'silent'
+          ? null
+          : sound.rawResource == null
+          ? null
+          : RawResourceAndroidNotificationSound(sound.rawResource!);
+
+      final channel = AndroidNotificationChannel(
+        NotificationSounds.channelIdFor(sound.id),
+        '$channelName · ${sound.label}',
+        description: channelDescription,
+        importance: Importance.high,
+        playSound: sound.id != 'silent',
+        sound: androidSound,
+      );
+      await android.createNotificationChannel(channel);
+    }
   }
 
   void setSound(String soundId) {
     _soundId = NotificationSounds.byId(soundId).id;
   }
 
-  Future<void> previewCurrentSound() async {
-    if (!_initialized) return;
-    final sound = NotificationSounds.byId(_soundId);
-    if (sound.id == 'silent') return;
+  Future<void> previewCurrentSound([String? soundIdOverride]) async {
+    final sound = NotificationSounds.byId(soundIdOverride ?? _soundId);
+    if (sound.id == 'silent') {
+      try {
+        await _soundChannel.invokeMethod('stopPreview');
+      } catch (_) {}
+      return;
+    }
 
+    // 1. Putar langsung di dalam aplikasi via native MediaPlayer agar selalu terdengar
+    try {
+      await _soundChannel.invokeMethod('playPreview', {'soundId': sound.id});
+      return;
+    } catch (error) {
+      debugPrint('Fallback ke notifikasi sistem untuk contoh suara: $error');
+    }
+
+    // 2. Fallback untuk non-Android
+    if (!_initialized) return;
     final details = _detailsFor(sound);
     try {
       await _plugin.show(

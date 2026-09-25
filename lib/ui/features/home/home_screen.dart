@@ -1175,13 +1175,33 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               title: Text(
                 sound.label,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(
+                  color: isSelected ? AppTheme.primaryGold : Colors.white,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 14,
+                ),
+              ),
+              trailing: IconButton(
+                tooltip: sound.id == 'silent'
+                    ? 'Mode senyap'
+                    : 'Putar suara ${sound.label}',
+                icon: Icon(
+                  sound.id == 'silent'
+                      ? Icons.volume_off_rounded
+                      : Icons.volume_up_rounded,
+                  size: 20,
+                  color: isSelected ? AppTheme.primaryGold : AppTheme.textMuted,
+                ),
+                onPressed: () {
+                  NotificationService.instance.previewCurrentSound(sound.id);
+                },
               ),
               onTap: () async {
                 final questVM = context.read<QuestViewModel>();
+                // Putar suara langsung seketika saat dipilih
+                NotificationService.instance.previewCurrentSound(sound.id);
                 await charVM.updateNotificationSound(sound.id);
                 await questVM.rescheduleNotifications();
-                await NotificationService.instance.previewCurrentSound();
               },
             );
           }),
