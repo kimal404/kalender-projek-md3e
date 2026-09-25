@@ -484,20 +484,6 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                               color: AppTheme.neonPurple,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          const Icon(
-                            Icons.monetization_on,
-                            size: 16,
-                            color: AppTheme.primaryGold,
-                          ),
-                          Text(
-                            ' +${_selectedRank.defaultCoins} Gold',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.primaryGold,
-                            ),
-                          ),
                         ],
                       ),
                     ),

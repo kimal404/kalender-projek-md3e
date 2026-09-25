@@ -250,52 +250,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-
-              // Koin / Emas dengan animasi pop
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGold.withAlpha(40),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.primaryGold, width: 1),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.monetization_on,
-                      size: 16,
-                      color: AppTheme.primaryGold,
-                    ),
-                    const SizedBox(width: 2),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder: (child, animation) {
-                        return ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: animation,
-                            curve: Curves.easeOutBack,
-                          ),
-                          child: child,
-                        );
-                      },
-                      child: Text(
-                        '${profile.coins} G',
-                        key: ValueKey<int>(profile.coins),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryGold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -428,7 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Ambil misi baru dari Guild untuk meningkatkan level dan mengumpulkan koin!',
+                          'Ambil misi baru dari Guild untuk meningkatkan level dan atribut karaktermu!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 12,
@@ -757,9 +711,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       Icons.local_fire_department,
                     ),
                     _buildStatPill(
-                      'Kekayaan',
-                      '${profile.coins} G',
-                      Icons.monetization_on,
+                      'Level Karakter',
+                      'Lv. ${profile.level}',
+                      Icons.military_tech,
                     ),
                   ],
                 ),

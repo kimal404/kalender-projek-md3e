@@ -288,13 +288,6 @@ class _QuestCardState extends State<QuestCard>
                                         color: AppTheme.neonPurple,
                                         isDone: isDone,
                                       ),
-                                      const SizedBox(width: 6),
-                                      _RewardBadge(
-                                        icon: Icons.monetization_on,
-                                        label: '+${widget.quest.coinReward} G',
-                                        color: AppTheme.primaryGold,
-                                        isDone: isDone,
-                                      ),
                                       const Spacer(),
                                       PopupMenuButton<String>(
                                         icon: const Icon(
