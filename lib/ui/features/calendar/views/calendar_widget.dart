@@ -24,24 +24,35 @@ class CalendarWidget extends StatelessWidget {
           _buildHeader(context),
           const SizedBox(height: 10),
 
-          // Tampilan Berdasarkan Mode dengan transisi halus
-          AnimatedSwitcher(
+          // Tampilan Berdasarkan Mode dengan transisi tinggi & slide-fade halus
+          AnimatedSize(
             duration: const Duration(milliseconds: 260),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            transitionBuilder: (child, animation) {
-              return FadeTransition(
-                opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
-                child: child,
-              );
-            },
-            child: KeyedSubtree(
-              key: ValueKey<String>(viewModel.calendarViewMode),
-              child: viewModel.calendarViewMode == 'month'
-                  ? _buildMonthGrid(context)
-                  : viewModel.calendarViewMode == 'week'
-                  ? _buildWeekStrip(context)
-                  : _buildDayHeader(context),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 240),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.025),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  ),
+                );
+              },
+              child: KeyedSubtree(
+                key: ValueKey<String>(viewModel.calendarViewMode),
+                child: viewModel.calendarViewMode == 'month'
+                    ? _buildMonthGrid(context)
+                    : viewModel.calendarViewMode == 'week'
+                    ? _buildWeekStrip(context)
+                    : _buildDayHeader(context),
+              ),
             ),
           ),
         ],
@@ -136,26 +147,10 @@ class CalendarWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Pilihan Mode (Bulan, Minggu, Hari) Full Width di Portrait
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceLighter,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.all(3),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildModeButton('month', 'Bulan', expand: true),
-                    ),
-                    Expanded(
-                      child: _buildModeButton('week', 'Minggu', expand: true),
-                    ),
-                    Expanded(
-                      child: _buildModeButton('day', 'Hari', expand: true),
-                    ),
-                  ],
-                ),
+              // Pilihan Mode (Bulan, Minggu, Hari) Full Width dengan sliding pill animation
+              _CalendarModeSlidingSelector(
+                currentMode: viewModel.calendarViewMode,
+                onModeChanged: viewModel.setCalendarViewMode,
               ),
             ],
           );
@@ -209,59 +204,15 @@ class CalendarWidget extends StatelessWidget {
 
             const SizedBox(width: 4),
 
-            // Pilihan Mode (Bulan, Minggu, Hari)
-            Container(
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceLighter,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.all(2),
-              child: Row(
-                children: [
-                  _buildModeButton('month', 'Bulan'),
-                  _buildModeButton('week', 'Minggu'),
-                  _buildModeButton('day', 'Hari'),
-                ],
-              ),
+            // Pilihan Mode (Bulan, Minggu, Hari) dengan sliding pill animation
+            _CalendarModeSlidingSelector(
+              currentMode: viewModel.calendarViewMode,
+              onModeChanged: viewModel.setCalendarViewMode,
+              width: 216,
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildModeButton(String mode, String label, {bool expand = false}) {
-    final isSelected = viewModel.calendarViewMode == mode;
-    return AnimatedPressScale(
-      isSelected: false,
-      pressedScale: 0.93,
-      onTap: () => viewModel.setCalendarViewMode(mode),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 190),
-        curve: Curves.easeOutCubic,
-        alignment: expand ? Alignment.center : null,
-        padding: EdgeInsets.symmetric(
-          horizontal: expand ? 4 : 10,
-          vertical: expand ? 6 : 4,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryGold : Colors.transparent,
-          borderRadius: BorderRadius.circular(7),
-        ),
-        child: AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 190),
-          curve: Curves.easeOutCubic,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? Colors.black : Colors.white70,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
     );
   }
 
@@ -555,6 +506,129 @@ class CalendarWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Komponen pemilih mode tampilan kalender (Bulan, Minggu, Hari)
+/// dengan indikator pil kuning emas (sliding pill) yang meluncur mulus
+class _CalendarModeSlidingSelector extends StatelessWidget {
+  final String currentMode; // 'month', 'week', 'day'
+  final ValueChanged<String> onModeChanged;
+  final double? width;
+
+  const _CalendarModeSlidingSelector({
+    required this.currentMode,
+    required this.onModeChanged,
+    this.width,
+  });
+
+  int get _selectedIndex {
+    switch (currentMode) {
+      case 'week':
+        return 1;
+      case 'day':
+        return 2;
+      case 'month':
+      default:
+        return 0;
+    }
+  }
+
+  double get _alignmentX {
+    switch (_selectedIndex) {
+      case 1:
+        return 0.0;
+      case 2:
+        return 1.0;
+      case 0:
+      default:
+        return -1.0;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selector = Container(
+      height: 38,
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceLighter,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.all(3),
+      child: Stack(
+        children: [
+          // Sliding indicator (pill kuning emas yang meluncur mulus antar opsi)
+          AnimatedAlign(
+            alignment: Alignment(_alignmentX, 0.0),
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            child: FractionallySizedBox(
+              widthFactor: 1.0 / 3.0,
+              heightFactor: 1.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGold,
+                  borderRadius: BorderRadius.circular(7),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryGold.withAlpha(90),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Label teks untuk setiap opsi
+          Row(
+            children: [
+              Expanded(
+                child: _buildItem('month', 'Bulan', 0),
+              ),
+              Expanded(
+                child: _buildItem('week', 'Minggu', 1),
+              ),
+              Expanded(
+                child: _buildItem('day', 'Hari', 2),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    if (width != null) {
+      return SizedBox(width: width, child: selector);
+    }
+    return selector;
+  }
+
+  Widget _buildItem(String mode, String label, int index) {
+    final isSelected = _selectedIndex == index;
+
+    return AnimatedPressScale(
+      pressedScale: 0.94,
+      isSelected: false,
+      onTap: () => onModeChanged(mode),
+      child: Center(
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+            color: isSelected ? Colors.black : Colors.white70,
+            letterSpacing: 0.2,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
