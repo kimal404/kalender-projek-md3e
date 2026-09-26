@@ -18,6 +18,14 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Penyimpanan | Lokal, `SharedPreferences` |
 | Remote Git | https://github.com/senji830/kalender-projek |
 | Branch | `master` |
+| Rilis Terkini | `v1.1.0` |
+
+### Riwayat Rilis
+
+| Tag | Versi | Tanggal | Sorotan Perubahan |
+| --- | --- | --- | --- |
+| [`v1.0.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.0.0) | `1.0.0+1` | Sep 2026 | Rilis perdana: Sistem RPG, limit 500 EXP/hari, tugas 1x pakai, tema Claymorphism 3D |
+| [`v1.1.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.0) | `1.1.0+2` | Sep 2026 | Pembaruan besar UI/UX: Tema Dark Arcane Glassmorphism, multi-orb glow, kalender kristal |
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 
@@ -48,11 +56,11 @@ lib/
   domain/models/                    Quest, UserProfile, AvatarCatalog, NotificationSound
   data/services/                    StorageService, NotificationService, AuthSyncService
   data/repositories/                QuestRepository (cache memori & persistensi)
-  ui/core/themes/                   AppTheme (palet warna RPG dark mode)
-  ui/core/widgets/                  GuildBackdrop (latar bintang) & animated_tap_menu.dart (animasi menu 60fps)
+  ui/core/themes/                   AppTheme (palet warna RPG dark mode & glassmorphism decorations)
+  ui/core/widgets/                  GuildBackdrop (ambient glow), glass_container.dart, & animated_tap_menu.dart
   ui/features/splash/               SplashScreen dengan animasi shimmer
   ui/features/home/                 HomeScreen dan _EditNameDialog
-  ui/features/calendar/             CalendarWidget (mode Bulan, Minggu, Hari responsif)
+  ui/features/calendar/             CalendarWidget (mode Bulan, Minggu, Hari responsif & sliding indicator)
   ui/features/quests/               QuestCard, AddQuestDialog, dan QuestViewModel
   ui/features/character/            CharacterViewModel, AvatarView, AvatarPickerSheet, LevelUpDialog
 assets/avatars/                     tujuh avatar bawaan berformat SVG
@@ -201,15 +209,28 @@ flutter test
 flutter build apk --release
 ```
 
-Hasil APK Release berada di `build/app/outputs/flutter-apk/app-release.apk`.
+### Berkas Hasil Build APK Release
+- `build/app/outputs/flutter-apk/app-release.apk`
+- `build/app/outputs/flutter-apk/quest-kalender-v1.1.0.apk` (~54.4 MB)
+
+Rilis dan aset biner APK dapat diunduh melalui [GitHub Releases](https://github.com/senji830/kalender-projek/releases).
 
 ## 10. Pengujian Otomatis (`test/`)
 
-- `test/widget_test.dart`: Memastikan aplikasi utama dan ketiga tab (`Kalender & Quest`, `Profil Saya`, `Papan Guild`) ter-render dengan benar.
-- `test/quest_rpg_test.dart`: Menguji:
-  - Hadiah EXP bawaan Rank `E` sampai `S`;
-  - Serialisasi `toMap` dan `fromMap` pada `Quest` (termasuk status `isCompleted` & `expClaimed`);
-  - Rumus kebutuhan EXP kenaikan level (`calculateMaxExp`);
-  - Pemberian EXP, kenaikan atribut, dan pemicu `onLevelUp`;
-  - Penyimpanan avatar bawaan, foto kustom, dan pilihan suara pengingat;
-  - Pembatasan **Limit EXP Harian (`500 EXP/hari`)** agar klaim EXP dalam satu hari tidak dapat melewati batas `500 EXP`.
+Aplikasi dilengkapi 12 skenario pengujian otomatis (100% lulus):
+
+### 1. `test/quest_rpg_test.dart` (9 Unit Tests):
+- **Hadiah EXP Bawaan Rank**: Memastikan Rank `E` sampai `S` memberikan nilai EXP dasar yang sesuai spesifikasi.
+- **Serialisasi Data**: Menguji `toMap` dan `fromMap` model `Quest`, termasuk status `isCompleted` dan `expClaimed`.
+- **Pencarian Quest**: Memastikan `QuestViewModel` memfilter daftar quest dengan kueri pencarian (`setSearchQuery`).
+- **Skala EXP Naik Level**: Memverifikasi rumus `100 + (level - 1) * 75`.
+- **Kenaikan Atribut & Level**: Memastikan `CharacterViewModel` mendistribusikan EXP, menaikkan atribut STR/INT/DIS/VIT, dan memicu event `onLevelUp`.
+- **Kustomisasi Avatar**: Memastikan avatar bawaan SVG tersimpan dan foto kustom pengguna dapat disimpan dan diganti.
+- **Preferensi Audio**: Memastikan pilihan nada notifikasi pengingat tersimpan di profil pengguna.
+- **Limit EXP Harian (`500 EXP/hari`)**: Menguji secara ketat bahwa akumulasi EXP dalam 1 hari tidak pernah dapat melebihi batas 500 EXP.
+- **Nama Petualang**: Memastikan nama default `"Petualang"` dapat diperbarui melalui `updateName`.
+
+### 2. `test/widget_test.dart` (3 Widget Tests):
+- **Render Aplikasi Utama**: Memastikan `HomeScreen` dan seluruh tab bawah (`Kalender & Quest`, `Profil Saya`, `Papan Guild`) tampil tanpa error layout.
+- **Animasi Mode Kalender**: Memverifikasi transisi animasi dan indikator geser saat berpindah antara opsi **`Bulan`**, **`Minggu`**, dan **`Hari`**.
+- **Dialog Selamat Datang / Registrasi**: Memastikan modal onboarding pendaftaran awal muncul saat pertama kali aplikasi dibuka dan dapat ditutup setelah menyimpan nama petualang.

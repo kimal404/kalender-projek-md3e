@@ -5,14 +5,17 @@ Dokumentasi produk lengkap ada di [docs/DOKUMENTASI.md](docs/DOKUMENTASI.md).
 
 ## Proyek
 
-Aplikasi Flutter kalender tugas bergaya RPG. Pengguna membuat quest, menyelesaikannya (1 kali pakai per tugas), lalu mendapat **EXP** (dengan batas maksimal **500 EXP/hari**), kenaikan **Atribut (`STR`, `INT`, `DIS`, `VIT`)**, **Level**, **Gelar**, dan **Streak Harian**.
+Aplikasi Flutter kalender tugas bergaya RPG dengan tema **Dark Arcane Glassmorphism**. Pengguna membuat quest, menyelesaikannya (1 kali pakai per tugas), lalu mendapat **EXP** (dengan batas maksimal **500 EXP/hari**), kenaikan **Atribut (`STR`, `INT`, `DIS`, `VIT`)**, **Level**, **Gelar**, dan **Streak Harian**.
 Data tersimpan lokal di perangkat. Bahasa antarmuka: Indonesia.
 
 Remote: https://github.com/senji830/kalender-projek
 Branch kerja: `master`
+Tag Rilis Terkini: `v1.1.0` (Rilis awal: `v1.0.0`)
 
 ## Batasan & Aturan Penting
 
+- **Tema Desain (Dark Arcane Glassmorphism)**: Pertahankan konsistensi antarmuka kaca buram (*frosted glass*). Gunakan `AppTheme.glassCardDecoration`, `glassButtonDecoration`, `glassPillDecoration`, `glassRecessedDecoration`, atau `GlassContainer` (`lib/ui/core/widgets/glass_container.dart`). Selalu bungkus panel kaca dengan `ClipRRect` + `BackdropFilter` (blur sigma 10–18px).
+- **Aksesibilitas & Kontras**: Teks judul, label, lencana, dan tombol aksi wajib mempertahankan rasio kontras tinggi **WCAG AA (> 6.0:1)** di atas latar belakang kaca gelap.
 - Jangan mengubah ikon launcher, favicon, atau splash native Flutter kecuali diminta.
 - Jangan menambahkan backend, Firebase, atau Supabase sungguhan. `AuthSyncService` masih stub lokal.
 - Sistem poin **Gold/Koin** sudah dihapus dari UI agar progres berfokus pada EXP, Level, Atribut RPG, dan Streak. Jangan menampilkan kembali indikator Gold/Koin di UI kecuali diminta.
@@ -28,10 +31,11 @@ Branch kerja: `master`
 3. Widget dialog yang memegang `TextEditingController` harus `StatefulWidget`, dan controller hanya di-`dispose` di `dispose()` widget itu.
 4. Quest dan profil disimpan sebagai JSON di `SharedPreferences`. Pertahankan kunci `quest_kalender_quests_v1` dan `quest_kalender_profile_v1`.
 5. Notifikasi dijadwalkan dari jam mulai quest (`HH:mm`) lewat `NotificationService`. Pemutaran suara langsung (*preview*) menggunakan `MethodChannel('quest_kalender/sound')` di `MainActivity.kt` dan file WAV di `android/app/src/main/res/raw/` yang dijaga oleh `keep.xml`.
-6. Untuk komponen menu atau tombol pilihan baru, gunakan widget animasi ringan di `lib/ui/core/widgets/animated_tap_menu.dart` (`AnimatedPressScale`, `AnimatedMenuChip`, `AnimatedRpgBottomNav`) agar tetap smooth `60fps+` tanpa efek berat.
-7. UI baru harus memakai warna di `AppTheme` dan bahasa Indonesia.
+6. Untuk komponen menu atau tombol pilihan baru, gunakan widget animasi ringan di `lib/ui/core/widgets/animated_tap_menu.dart` (`AnimatedPressScale`, `AnimatedMenuChip`, `AnimatedRpgBottomNav`) berpadu dengan dekorasi kaca `AppTheme` agar tetap smooth `60fps+` di GPU.
+7. Komponen panel kaca baru dapat langsung menggunakan `GlassContainer` (`lib/ui/core/widgets/glass_container.dart`) atau `ClipRRect(child: BackdropFilter(filter: ImageFilter.blur(...), child: Container(decoration: AppTheme.glassCardDecoration(...))))`.
+8. UI baru harus memakai warna di `AppTheme` dan bahasa Indonesia.
 
-## Perintah
+## Perintah & Rilis
 
 Jalankan dari akar repositori `quest_kalender`:
 
@@ -39,6 +43,17 @@ Jalankan dari akar repositori `quest_kalender`:
 flutter analyze
 flutter test
 flutter build apk --release
+```
+
+Hasil build APK berada di:
+- `build/app/outputs/flutter-apk/app-release.apk`
+- `build/app/outputs/flutter-apk/quest-kalender-v1.1.0.apk`
+
+Untuk membuat tag rilis baru dan mengunggah ke GitHub:
+```powershell
+git tag -a v1.1.0 -m "Release v1.1.0: Dark Arcane Glassmorphism UI/UX Overhaul"
+git push origin v1.1.0
+gh release create v1.1.0 build/app/outputs/flutter-apk/quest-kalender-v1.1.0.apk --title "Quest Kalender v1.1.0 - Dark Arcane Glassmorphism Release" --notes-file RELEASE_NOTES_v1.1.0.md
 ```
 
 <!-- antislop:start -->
