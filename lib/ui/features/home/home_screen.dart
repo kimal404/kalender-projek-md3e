@@ -568,27 +568,63 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 13, color: Colors.white70),
           ),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(Icons.bolt, size: 15, color: AppTheme.neonCyan),
-              const SizedBox(width: 4),
-              Text(
-                'Limit EXP Harian: $earnedDailyExp / ${UserProfile.maxDailyExp} EXP Diklaim',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.neonCyan,
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceLighter.withAlpha(90),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: accent.withAlpha(45),
+                width: 1,
               ),
-              const Spacer(),
-              Text(
-                'Terjadwal: $committedDailyExp/${UserProfile.maxDailyExp}',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.textMuted,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(Icons.bolt, size: 14, color: AppTheme.neonCyan),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Limit: $earnedDailyExp/${UserProfile.maxDailyExp} EXP Diklaim',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.neonCyan,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 6),
+                Container(
+                  height: 12,
+                  width: 1,
+                  color: Colors.white24,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Terjadwal: $committedDailyExp/${UserProfile.maxDailyExp}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 10),
           ClipRRect(
@@ -741,26 +777,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () => AvatarPickerSheet.show(context, charVM),
                   child: const Text('Ganti avatar'),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      profile.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                InkWell(
+                  onTap: () => _showEditNameDialog(charVM),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.edit,
-                        size: 16,
-                        color: AppTheme.textMuted,
-                      ),
-                      onPressed: () => _showEditNameDialog(charVM),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Kotak pengimbang selebar 22px (16px ikon + 6px spasi)
+                        // agar teks nama petualang berada tepat di tengah geometris card
+                        const SizedBox(width: 22),
+                        Text(
+                          profile.name,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.edit,
+                          size: 16,
+                          color: AppTheme.textMuted,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 Text(
                   '${profile.title} (Level ${profile.level})',
