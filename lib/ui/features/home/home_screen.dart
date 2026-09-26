@@ -26,16 +26,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentTabIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
+  bool _hasCheckedWelcome = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final charVM = context.read<CharacterViewModel>();
       final questVM = context.read<QuestViewModel>();
 
-      charVM.init();
-      questVM.init();
+      await charVM.init();
+      await questVM.init();
 
       charVM.onLevelUp = (newLevel, title) {
         LevelUpDialog.show(
@@ -45,7 +47,21 @@ class _HomeScreenState extends State<HomeScreen> {
           profile: charVM.profile,
         );
       };
+
+      if (!_hasCheckedWelcome && mounted) {
+        _hasCheckedWelcome = true;
+        if (charVM.profile.name == 'Petualang' &&
+            charVM.profile.completedQuestsCount == 0) {
+          _showWelcomeRegistrationDialog(charVM);
+        }
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _openAddQuestDialog({Quest? existingQuest}) async {
@@ -323,6 +339,10 @@ class _HomeScreenState extends State<HomeScreen> {
         CalendarWidget(viewModel: questVM),
         const SizedBox(height: 16),
 
+        // Pencarian Quest
+        _buildQuestSearchBar(questVM),
+        const SizedBox(height: 12),
+
         // Filter Rank & Kategori
         _buildFilterChips(questVM),
         const SizedBox(height: 16),
@@ -361,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: KeyedSubtree(
             key: ValueKey<String>(
-              '${questVM.selectedDate.year}-${questVM.selectedDate.month}-${questVM.selectedDate.day}-${questVM.selectedCategory?.name}-${questVM.selectedRank?.code}-${quests.length}',
+              '${questVM.selectedDate.year}-${questVM.selectedDate.month}-${questVM.selectedDate.day}-${questVM.selectedCategory?.name}-${questVM.selectedRank?.code}-${questVM.searchQuery}-${quests.length}',
             ),
             child: quests.isEmpty
                 ? Container(
@@ -374,39 +394,60 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: Column(
                       children: [
-                        const Icon(
-                          Icons.auto_stories,
+                        Icon(
+                          questVM.searchQuery.isNotEmpty
+                              ? Icons.search_off_rounded
+                              : Icons.auto_stories,
                           size: 48,
                           color: AppTheme.textMuted,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Tidak ada quest pada tanggal ini.',
-                          style: TextStyle(
+                        Text(
+                          questVM.searchQuery.isNotEmpty
+                              ? 'Quest tidak ditemukan'
+                              : 'Tidak ada quest pada tanggal ini.',
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          'Ambil misi baru dari Guild untuk meningkatkan level dan atribut karaktermu!',
+                        Text(
+                          questVM.searchQuery.isNotEmpty
+                              ? 'Tidak ada misi yang cocok dengan kata kunci "${questVM.searchQuery}".'
+                              : 'Ambil misi baru dari Guild untuk meningkatkan level dan atribut karaktermu!',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.textMuted,
                           ),
                         ),
                         const SizedBox(height: 14),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryGold,
-                            foregroundColor: Colors.black,
-                          ),
-                          onPressed: () => _openAddQuestDialog(),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Tambah Quest'),
-                        ),
+                        questVM.searchQuery.isNotEmpty
+                            ? OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                    color: AppTheme.primaryGold,
+                                  ),
+                                  foregroundColor: AppTheme.primaryGold,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  questVM.setSearchQuery('');
+                                },
+                                icon: const Icon(Icons.clear, size: 16),
+                                label: const Text('Reset Pencarian'),
+                              )
+                            : ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryGold,
+                                  foregroundColor: Colors.black,
+                                ),
+                                onPressed: () => _openAddQuestDialog(),
+                                icon: const Icon(Icons.add),
+                                label: const Text('Tambah Quest'),
+                              ),
                       ],
                     ),
                   )
@@ -644,6 +685,50 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuestSearchBar(QuestViewModel questVM) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.cardBackground,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.surfaceLighter),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: questVM.setSearchQuery,
+        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: 'Cari nama atau deskripsi quest...',
+          hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppTheme.primaryGold,
+            size: 20,
+          ),
+          suffixIcon: questVM.searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: AppTheme.textMuted,
+                    size: 18,
+                  ),
+                  tooltip: 'Hapus pencarian',
+                  onPressed: () {
+                    _searchController.clear();
+                    questVM.setSearchQuery('');
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 12,
+          ),
+        ),
       ),
     );
   }
@@ -1009,6 +1094,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showWelcomeRegistrationDialog(CharacterViewModel charVM) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => _WelcomeRegistrationDialog(
+        onSave: charVM.updateName,
+      ),
+    );
+  }
+
   // TAB 3: Papan Pengumuman Guild (Guild Board)
   Widget _buildGuildBoardTab(
     QuestViewModel questVM,
@@ -1150,7 +1245,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildSoundCard(charVM),
         const SizedBox(height: 16),
 
-        // Sinkronisasi Cloud (Firebase / Supabase)
+        // Penyimpanan Offline Lokal Aktif (Hive Database)
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -1161,42 +1256,83 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.cloud_sync, color: AppTheme.neonCyan),
-                  SizedBox(width: 8),
-                  Text(
-                    'Sinkronisasi Cloud & Backup',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  const Icon(Icons.shield_outlined, color: AppTheme.neonCyan),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Penyimpanan Offline Lokal',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF69F0AE).withAlpha(35),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFF69F0AE).withAlpha(120),
+                      ),
+                    ),
+                    child: const Text(
+                      'AMAN & LOKAL',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF69F0AE),
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               const Text(
-                'Data tersimpan secara lokal dan aman di perangkat ini. Kamu dapat menghubungkan akun untuk sinkronisasi antar perangkat.',
-                style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
-              ),
-              const SizedBox(height: 14),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.neonCyan),
-                  foregroundColor: AppTheme.neonCyan,
+                'Semua data misi, riwayat quest, dan profil petualang tersimpan di penyimpanan lokal perangkat (Hive). Tanpa ketergantungan internet dan bebas pelacakan.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textMuted,
+                  height: 1.4,
                 ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Status: Penyimpanan offline lokal aktif & sinkron.',
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceLighter.withAlpha(80),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.storage_rounded,
+                      size: 16,
+                      color: AppTheme.neonCyan,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Total Terdaftar: ${allQuests.length} Quest • $completed Selesai',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white70,
+                        ),
                       ),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.sync),
-                label: const Text('Periksa Sinkronisasi'),
+                  ],
+                ),
               ),
             ],
           ),
@@ -1423,6 +1559,114 @@ class _EditNameDialogState extends State<_EditNameDialog> {
           ),
           onPressed: _saving ? null : _save,
           child: const Text('Simpan', style: TextStyle(color: Colors.black)),
+        ),
+      ],
+    );
+  }
+}
+
+/// Dialog sambutan dan registrasi nama untuk petualang baru pada peluncuran perdana
+class _WelcomeRegistrationDialog extends StatefulWidget {
+  final Future<void> Function(String name) onSave;
+
+  const _WelcomeRegistrationDialog({required this.onSave});
+
+  @override
+  State<_WelcomeRegistrationDialog> createState() =>
+      _WelcomeRegistrationDialogState();
+}
+
+class _WelcomeRegistrationDialogState
+    extends State<_WelcomeRegistrationDialog> {
+  late final TextEditingController _controller;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: 'Petualang');
+    _controller.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _controller.text.length,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _saving) return;
+    setState(() => _saving = true);
+    await widget.onSave(text);
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.shield, color: AppTheme.primaryGold, size: 22),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Pendaftaran Guild',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Selamat datang di Guild Quest Kalender! Daftarkan nama panggilan petualangmu untuk memulai petualangan produktivitas.',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppTheme.textMuted,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            enabled: !_saving,
+            maxLength: 24,
+            textInputAction: TextInputAction.done,
+            decoration: const InputDecoration(
+              labelText: 'Nama Petualang',
+              hintText: 'Contoh: Arthur, Kael, dsb...',
+              counterText: '',
+            ),
+            onSubmitted: (_) => _submit(),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          child: const Text(
+            'Nanti Saja',
+            style: TextStyle(color: AppTheme.textMuted),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryGold,
+            foregroundColor: Colors.black,
+          ),
+          onPressed: _saving ? null : _submit,
+          child: const Text(
+            'Mulai Petualangan',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );

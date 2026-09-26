@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:quest_kalender/data/repositories/quest_repository.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
 import 'package:quest_kalender/ui/features/character/view_models/character_view_model.dart';
+import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +54,49 @@ void main() {
       expect(restored.rank, equals(QuestRank.b));
       expect(restored.category, equals(QuestCategory.strength));
       expect(restored.isCompleted, isTrue);
+    });
+
+    test('QuestViewModel memfilter daftar quest dengan setSearchQuery', () async {
+      final repo = QuestRepository();
+      final vm = QuestViewModel(repository: repo);
+      final date = DateTime(2026, 9, 26);
+      vm.selectDate(date);
+
+      final q1 = Quest(
+        id: 'q1',
+        title: 'Membaca Buku Sejarah',
+        description: 'Bab 1 dan 2',
+        date: date,
+        rank: QuestRank.e,
+        category: QuestCategory.intellect,
+      );
+      final q2 = Quest(
+        id: 'q2',
+        title: 'Latihan Pushup',
+        description: '3 set 15 repetisi',
+        date: date,
+        rank: QuestRank.d,
+        category: QuestCategory.strength,
+      );
+
+      await vm.addQuest(q1);
+      await vm.addQuest(q2);
+
+      expect(vm.questsForSelectedDate.length, equals(2));
+
+      vm.setSearchQuery('sejarah');
+      expect(vm.questsForSelectedDate.length, equals(1));
+      expect(vm.questsForSelectedDate.first.id, equals('q1'));
+
+      vm.setSearchQuery('pushup');
+      expect(vm.questsForSelectedDate.length, equals(1));
+      expect(vm.questsForSelectedDate.first.id, equals('q2'));
+
+      vm.setSearchQuery('tidak-ada');
+      expect(vm.questsForSelectedDate.isEmpty, isTrue);
+
+      vm.setSearchQuery('');
+      expect(vm.questsForSelectedDate.length, equals(2));
     });
   });
 
@@ -151,6 +196,18 @@ void main() {
       );
       expect(granted3, equals(0));
       expect(charVM.profile.dailyExpForDate(today), equals(500));
+    });
+
+    test('Nama petualang default Petualang dan bisa diperbarui via updateName', () async {
+      final charVM = CharacterViewModel();
+      expect(charVM.profile.name, equals('Petualang'));
+      expect(charVM.profile.completedQuestsCount, equals(0));
+
+      await charVM.updateName('Arthur Pendragon');
+      expect(charVM.profile.name, equals('Arthur Pendragon'));
+
+      final restored = UserProfile.fromMap(charVM.profile.toMap());
+      expect(restored.name, equals('Arthur Pendragon'));
     });
   });
 }

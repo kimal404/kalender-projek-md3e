@@ -6,7 +6,7 @@ class AppTheme {
   static const Color darkBackground = Color(0xFF0F1126);
   static const Color cardBackground = Color(0xFF1A1F3A);
   static const Color surfaceLighter = Color(0xFF2A2F4D);
-  static const Color textMuted = Color(0xFF9E9E9E);
+  static const Color textMuted = Color(0xFFB8BAC8);
   static const Color neonCyan = Color(0xFF00E5FF);
   static const Color neonPurple = Color(0xFFD500F9);
 
