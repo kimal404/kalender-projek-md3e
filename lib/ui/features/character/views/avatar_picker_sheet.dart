@@ -188,16 +188,16 @@ class _AvatarChoice extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppTheme.primaryGold.withAlpha(28)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected ? AppTheme.primaryGold : Colors.transparent,
-            width: 1.2,
-          ),
-        ),
+        decoration: selected
+            ? AppTheme.clayCardDecoration(
+                radius: 14,
+                accentColor: AppTheme.primaryGold,
+                color: AppTheme.primaryGold.withAlpha(24),
+              )
+            : BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+              ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

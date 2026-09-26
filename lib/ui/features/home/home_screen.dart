@@ -230,16 +230,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Streak Harian dengan animasi pulse
+              // Streak Harian dengan animasi pulse & clay pill
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
+                  horizontal: 11,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.deepOrange.withAlpha(40),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.deepOrange, width: 1),
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.alphaBlend(
+                        Colors.white.withAlpha(40),
+                        Colors.deepOrange.withAlpha(60),
+                      ),
+                      Colors.deepOrange.withAlpha(45),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.deepOrange.withAlpha(180),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.deepOrange.withAlpha(50),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withAlpha(20),
+                      blurRadius: 2,
+                      offset: const Offset(0, -1),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -249,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       size: 16,
                       color: Colors.deepOrange,
                     ),
-                    const SizedBox(width: 2),
+                    const SizedBox(width: 3),
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       transitionBuilder: (child, animation) {
@@ -278,27 +303,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 8),
 
-          // EXP Bar dengan animasi luncur halus (smooth easing)
+          // EXP Bar dengan track recessed clay dan animasi luncur halus
           Row(
             children: [
               Expanded(
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: expPercent),
-                  duration: const Duration(milliseconds: 650),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, animatedExp, child) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: LinearProgressIndicator(
-                        value: animatedExp,
-                        minHeight: 8,
-                        backgroundColor: AppTheme.surfaceLighter,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppTheme.neonPurple,
-                        ),
+                child: Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF131628),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(120),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
                       ),
-                    );
-                  },
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: expPercent),
+                      duration: const Duration(milliseconds: 650),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, animatedExp, child) {
+                        return LinearProgressIndicator(
+                          value: animatedExp,
+                          minHeight: 8,
+                          backgroundColor: Colors.transparent,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppTheme.neonPurple,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -387,11 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(28),
-                    decoration: BoxDecoration(
-                      color: AppTheme.cardBackground,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppTheme.surfaceLighter),
-                    ),
+                    decoration: AppTheme.clayCardDecoration(radius: 18),
                     child: Column(
                       children: [
                         Icon(
@@ -549,24 +584,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            accent.withAlpha(48),
-            AppTheme.cardBackground.withAlpha(220),
-          ],
-        ),
-        border: Border.all(color: accent.withAlpha(140)),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withAlpha(36),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
+      decoration: AppTheme.clayCardDecoration(
+        radius: 20,
+        accentColor: accent,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -611,13 +631,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceLighter.withAlpha(90),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: accent.withAlpha(45),
-                width: 1,
-              ),
+            decoration: AppTheme.clayRecessedDecoration(
+              radius: 10,
+              color: const Color(0xFF131628),
+              borderColor: accent.withAlpha(60),
             ),
             child: Row(
               children: [
@@ -668,20 +685,34 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0, end: progress),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOutCubic,
-              builder: (context, value, _) {
-                return LinearProgressIndicator(
-                  value: value,
-                  minHeight: 7,
-                  backgroundColor: AppTheme.surfaceLighter,
-                  valueColor: AlwaysStoppedAnimation<Color>(accent),
-                );
-              },
+          Container(
+            height: 7,
+            decoration: BoxDecoration(
+              color: const Color(0xFF131628),
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(120),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: progress),
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, _) {
+                  return LinearProgressIndicator(
+                    value: value,
+                    minHeight: 7,
+                    backgroundColor: Colors.transparent,
+                    valueColor: AlwaysStoppedAnimation<Color>(accent),
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -691,10 +722,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildQuestSearchBar(QuestViewModel questVM) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.surfaceLighter),
+      decoration: AppTheme.clayRecessedDecoration(
+        radius: 14,
+        color: const Color(0xFF15192E),
+        borderColor: AppTheme.primaryGold.withAlpha(35),
       ),
       child: TextField(
         controller: _searchController,
@@ -804,18 +835,9 @@ class _HomeScreenState extends State<HomeScreen> {
           delayMs: 0,
           child: Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.cardBackground,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.surfaceLighter),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.surfaceLighter.withAlpha(100),
-                  AppTheme.cardBackground,
-                ],
-              ),
+            decoration: AppTheme.clayCardDecoration(
+              radius: 20,
+              accentColor: AppTheme.primaryGold,
             ),
             child: Column(
               children: [
@@ -842,10 +864,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         right: 0,
                         bottom: 0,
                         child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: AppTheme.primaryGold,
-                            shape: BoxShape.circle,
+                          padding: const EdgeInsets.all(7),
+                          decoration: AppTheme.clayButtonDecoration(
+                            primaryColor: AppTheme.primaryGold,
+                            radius: 16,
                           ),
                           child: const Icon(
                             Icons.photo_camera,
@@ -996,23 +1018,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatPill(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, size: 20, color: AppTheme.primaryGold),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: AppTheme.clayRecessedDecoration(
+        radius: 12,
+        color: const Color(0xFF131628),
+        borderColor: Colors.white.withAlpha(20),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 20, color: AppTheme.primaryGold),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-        ),
-      ],
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10.5, color: AppTheme.textMuted),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1025,18 +1055,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withAlpha(80)),
+      decoration: AppTheme.clayCardDecoration(
+        radius: 16,
+        accentColor: color,
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withAlpha(40),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color.alphaBlend(
+                    Colors.white.withAlpha(45),
+                    color.withAlpha(45),
+                  ),
+                  color.withAlpha(35),
+                ],
+              ),
+              border: Border.all(color: color.withAlpha(120), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withAlpha(50),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Icon(icon, color: color, size: 24),
           ),
@@ -1066,9 +1113,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceLighter,
-              borderRadius: BorderRadius.circular(10),
+            decoration: AppTheme.clayRecessedDecoration(
+              radius: 10,
+              color: const Color(0xFF131628),
+              borderColor: color.withAlpha(70),
             ),
             child: Text(
               '$value Pts',
@@ -1119,10 +1167,9 @@ class _HomeScreenState extends State<HomeScreen> {
         // Ringkasan Papan Misi
         Container(
           padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppTheme.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.surfaceLighter),
+          decoration: AppTheme.clayCardDecoration(
+            radius: 18,
+            accentColor: AppTheme.primaryGold,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1175,11 +1222,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Statistik Berdasarkan Tingkat Kesulitan Rank
         Container(
           padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppTheme.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.surfaceLighter),
-          ),
+          decoration: AppTheme.clayCardDecoration(radius: 18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1211,16 +1254,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: allQuests.isEmpty
-                                ? 0.0
-                                : count / allQuests.length,
-                            minHeight: 6,
-                            backgroundColor: AppTheme.surfaceLighter,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              rank.color,
+                        child: Container(
+                          height: 7,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF131628),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: allQuests.isEmpty
+                                  ? 0.0
+                                  : count / allQuests.length,
+                              minHeight: 7,
+                              backgroundColor: Colors.transparent,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                rank.color,
+                              ),
                             ),
                           ),
                         ),
@@ -1248,10 +1298,9 @@ class _HomeScreenState extends State<HomeScreen> {
         // Penyimpanan Offline Lokal Aktif (Hive Database)
         Container(
           padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppTheme.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.surfaceLighter),
+          decoration: AppTheme.clayCardDecoration(
+            radius: 18,
+            accentColor: AppTheme.neonCyan,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1309,9 +1358,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   horizontal: 12,
                   vertical: 8,
                 ),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceLighter.withAlpha(80),
-                  borderRadius: BorderRadius.circular(10),
+                decoration: AppTheme.clayRecessedDecoration(
+                  radius: 10,
+                  color: const Color(0xFF131628),
+                  borderColor: AppTheme.neonCyan.withAlpha(50),
                 ),
                 child: Row(
                   children: [
@@ -1348,10 +1398,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.surfaceLighter),
+      decoration: AppTheme.clayCardDecoration(
+        radius: 18,
+        accentColor: AppTheme.primaryGold,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1397,18 +1446,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     horizontal: 12,
                     vertical: 4,
                   ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppTheme.primaryGold.withAlpha(28)
-                        : AppTheme.surfaceLighter.withAlpha(110),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected
-                          ? AppTheme.primaryGold.withAlpha(160)
-                          : Colors.transparent,
-                      width: 1.2,
-                    ),
-                  ),
+                  decoration: isSelected
+                      ? AppTheme.clayCardDecoration(
+                          radius: 12,
+                          accentColor: AppTheme.primaryGold,
+                          color: AppTheme.primaryGold.withAlpha(24),
+                        )
+                      : AppTheme.clayRecessedDecoration(
+                          radius: 12,
+                          color: AppTheme.surfaceLighter.withAlpha(70),
+                          borderColor: Colors.white.withAlpha(15),
+                        ),
                   child: Row(
                     children: [
                       AnimatedScale(
@@ -1476,22 +1524,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBoardMetric(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: color,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: AppTheme.clayRecessedDecoration(
+        radius: 12,
+        color: const Color(0xFF131628),
+        borderColor: color.withAlpha(45),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10.5, color: AppTheme.textMuted),
+          ),
+        ],
+      ),
     );
   }
 }

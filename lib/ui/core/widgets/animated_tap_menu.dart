@@ -50,7 +50,12 @@ class _AnimatedPressScaleState extends State<AnimatedPressScale> {
         scale: targetScale,
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOutCubic,
-        child: widget.child,
+        child: AnimatedSlide(
+          offset: _pressed ? const Offset(0, 0.02) : Offset.zero,
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOutCubic,
+          child: widget.child,
+        ),
       ),
     );
   }
@@ -83,14 +88,44 @@ class AnimatedMenuChip extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? activeColor.withAlpha(55) : AppTheme.surfaceLighter,
-          borderRadius: BorderRadius.circular(12),
+          color: selected ? activeColor.withAlpha(65) : AppTheme.surfaceLighter,
+          borderRadius: BorderRadius.circular(14),
+          gradient: selected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    activeColor.withAlpha(90),
+                    activeColor.withAlpha(45),
+                  ],
+                )
+              : null,
           border: Border.all(
-            color: selected ? activeColor : Colors.white10,
+            color: selected ? activeColor : Colors.white.withAlpha(24),
             width: selected ? 1.5 : 1.0,
           ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: activeColor.withAlpha(90),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withAlpha(50),
+                    blurRadius: 3,
+                    offset: const Offset(0, -1),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(60),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -153,8 +188,15 @@ class AnimatedRpgBottomNav extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.cardBackground,
         border: Border(
-          top: BorderSide(color: AppTheme.primaryGold.withAlpha(38), width: 1),
+          top: BorderSide(color: Colors.white.withAlpha(25), width: 1),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(120),
+            blurRadius: 18,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -180,15 +222,39 @@ class AnimatedRpgBottomNav extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppTheme.primaryGold.withAlpha(32)
+                          ? AppTheme.primaryGold.withAlpha(45)
                           : Colors.transparent,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: isSelected
+                          ? LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                AppTheme.primaryGold.withAlpha(60),
+                                AppTheme.primaryGold.withAlpha(25),
+                              ],
+                            )
+                          : null,
                       border: Border.all(
                         color: isSelected
-                            ? AppTheme.primaryGold.withAlpha(110)
+                            ? AppTheme.primaryGold.withAlpha(120)
                             : Colors.transparent,
-                        width: 1,
+                        width: 1.5,
                       ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: AppTheme.primaryGold.withAlpha(60),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withAlpha(50),
+                                blurRadius: 3,
+                                offset: const Offset(0, -1),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

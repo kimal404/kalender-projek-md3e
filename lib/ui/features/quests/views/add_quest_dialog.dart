@@ -199,12 +199,9 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.cardBackground,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          border: Border.fromBorderSide(
-            BorderSide(color: AppTheme.surfaceLighter, width: 1.5),
-          ),
+        decoration: AppTheme.clayCardDecoration(
+          radius: 22,
+          accentColor: AppTheme.primaryGold,
         ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500, maxHeight: 680),
@@ -451,14 +448,12 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                         horizontal: 14,
                         vertical: 12,
                       ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceLighter,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isQuotaFull
-                              ? Colors.redAccent.withAlpha(140)
-                              : AppTheme.neonPurple.withAlpha(80),
-                        ),
+                      decoration: AppTheme.clayRecessedDecoration(
+                        radius: 14,
+                        color: const Color(0xFF131628),
+                        borderColor: isQuotaFull
+                            ? Colors.redAccent.withAlpha(140)
+                            : AppTheme.neonPurple.withAlpha(90),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,18 +521,25 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                             ],
                           ),
                           const SizedBox(height: 6),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: ((committedExp + effectiveExp) /
-                                      UserProfile.maxDailyExp)
-                                  .clamp(0.0, 1.0),
-                              minHeight: 6,
-                              backgroundColor: AppTheme.darkBackground,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                isQuotaFull
-                                    ? Colors.redAccent
-                                    : AppTheme.neonCyan,
+                          Container(
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F1122),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: ((committedExp + effectiveExp) /
+                                        UserProfile.maxDailyExp)
+                                    .clamp(0.0, 1.0),
+                                minHeight: 6,
+                                backgroundColor: Colors.transparent,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  isQuotaFull
+                                      ? Colors.redAccent
+                                      : AppTheme.neonCyan,
+                                ),
                               ),
                             ),
                           ),
@@ -569,31 +571,36 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Tombol Simpan
+                    // Tombol Simpan Claymorphic
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryGold,
-                          disabledBackgroundColor: AppTheme.surfaceLighter,
-                          foregroundColor: Colors.black,
-                          disabledForegroundColor: AppTheme.textMuted,
+                      child: AnimatedPressScale(
+                        onTap: isQuotaFull ? null : () => _save(effectiveExp),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed:
-                            isQuotaFull ? null : () => _save(effectiveExp),
-                        child: Text(
-                          isQuotaFull
-                              ? 'Limit EXP Harian Penuh (${UserProfile.maxDailyExp} EXP)'
-                              : (isEditing
-                                    ? 'Simpan Perubahan'
-                                    : 'Terbitkan Quest ke Guild'),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          decoration: isQuotaFull
+                              ? BoxDecoration(
+                                  color: AppTheme.surfaceLighter,
+                                  borderRadius: BorderRadius.circular(14),
+                                )
+                              : AppTheme.clayButtonDecoration(
+                                  primaryColor: AppTheme.primaryGold,
+                                  radius: 14,
+                                ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            isQuotaFull
+                                ? 'Limit EXP Harian Penuh (${UserProfile.maxDailyExp} EXP)'
+                                : (isEditing
+                                      ? 'Simpan Perubahan'
+                                      : 'Terbitkan Quest ke Guild'),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: isQuotaFull
+                                  ? AppTheme.textMuted
+                                  : Colors.black,
+                            ),
                           ),
                         ),
                       ),

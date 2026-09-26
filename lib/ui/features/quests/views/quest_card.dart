@@ -83,33 +83,19 @@ class _QuestCardState extends State<QuestCard>
           duration: const Duration(milliseconds: 380),
           curve: Curves.easeOutCubic,
           margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: isDone
-                ? AppTheme.cardBackground.withAlpha(130)
-                : AppTheme.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDone
-                  ? AppTheme.surfaceLighter.withAlpha(70)
-                  : rankColor.withAlpha(130),
-              width: 1.5,
-            ),
-            boxShadow: isDone
-                ? []
-                : [
-                    BoxShadow(
-                      color: rankColor.withAlpha(30),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                    BoxShadow(
-                      color: rankColor.withAlpha(10),
-                      blurRadius: 22,
-                      spreadRadius: 2,
-                      offset: Offset.zero,
-                    ),
-                  ],
-          ),
+          decoration: isDone
+              ? BoxDecoration(
+                  color: AppTheme.cardBackground.withAlpha(120),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppTheme.surfaceLighter.withAlpha(70),
+                    width: 1.5,
+                  ),
+                )
+              : AppTheme.clayCardDecoration(
+                  accentColor: rankColor,
+                  radius: 18,
+                ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -456,22 +442,40 @@ class _SpringCheckboxState extends State<_SpringCheckbox>
             color: widget.isDone
                 ? AppTheme.primaryGold
                 : AppTheme.surfaceLighter,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(9),
+            gradient: widget.isDone
+                ? const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFFFFCA28), AppTheme.primaryGold],
+                  )
+                : null,
             border: Border.all(
               color: widget.isDone
-                  ? AppTheme.primaryGold
-                  : AppTheme.textMuted.withAlpha(100),
-              width: 2,
+                  ? Colors.white.withAlpha(140)
+                  : Colors.white.withAlpha(28),
+              width: 1.5,
             ),
             boxShadow: widget.isDone
                 ? [
                     BoxShadow(
-                      color: AppTheme.primaryGold.withAlpha(110),
-                      blurRadius: 10,
-                      spreadRadius: 1,
+                      color: AppTheme.primaryGold.withAlpha(140),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withAlpha(120),
+                      blurRadius: 3,
+                      offset: const Offset(0, -1),
                     ),
                   ]
-                : [],
+                : [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(80),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 230),
@@ -519,16 +523,29 @@ class _RewardBadge extends StatelessWidget {
       duration: const Duration(milliseconds: 400),
       opacity: isDone ? 0.4 : 1.0,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withAlpha(isDone ? 12 : 30),
-          borderRadius: BorderRadius.circular(6),
+          color: color.withAlpha(isDone ? 15 : 32),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: color.withAlpha(isDone ? 30 : 90),
+            width: 1,
+          ),
+          boxShadow: isDone
+              ? null
+              : [
+                  BoxShadow(
+                    color: color.withAlpha(40),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 14, color: color),
-            const SizedBox(width: 2),
+            const SizedBox(width: 3),
             Text(
               label,
               style: TextStyle(

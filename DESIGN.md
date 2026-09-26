@@ -54,3 +54,23 @@ Quest Kalender menggunakan palet gelap bertema **Guild Petualang Malam (Midnight
    - Limit perolehan EXP harian (500 EXP/hari) dipantau secara transparan dengan bilah progres terverifikasi.
 4. **Target Sentuh Ergonomis:**
    - Semua elemen interaktif (tombol, chip filter, avatar picker, icon button) memiliki target sentuh minimum $\ge 48 \times 48$ dp untuk kenyamanan navigasi satu tangan.
+
+---
+
+## 5. Claymorphism RPG Styling (3D Tactile Theme)
+
+Antarmuka Quest Kalender mengusung sentuhan **Claymorphism RPG**: elemen antarmuka terasa seperti token fisik atau pelat guild 3D yang empuk, tebal (*chunky*), dan taktil saat disentuh, tanpa mengorbankan keterbacaan gelap (*dark mode*) atau aturan kontras WCAG AA.
+
+### A. Anatomi Visual Kartu & Tombol Clay
+1. **Chunky Rounded Geometry:** Sudut kurva tebal beradius `16–22px` pada kartu, dan `12–16px` pada tombol/chip, memberikan kesan fisik material *clay* padat.
+2. **Lighting Gradient 3D:** Setiap permukaan diberi gradasi linear halus dari sudut kiri-atas (sumber cahaya imajiner yang sedikit lebih cerah) ke sudut kanan-bawah (sisi bayangan dasar).
+3. **Dual Shadow Formula:**
+   - **Grounding Drop Shadow:** `Offset(0, 7)`, blur `16`, hitam pekat `black.withAlpha(140)` untuk mengangkat elemen di atas latar belakang malam.
+   - **Top-Left Highlight Rim:** `Offset(-2, -2)`, blur `6`, putih transparan `white.withAlpha(28)` yang merefleksikan pantulan tepi material clay.
+   - **Ambient Accent Rim:** Aksen warna dinamis (Gold, Cyan, Crimson, Green) yang berpendar lembut di sekitar perbatasan elemen.
+4. **Recessed Groove (Permukaan Cekung):** Digunakan untuk kotak pencarian, track progress bar, dan info pod (`clayRecessedDecoration`) dengan bayangan dalam gelap di sisi atas dan pantulan halus di sisi bawah, menciptakan kedalaman relief.
+
+### B. Dinamika Fisik Sentuhan (Tactile Physics)
+- **Micro-Dip & Scale Compression:** Saat ditekan, tombol dan kartu memicu animasi `AnimatedPressScale` yang mengecilkan skala ke `0.94` sekaligus memberikan pergeseran vertikal halus ke bawah `Offset(0, 0.02)` (2px micro-dip).
+- **Elastic Release:** Saat dilepas, kurva `easeOutBack` mengembalikan elemen ke posisi semula dengan pegas mikro alami, memberikan sensasi memencet tombol arcade/token fisik.
+- **Sliding Indicator:** Navigasi mode kalender (Bulan, Minggu, Hari) menggunakan kapsul emas clay yang meluncur mulus (`AnimatedAlign` kurva `easeOutCubic`) di dalam lintasan rel cekung (*recessed track*).

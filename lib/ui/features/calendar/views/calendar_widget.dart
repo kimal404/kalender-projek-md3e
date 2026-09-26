@@ -12,11 +12,7 @@ class CalendarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.surfaceLighter, width: 1),
-      ),
+      decoration: AppTheme.clayCardDecoration(radius: 20),
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
@@ -291,15 +287,32 @@ class CalendarWidget extends StatelessWidget {
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
             margin: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? AppTheme.primaryGold
-                  : (isToday ? AppTheme.surfaceLighter : Colors.transparent),
-              borderRadius: BorderRadius.circular(10),
-              border: isToday && !isSelected
-                  ? Border.all(color: AppTheme.primaryGold, width: 1.5)
-                  : null,
-            ),
+            decoration: isSelected
+                ? AppTheme.clayButtonDecoration(
+                    primaryColor: AppTheme.primaryGold,
+                    radius: 12,
+                  )
+                : BoxDecoration(
+                    color: isToday
+                        ? AppTheme.surfaceLighter
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    border: isToday && !isSelected
+                        ? Border.all(
+                            color: AppTheme.primaryGold.withAlpha(160),
+                            width: 1.5,
+                          )
+                        : null,
+                    boxShadow: isToday && !isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppTheme.primaryGold.withAlpha(40),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                        : null,
+                  ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -399,15 +412,32 @@ class CalendarWidget extends StatelessWidget {
               curve: Curves.easeOutCubic,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppTheme.primaryGold
-                    : (isToday ? AppTheme.surfaceLighter : Colors.transparent),
-                borderRadius: BorderRadius.circular(10),
-                border: isToday && !isSelected
-                    ? Border.all(color: AppTheme.primaryGold, width: 1.5)
-                    : null,
-              ),
+              decoration: isSelected
+                  ? AppTheme.clayButtonDecoration(
+                      primaryColor: AppTheme.primaryGold,
+                      radius: 12,
+                    )
+                  : BoxDecoration(
+                      color: isToday
+                          ? AppTheme.surfaceLighter
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      border: isToday && !isSelected
+                          ? Border.all(
+                              color: AppTheme.primaryGold.withAlpha(160),
+                              width: 1.5,
+                            )
+                          : null,
+                      boxShadow: isToday && !isSelected
+                          ? [
+                              BoxShadow(
+                                color: AppTheme.primaryGold.withAlpha(40),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                          : null,
+                    ),
               child: Column(
                 children: [
                   Text(
@@ -551,12 +581,24 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selector = Container(
-      height: 38,
+      height: 40,
       decoration: BoxDecoration(
-        color: AppTheme.surfaceLighter,
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFF131628),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withAlpha(20),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(100),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+            spreadRadius: -1,
+          ),
+        ],
       ),
-      padding: const EdgeInsets.all(3),
+      padding: const EdgeInsets.all(3.5),
       child: Stack(
         children: [
           // Sliding indicator (pill kuning emas yang meluncur mulus antar opsi)
@@ -568,16 +610,9 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
               widthFactor: 1.0 / 3.0,
               heightFactor: 1.0,
               child: Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGold,
-                  borderRadius: BorderRadius.circular(7),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryGold.withAlpha(90),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                decoration: AppTheme.clayButtonDecoration(
+                  primaryColor: AppTheme.primaryGold,
+                  radius: 9,
                 ),
               ),
             ),
