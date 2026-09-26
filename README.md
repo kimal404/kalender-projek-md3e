@@ -12,7 +12,7 @@ Versi `1.0.0+1` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUME
 - **Kontrak Harian Guild**: Menampilkan progres ketuntasan misi harian serta pantauan **Limit EXP Harian (`X / 500 EXP Diklaim` & `Terjadwal`)**.
 - **Profil Petualang & Kustomisasi Avatar**: Nama, gelar otomatis berdasarkan level, bar EXP, level karakter, streak aktif, empat atribut RPG (`STR`, `INT`, `DIS`, `VIT`), 7 avatar SVG bawaan, serta dukungan unggah foto dari Galeri atau Kamera.
 - **Suara Pengingat Kustom (Native Audio & Notifikasi)**: Pengingat tepat pada jam mulai quest dengan 6 pilihan nada (`Default`, `Lonceng`, `Lonceng Angin`, `Terompet Guild`, `Denyut`, `Senyap`) yang dapat langsung diputar (*preview*) dari tab **Papan Guild**.
-- **Animasi Menu Smooth & Ringan (`60fps+` GPU-Accelerated)**: Seluruh menu, navigasi bawah (`AnimatedRpgBottomNav`), chip filter/pilihan (`AnimatedMenuChip`), sel tanggal kalender, hingga checkbox menggunakan animasi transformasi ringan tanpa membebani perangkat.
+- **Desain Dark Arcane Glassmorphism & Animasi Smooth (`60fps+`)**: Tampilan premium *Dark Arcane Glassmorphism* dengan frosted glass (`BackdropFilter`), specular gradient border, multi-orb ambient glow, serta interaksi mikro GPU-accelerated yang mulus.
 
 ## Cara Bermain & Aturan RPG
 

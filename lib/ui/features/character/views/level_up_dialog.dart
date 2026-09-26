@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
@@ -134,244 +135,227 @@ class _LevelUpDialogState extends State<LevelUpDialog>
             alignment: Alignment.center,
             children: [
               // ── Kartu Utama ──
-              Container(
-                constraints: const BoxConstraints(maxWidth: 360),
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppTheme.cardBackground,
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppTheme.primaryGold.withAlpha(55),
-                      AppTheme.cardBackground,
-                      AppTheme.neonPurple.withAlpha(20),
-                    ],
-                    stops: const [0.0, 0.45, 1.0],
-                  ),
-                  border: Border.all(color: AppTheme.primaryGold, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryGold.withAlpha(60),
-                      blurRadius: 30,
-                      spreadRadius: 2,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 360),
+                    padding: const EdgeInsets.all(24),
+                    decoration: AppTheme.glassCardDecoration(
+                      radius: 24,
+                      accentColor: AppTheme.primaryGold,
                     ),
-                    BoxShadow(
-                      color: AppTheme.neonPurple.withAlpha(30),
-                      blurRadius: 40,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // ── Badge dengan glow + breathe ──
-                    AnimatedBuilder(
-                      animation: Listenable.merge([_glowAnim, _breatheAnim]),
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: Tween<double>(begin: 0.92, end: 1.0).animate(_breatheAnim).value,
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppTheme.primaryGold.withAlpha(35),
-                              border: Border.all(
-                                color: AppTheme.primaryGold,
-                                width: 2,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // ── Badge dengan glow + breathe ──
+                        AnimatedBuilder(
+                          animation: Listenable.merge([_glowAnim, _breatheAnim]),
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: Tween<double>(begin: 0.92, end: 1.0).animate(_breatheAnim).value,
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppTheme.primaryGold.withAlpha(35),
+                                  border: Border.all(
+                                    color: AppTheme.primaryGold,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.primaryGold.withAlpha(130),
+                                      blurRadius: _glowAnim.value,
+                                      spreadRadius: _glowAnim.value * 0.2,
+                                    ),
+                                    BoxShadow(
+                                      color: AppTheme.accentAmber.withAlpha(60),
+                                      blurRadius: _glowAnim.value * 2,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.military_tech,
+                                  size: 56,
+                                  color: AppTheme.primaryGold,
+                                ),
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.primaryGold.withAlpha(130),
-                                  blurRadius: _glowAnim.value,
-                                  spreadRadius: _glowAnim.value * 0.2,
-                                ),
-                                BoxShadow(
-                                  color: AppTheme.accentAmber.withAlpha(60),
-                                  blurRadius: _glowAnim.value * 2,
-                                  spreadRadius: 1,
-                                ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // ── Teks LEVEL UP! dengan shimmer effect ──
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: const [
+                              AppTheme.primaryGold,
+                              AppTheme.accentAmber,
+                              Color(0xFFFFE57F),
+                              AppTheme.primaryGold,
+                            ],
+                            stops: const [0.0, 0.35, 0.65, 1.0],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds),
+                          child: const Text(
+                            '★  LEVEL UP!  ★',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Text(
+                          'Selamat! Kamu telah mencapai\nLevel ${widget.newLevel}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.white,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        // ── Gelar / Title Badge ──
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 600),
+                          curve: Curves.easeOutBack,
+                          builder: (context, value, child) =>
+                              Transform.scale(scale: value, child: child),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppTheme.neonCyan.withAlpha(40),
+                                  AppTheme.neonPurple.withAlpha(30),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppTheme.neonCyan.withAlpha(160),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              widget.title,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.neonCyan,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // ── Separator ──
+                        Container(
+                          height: 1,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                AppTheme.surfaceLighter,
+                                Colors.transparent,
                               ],
                             ),
-                            child: const Icon(
-                              Icons.military_tech,
-                              size: 56,
-                              color: AppTheme.primaryGold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        const Text(
+                          'Statistik Atribut Kamu:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textMuted,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        _buildAnimatedStatRow(
+                          Icons.fitness_center,
+                          'Kekuatan (STR)',
+                          widget.profile.strength,
+                          const Color(0xFFEF5350),
+                          delayMs: 200,
+                        ),
+                        _buildAnimatedStatRow(
+                          Icons.psychology,
+                          'Kecerdasan (INT)',
+                          widget.profile.intellect,
+                          const Color(0xFF42A5F5),
+                          delayMs: 320,
+                        ),
+                        _buildAnimatedStatRow(
+                          Icons.task_alt,
+                          'Disiplin (DIS)',
+                          widget.profile.discipline,
+                          const Color(0xFFAB47BC),
+                          delayMs: 440,
+                        ),
+                        _buildAnimatedStatRow(
+                          Icons.favorite,
+                          'Kebugaran (VIT)',
+                          widget.profile.vitality,
+                          const Color(0xFF66BB6A),
+                          delayMs: 560,
+                        ),
+                        const SizedBox(height: 24),
+
+                        // ── Tombol Lanjutkan ──
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 700),
+                          curve: Curves.easeOutCubic,
+                          builder: (context, value, child) => Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset(0, 12 * (1 - value)),
+                              child: child,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // ── Teks LEVEL UP! dengan shimmer effect ──
-                    ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: const [
-                          AppTheme.primaryGold,
-                          AppTheme.accentAmber,
-                          Color(0xFFFFE57F),
-                          AppTheme.primaryGold,
-                        ],
-                        stops: const [0.0, 0.35, 0.65, 1.0],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: const Text(
-                        '★  LEVEL UP!  ★',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 3,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    Text(
-                      'Selamat! Kamu telah mencapai\nLevel ${widget.newLevel}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // ── Gelar / Title Badge ──
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 600),
-                      curve: Curves.easeOutBack,
-                      builder: (context, value, child) =>
-                          Transform.scale(scale: value, child: child),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppTheme.neonCyan.withAlpha(40),
-                              AppTheme.neonPurple.withAlpha(30),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppTheme.neonCyan.withAlpha(160),
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          widget.title,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.neonCyan,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // ── Separator ──
-                    Container(
-                      height: 1,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            AppTheme.surfaceLighter,
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    const Text(
-                      'Statistik Atribut Kamu:',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildAnimatedStatRow(
-                      Icons.fitness_center,
-                      'Kekuatan (STR)',
-                      widget.profile.strength,
-                      const Color(0xFFEF5350),
-                      delayMs: 200,
-                    ),
-                    _buildAnimatedStatRow(
-                      Icons.psychology,
-                      'Kecerdasan (INT)',
-                      widget.profile.intellect,
-                      const Color(0xFF42A5F5),
-                      delayMs: 320,
-                    ),
-                    _buildAnimatedStatRow(
-                      Icons.task_alt,
-                      'Disiplin (DIS)',
-                      widget.profile.discipline,
-                      const Color(0xFFAB47BC),
-                      delayMs: 440,
-                    ),
-                    _buildAnimatedStatRow(
-                      Icons.favorite,
-                      'Kebugaran (VIT)',
-                      widget.profile.vitality,
-                      const Color(0xFF66BB6A),
-                      delayMs: 560,
-                    ),
-                    const SizedBox(height: 24),
-
-                    // ── Tombol Lanjutkan ──
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 700),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) => Opacity(
-                        opacity: value,
-                        child: Transform.translate(
-                          offset: Offset(0, 12 * (1 - value)),
-                          child: child,
-                        ),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryGold,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: InkWell(
                               borderRadius: BorderRadius.circular(14),
-                            ),
-                            elevation: 4,
-                            shadowColor: AppTheme.primaryGold.withAlpha(100),
-                          ),
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text(
-                            'Lanjutkan Petualangan!',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                decoration: AppTheme.glassButtonDecoration(
+                                  primaryColor: AppTheme.primaryGold,
+                                  radius: 14,
+                                ),
+                                alignment: Alignment.center,
+                                child: const Text(
+                                  'Lanjutkan Petualangan!',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
 

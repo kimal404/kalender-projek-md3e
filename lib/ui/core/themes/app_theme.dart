@@ -10,60 +10,63 @@ class AppTheme {
   static const Color neonCyan = Color(0xFF00E5FF);
   static const Color neonPurple = Color(0xFFD500F9);
 
-  /// Dekorasi kartu bergaya Claymorphism RPG:
-  /// Memadukan sudut melengkung tebal (chunky), gradien pencahayaan 3D,
-  /// bayangan ganda (outer drop shadow + top ambient highlight) yang empuk/taktil.
-  static BoxDecoration clayCardDecoration({
+  /// Dekorasi kartu bergaya Dark Arcane Glassmorphism:
+  /// Permukaan kaca kristal buram (frosted glass), gradasi specular edge tipis,
+  /// dan ambient aura glow yang tembus cahaya.
+  static BoxDecoration glassCardDecoration({
     Color? color,
     Color? accentColor,
     double radius = 18,
     bool isPressed = false,
+    double opacity = 0.60,
   }) {
-    final base = color ?? cardBackground;
+    final base = color ?? const Color(0xFF141933);
     return BoxDecoration(
       borderRadius: BorderRadius.circular(radius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color.alphaBlend(Colors.white.withAlpha(22), base),
-          Color.alphaBlend(Colors.black.withAlpha(35), base),
+          // Pantulan kilau specular kiri-atas
+          accentColor != null
+              ? accentColor.withAlpha(isPressed ? 45 : 32)
+              : Colors.white.withAlpha(isPressed ? 30 : 20),
+          // Dasar kaca transparan
+          base.withAlpha((255 * opacity).round()),
+          // Sisi kanan-bawah berbayangan tipis
+          Color.alphaBlend(Colors.black.withAlpha(55), base)
+              .withAlpha((255 * (opacity + 0.12).clamp(0.0, 1.0)).round()),
         ],
+        stops: const [0.0, 0.42, 1.0],
       ),
       border: Border.all(
         color: accentColor != null
-            ? accentColor.withAlpha(120)
-            : Colors.white.withAlpha(32),
-        width: 1.5,
+            ? accentColor.withAlpha(isPressed ? 180 : 120)
+            : Colors.white.withAlpha(isPressed ? 65 : 36),
+        width: 1.2,
       ),
       boxShadow: [
-        // 1. Deep grounding drop shadow (bayangan bawah gelap)
+        // 1. Soft diffused ambient glass shadow
         BoxShadow(
-          color: Colors.black.withAlpha(isPressed ? 90 : 140),
-          blurRadius: isPressed ? 8 : 16,
-          offset: isPressed ? const Offset(0, 3) : const Offset(0, 7),
+          color: Colors.black.withAlpha(isPressed ? 85 : 125),
+          blurRadius: isPressed ? 10 : 22,
+          offset: const Offset(0, 8),
           spreadRadius: -2,
         ),
-        // 2. Soft top-left highlight (pantulan cahaya permukaan clay)
-        BoxShadow(
-          color: Colors.white.withAlpha(isPressed ? 16 : 28),
-          blurRadius: 6,
-          offset: const Offset(-2, -2),
-          spreadRadius: 0,
-        ),
-        // 3. Aksen ambient glow jika diberikan
+        // 2. Ambient aura glow saat accentColor aktif
         if (accentColor != null)
           BoxShadow(
-            color: accentColor.withAlpha(isPressed ? 20 : 38),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
+            color: accentColor.withAlpha(isPressed ? 35 : 24),
+            blurRadius: isPressed ? 8 : 16,
+            offset: const Offset(0, 2),
+            spreadRadius: -1,
           ),
       ],
     );
   }
 
-  /// Dekorasi tombol bergaya Claymorphism 3D Arcade / RPG Token
-  static BoxDecoration clayButtonDecoration({
+  /// Dekorasi tombol kaca kristal bergaya Glassmorphism
+  static BoxDecoration glassButtonDecoration({
     Color primaryColor = primaryGold,
     double radius = 14,
     bool isPressed = false,
@@ -71,34 +74,44 @@ class AppTheme {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(radius),
       gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
         colors: [
-          Color.alphaBlend(Colors.white.withAlpha(65), primaryColor),
+          Color.alphaBlend(
+            Colors.white.withAlpha(isPressed ? 90 : 130),
+            primaryColor,
+          ),
           primaryColor,
+          Color.alphaBlend(Colors.black.withAlpha(35), primaryColor),
         ],
+        stops: const [0.0, 0.48, 1.0],
+      ),
+      border: Border.all(
+        color: Colors.white.withAlpha(isPressed ? 200 : 140),
+        width: 1.2,
       ),
       boxShadow: [
-        // Deep warm drop shadow
         BoxShadow(
-          color: primaryColor.withAlpha(isPressed ? 60 : 110),
-          blurRadius: isPressed ? 5 : 12,
-          offset: isPressed ? const Offset(0, 2) : const Offset(0, 5),
+          color: primaryColor.withAlpha(isPressed ? 70 : 110),
+          blurRadius: isPressed ? 6 : 14,
+          offset: isPressed ? const Offset(0, 2) : const Offset(0, 4),
+          spreadRadius: 0,
         ),
-        // Top edge light highlight
         BoxShadow(
-          color: Colors.white.withAlpha(140),
-          blurRadius: 3,
+          color: Colors.white.withAlpha(isPressed ? 40 : 70),
+          blurRadius: 4,
           offset: const Offset(0, -1),
         ),
       ],
     );
   }
 
-  /// Dekorasi badge / pil kecil bergaya Claymorphism
-  static BoxDecoration clayPillDecoration({
+  /// Dekorasi badge / pil kecil bergaya kaca buram
+  static BoxDecoration glassPillDecoration({
     required Color color,
-    double radius = 10,
+    Color? borderColor,
+    double radius = 12,
+    bool selected = false,
   }) {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(radius),
@@ -106,48 +119,102 @@ class AppTheme {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color.alphaBlend(Colors.white.withAlpha(45), color),
-          color,
+          Color.alphaBlend(
+            Colors.white.withAlpha(selected ? 55 : 25),
+            color,
+          ).withAlpha(selected ? 75 : 35),
+          color.withAlpha(selected ? 55 : 25),
         ],
       ),
-      boxShadow: [
-        BoxShadow(
-          color: color.withAlpha(80),
-          blurRadius: 6,
-          offset: const Offset(0, 2),
-        ),
-      ],
+      border: Border.all(
+        color: borderColor ?? color.withAlpha(selected ? 190 : 80),
+        width: selected ? 1.4 : 1.0,
+      ),
+      boxShadow: selected
+          ? [
+              BoxShadow(
+                color: color.withAlpha(70),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ]
+          : null,
     );
   }
 
-  /// Dekorasi cekung / recessed bergaya Claymorphism (misal: search bar, track slider, info pod)
-  static BoxDecoration clayRecessedDecoration({
+  /// Dekorasi cekung / recessed rel kaca gelap (misal: search bar, track slider)
+  static BoxDecoration glassRecessedDecoration({
     double radius = 14,
     Color? color,
     Color? borderColor,
   }) {
-    final base = color ?? const Color(0xFF131628);
+    final base = color ?? const Color(0xFF0C0F22).withAlpha(195);
     return BoxDecoration(
       color: base,
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(
-        color: borderColor ?? Colors.white.withAlpha(22),
-        width: 1.2,
+        color: borderColor ?? Colors.white.withAlpha(24),
+        width: 1.0,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withAlpha(140),
+          color: Colors.black.withAlpha(120),
           blurRadius: 6,
           offset: const Offset(0, 2),
         ),
         BoxShadow(
-          color: Colors.white.withAlpha(12),
+          color: Colors.white.withAlpha(10),
           blurRadius: 2,
           offset: const Offset(0, -1),
         ),
       ],
     );
   }
+
+  /// Delegasi kompatibilitas kartu ke Glassmorphism
+  static BoxDecoration clayCardDecoration({
+    Color? color,
+    Color? accentColor,
+    double radius = 18,
+    bool isPressed = false,
+  }) =>
+      glassCardDecoration(
+        color: color,
+        accentColor: accentColor,
+        radius: radius,
+        isPressed: isPressed,
+      );
+
+  /// Delegasi kompatibilitas tombol ke Glassmorphism
+  static BoxDecoration clayButtonDecoration({
+    Color primaryColor = primaryGold,
+    double radius = 14,
+    bool isPressed = false,
+  }) =>
+      glassButtonDecoration(
+        primaryColor: primaryColor,
+        radius: radius,
+        isPressed: isPressed,
+      );
+
+  /// Delegasi kompatibilitas pil ke Glassmorphism
+  static BoxDecoration clayPillDecoration({
+    required Color color,
+    double radius = 10,
+  }) =>
+      glassPillDecoration(color: color, radius: radius, selected: true);
+
+  /// Delegasi kompatibilitas recessed ke Glassmorphism
+  static BoxDecoration clayRecessedDecoration({
+    double radius = 14,
+    Color? color,
+    Color? borderColor,
+  }) =>
+      glassRecessedDecoration(
+        radius: radius,
+        color: color,
+        borderColor: borderColor,
+      );
 
   static ThemeData get darkTheme {
     return ThemeData(
@@ -163,7 +230,7 @@ class AppTheme {
         onSurface: Colors.white,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: darkBackground,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         iconTheme: IconThemeData(color: Colors.white),
@@ -175,19 +242,19 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: cardBackground,
-        elevation: 6,
+        color: const Color(0xFF141933).withAlpha(165),
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: Colors.white.withAlpha(28), width: 1.5),
+          side: BorderSide(color: Colors.white.withAlpha(36), width: 1.2),
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: cardBackground,
+        backgroundColor: const Color(0xFF131830).withAlpha(225),
         elevation: 16,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: BorderSide(color: Colors.white.withAlpha(35), width: 1.5),
+          side: BorderSide(color: Colors.white.withAlpha(45), width: 1.2),
         ),
       ),
       chipTheme: ChipThemeData(

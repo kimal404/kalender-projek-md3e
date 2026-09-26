@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,10 +25,8 @@ class AvatarPickerSheet extends StatelessWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.cardBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       builder: (_) => AvatarPickerSheet(characterViewModel: characterViewModel),
     );
   }
@@ -77,84 +76,96 @@ class AvatarPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final profile = characterViewModel.profile;
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceLighter,
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Pilih Avatar',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Pakai wajah bawaan, atau unggah gambarmu sendiri.',
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pick(context, ImageSource.gallery),
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Galeri'),
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: AppTheme.glassCardDecoration(radius: 24),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(40),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pick(context, ImageSource.camera),
-                    icon: const Icon(Icons.photo_camera),
-                    label: const Text('Kamera'),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Pilih Avatar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: AvatarCatalog.defaults.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                mainAxisExtent: 86,
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Pakai wajah bawaan, atau unggah gambarmu sendiri.',
+                    style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _pick(context, ImageSource.gallery),
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('Galeri'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _pick(context, ImageSource.camera),
+                          icon: const Icon(Icons.photo_camera),
+                          label: const Text('Kamera'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: AvatarCatalog.defaults.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          mainAxisExtent: 86,
+                        ),
+                    itemBuilder: (context, index) {
+                      final avatar = AvatarCatalog.defaults[index];
+                      final selected =
+                          profile.customAvatarPath == null &&
+                          profile.avatarId == avatar.id;
+                      return _AvatarChoice(
+                        avatar: avatar,
+                        selected: selected,
+                        onTap: () async {
+                          await characterViewModel.updateAvatar(
+                            avatarId: avatar.id,
+                          );
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
-              itemBuilder: (context, index) {
-                final avatar = AvatarCatalog.defaults[index];
-                final selected =
-                    profile.customAvatarPath == null &&
-                    profile.avatarId == avatar.id;
-                return _AvatarChoice(
-                  avatar: avatar,
-                  selected: selected,
-                  onTap: () async {
-                    await characterViewModel.updateAvatar(avatarId: avatar.id);
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
-                );
-              },
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -189,10 +200,10 @@ class _AvatarChoice extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
         decoration: selected
-            ? AppTheme.clayCardDecoration(
+            ? AppTheme.glassCardDecoration(
                 radius: 14,
                 accentColor: AppTheme.primaryGold,
-                color: AppTheme.primaryGold.withAlpha(24),
+                color: AppTheme.primaryGold.withAlpha(30),
               )
             : BoxDecoration(
                 color: Colors.transparent,

@@ -1,12 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
 
-/// QuestCard dengan animasi elegan:
+/// QuestCard dengan animasi elegan dan gaya Dark Arcane Glassmorphism:
+/// - Frosted glass blur (BackdropFilter)
+/// - Specular highlight crystal border
 /// - Stagger slide-up entrance berdasarkan index
 /// - Spring-bounce checkbox dengan TweenSequence physics
-/// - Glow shadow pulsing pada kartu aktif
 /// - Reward badge fade-out halus saat quest selesai
 class QuestCard extends StatefulWidget {
   final Quest quest;
@@ -79,30 +81,36 @@ class _QuestCardState extends State<QuestCard>
       opacity: _fadeAnim,
       child: SlideTransition(
         position: _slideAnim,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 380),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: isDone
-              ? BoxDecoration(
-                  color: AppTheme.cardBackground.withAlpha(120),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: AppTheme.surfaceLighter.withAlpha(70),
-                    width: 1.5,
-                  ),
-                )
-              : AppTheme.clayCardDecoration(
-                  accentColor: rankColor,
-                  radius: 18,
-                ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              splashColor: rankColor.withAlpha(25),
-              highlightColor: rankColor.withAlpha(10),
-              onTap: widget.onEdit,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 380),
+                curve: Curves.easeOutCubic,
+                decoration: isDone
+                    ? BoxDecoration(
+                        color: const Color(0xFF141933).withAlpha(120),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.white.withAlpha(22),
+                          width: 1.0,
+                        ),
+                      )
+                    : AppTheme.glassCardDecoration(
+                        accentColor: rankColor,
+                        radius: 18,
+                        opacity: 0.58,
+                      ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    splashColor: rankColor.withAlpha(25),
+                    highlightColor: rankColor.withAlpha(10),
+                    onTap: widget.onEdit,
               child: IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -356,12 +364,15 @@ class _QuestCardState extends State<QuestCard>
           ),
         ),
       ),
-    );
+    ),
+  ),
+),
+);
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-// Checkbox dengan TweenSequence spring-bounce physics
+// Checkbox dengan TweenSequence spring-bounce physics bergaya Crystal Glass
 // ─────────────────────────────────────────────────────────────
 class _SpringCheckbox extends StatefulWidget {
   final bool isDone;
@@ -441,37 +452,44 @@ class _SpringCheckboxState extends State<_SpringCheckbox>
           decoration: BoxDecoration(
             color: widget.isDone
                 ? AppTheme.primaryGold
-                : AppTheme.surfaceLighter,
-            borderRadius: BorderRadius.circular(9),
+                : const Color(0xFF141933).withAlpha(160),
+            borderRadius: BorderRadius.circular(10),
             gradient: widget.isDone
                 ? const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFFFFCA28), AppTheme.primaryGold],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFFFD54F), AppTheme.primaryGold],
                   )
-                : null,
+                : LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withAlpha(20),
+                      const Color(0xFF141933).withAlpha(160),
+                    ],
+                  ),
             border: Border.all(
               color: widget.isDone
-                  ? Colors.white.withAlpha(140)
-                  : Colors.white.withAlpha(28),
-              width: 1.5,
+                  ? Colors.white.withAlpha(200)
+                  : Colors.white.withAlpha(40),
+              width: 1.4,
             ),
             boxShadow: widget.isDone
                 ? [
                     BoxShadow(
-                      color: AppTheme.primaryGold.withAlpha(140),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      color: AppTheme.primaryGold.withAlpha(130),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
                     ),
                     BoxShadow(
-                      color: Colors.white.withAlpha(120),
+                      color: Colors.white.withAlpha(90),
                       blurRadius: 3,
                       offset: const Offset(0, -1),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withAlpha(80),
+                      color: Colors.black.withAlpha(60),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -502,7 +520,7 @@ class _SpringCheckboxState extends State<_SpringCheckbox>
 }
 
 // ─────────────────────────────────────────────────────────────
-// Reward badge dengan smooth fade saat quest selesai
+// Reward badge dengan smooth fade saat quest selesai bergaya Glassmorphism
 // ─────────────────────────────────────────────────────────────
 class _RewardBadge extends StatelessWidget {
   final IconData icon;
@@ -524,22 +542,10 @@ class _RewardBadge extends StatelessWidget {
       opacity: isDone ? 0.4 : 1.0,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-        decoration: BoxDecoration(
-          color: color.withAlpha(isDone ? 15 : 32),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: color.withAlpha(isDone ? 30 : 90),
-            width: 1,
-          ),
-          boxShadow: isDone
-              ? null
-              : [
-                  BoxShadow(
-                    color: color.withAlpha(40),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        decoration: AppTheme.glassPillDecoration(
+          color: color,
+          radius: 10,
+          selected: !isDone,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

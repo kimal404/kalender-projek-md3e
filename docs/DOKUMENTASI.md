@@ -143,7 +143,14 @@ Saat naik level, `CharacterViewModel.onLevelUp` memicu `LevelUpDialog` yang mena
 Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
 `guardian` (Penjaga), `mage` (Penyihir), `scout` (Pengintai), `knight` (Ksatria), `scholar` (Cendekia), `ranger` (Pemanah), dan `healer` (Penyembuh). Pengguna juga dapat memilih foto dari Galeri atau Kamera yang disalin ke direktori dokumen aplikasi sebagai `user_avatar.jpg`.
 
-## 6. Kalender Responsif dan Animasi Menu Ringan
+## 6. Desain Dark Arcane Glassmorphism & Kalender Responsif
+
+### Sistem Desain Dark Arcane Glassmorphism (`AppTheme` & `GuildBackdrop`)
+
+- **Frosted Glass Containers**: Mengombinasikan `BackdropFilter(filter: ImageFilter.blur(...))` dengan `AppTheme.glassCardDecoration`, `glassButtonDecoration`, `glassPillDecoration`, dan `glassRecessedDecoration`.
+- **Specular Gradients & Border Kontras**: Gradien putih semi-transparan `white.withAlpha(55)` ke `white.withAlpha(12)` dengan ketebalan 1.2px memberikan kesan pantulan kaca kristal RPG.
+- **Multi-Orb Radiant Glow**: `GuildBackdrop` memancarkan 4 ambient radial glow beranimasi (*Arcane Gold*, *Mystic Cyan*, *Violet Nebula*, dan *Emerald Shimmer*) yang dibiaskan secara dinamis di balik elemen kaca.
+- **Aksesibilitas Kontras Tinggi**: Seluruh teks judul dan label mempertahankan rasio kontras > 6.0:1 (melebihi standar WCAG AA).
 
 ### Kalender Responsif (`CalendarWidget`)
 
@@ -151,12 +158,11 @@ Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
 - Pada mode portrait, baris judul bulan + tombol `Hari Ini` + navigasi `<` `>` dipisahkan di baris atas, sedangkan tombol pemilih mode **`Bulan | Minggu | Hari`** direntangkan penuh (*full-width*) di baris kedua agar tidak terhalang di layar sempit.
 - Nama bulan dan tahun (`MMMM yyyy`) dibungkus dengan `Flexible` + `FittedBox(fit: BoxFit.scaleDown)` sehingga setiap nama bulan (seperti *September 2026*) tampil utuh tanpa terpotong `...`.
 
-### Animasi Menu Ringan (`lib/ui/core/widgets/animated_tap_menu.dart`)
+### Animasi Menu Mikro (`lib/ui/core/widgets/animated_tap_menu.dart`)
 
-Untuk menjaga performa tetap ringan (`60fps+` / `120fps`) tanpa efek berat seperti *backdrop blur*:
 - **`AnimatedPressScale`**: Memanfaatkan `AnimatedScale` berbasis GPU transform (`Curves.easeOutCubic`, `160ms`) yang mengecil halus (`0.94x`) saat disentuh dan memantul ringan saat dilepas tanpa memicu *layout pass*.
-- **`AnimatedMenuChip`**: Digunakan pada seluruh filter kategori, filter rank, serta pemilih Rank dan Kategori di `AddQuestDialog`.
-- **`AnimatedRpgBottomNav`**: Navigasi bawah khusus dengan kapsul indikator aktif yang bergeser halus (`200ms`) dan transisi konten antar tab menggunakan `FadeTransition` + `SlideTransition` mikro (`210ms`).
+- **`AnimatedMenuChip`**: Berbasis glass pill decoration pada seluruh filter kategori, filter rank, serta pemilih Rank dan Kategori di `AddQuestDialog`.
+- **`AnimatedRpgBottomNav`**: Navigasi bawah frosted glass khusus dengan kapsul indikator aktif yang bergeser halus (`200ms`) dan transisi konten antar tab menggunakan `FadeTransition` + `SlideTransition` mikro (`210ms`).
 
 ## 7. Penyimpanan Lokal
 

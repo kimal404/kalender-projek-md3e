@@ -60,17 +60,36 @@ class _StarfieldPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // 1. Arcane Gold Orb (Kanan Atas)
     _paintOrb(
       canvas,
-      center: Offset(size.width * 0.88, size.height * 0.06),
-      radius: size.width * 0.62,
-      color: AppTheme.primaryGold.withAlpha(26),
+      center: Offset(size.width * 0.90, size.height * 0.08),
+      radius: size.width * 0.65,
+      color: AppTheme.primaryGold.withAlpha(40),
     );
+
+    // 2. Mystic Neon Cyan Orb (Kiri Tengah)
     _paintOrb(
       canvas,
-      center: Offset(size.width * 0.08, size.height * 0.72),
-      radius: size.width * 0.5,
-      color: AppTheme.neonPurple.withAlpha(22),
+      center: Offset(size.width * 0.05, size.height * 0.38),
+      radius: size.width * 0.55,
+      color: AppTheme.neonCyan.withAlpha(28),
+    );
+
+    // 3. Arcane Violet Nebula Orb (Kiri Bawah)
+    _paintOrb(
+      canvas,
+      center: Offset(size.width * 0.15, size.height * 0.78),
+      radius: size.width * 0.60,
+      color: AppTheme.neonPurple.withAlpha(35),
+    );
+
+    // 4. Emerald Guild Spark (Kanan Bawah)
+    _paintOrb(
+      canvas,
+      center: Offset(size.width * 0.85, size.height * 0.85),
+      radius: size.width * 0.45,
+      color: const Color(0xFF69F0AE).withAlpha(22),
     );
 
     for (final star in _stars) {

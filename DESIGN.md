@@ -10,26 +10,26 @@ Sesuai dengan panduan integritas estetika dan anti-slop, antarmuka Quest Kalende
 
 | Parameter | Nilai (1–3) | Penjelasan Desain |
 |---|:---:|---|
-| **ENERGY** | **2 (Balanced)** | Nuansa RPG gamified yang bersemangat namun tetap fokus pada produktivitas harian. Warna aksen emas guild dan aksen neon dipakai secara terukur tanpa membuat layar bising atau melelahkan mata. |
-| **RHYTHM** | **2 (Structured)** | Tata letak papan quest modular bergaya guild fantasy. Komponen tersusun dalam kartu (cards) dengan padding konsisten (16dp/18dp), radius melengkung 14–18dp, dan hierarki visual yang jelas. |
-| **MOTION** | **2 (Tactile)** | Animasi interaksi yang responsif dan taktil. Transisi tab berdurasi 210ms dengan kurva `easeOutCubic`, stagger fade-slide masuk bertahap (70ms interval), dan feedback sentuhan langsung tanpa jeda yang memperlambat alur kerja. |
+| **ENERGY** | **2 (Balanced)** | Nuansa RPG gamified berenergi tinggi namun tetap elegan untuk produktivitas. Pancaran cahaya kristal kaca (frosted glass) berpadu dengan aksen emas guild dan aura neon tanpa membebani mata. |
+| **RHYTHM** | **2 (Structured)** | Tata letak papan quest modular bergaya guild fantasy. Komponen tersusun dalam panel kaca kristal (glass cards) dengan padding terukur (16dp/18dp), radius melengkung 14–24dp, dan hierarki visual yang bersih. |
+| **MOTION** | **2 (Tactile & Fluid)** | Animasi interaksi yang responsif, lentur, dan taktil. Transisi tab berdurasi 210ms dengan kurva `easeOutCubic`, sliding pill kalender 240ms, micro-spring touch feedback 180ms, dan efek bias pendaran kaca dinamis. |
 
 ---
 
-## 2. Palet Warna & Token Visual (Dark RPG Theme)
+## 2. Palet Warna & Token Visual (Dark Arcane Theme)
 
-Quest Kalender menggunakan palet gelap bertema **Guild Petualang Malam (Midnight Obsidian & Gold)** dengan kepatuhan kontras aksesibilitas WCAG AA:
+Quest Kalender menggunakan palet gelap bertema **Dark Arcane Glassmorphism (Midnight Obsidian & Luminous Gold)** dengan kepatuhan kontras aksesibilitas WCAG AA:
 
 | Token | Nilai Hex | Peran Visual | Rasio Kontras pada Background |
 |---|---|---|:---:|
-| `primaryGold` | `#FFB300` | Aksen utama guild, tombol aksi utama (CTA), bintang reputasi, level-up highlight | 11.2:1 (Sangat Tinggi) |
+| `primaryGold` | `#FFB300` | Aksen utama guild, tombol kristal utama (CTA), bintang reputasi, level-up highlight | 11.2:1 (Sangat Tinggi) |
 | `accentAmber` | `#FF8F00` | Aksen hangat sekunder, badge peringatan, highlight transisi | 8.9:1 |
-| `darkBackground` | `#0F1126` | Kanvas latar belakang utama (Midnight Obsidian) | — |
-| `cardBackground` | `#1A1F3A` | Latar kartu informasi, dialog, dan surface papan quest (Slate Guild) | — |
-| `surfaceLighter` | `#2A2F4D` | Border pemisah, elevasi kartu, chip filter tidak aktif | — |
+| `darkBackground` | `#0B0D1B` | Kanvas dasar gelap obsidian pekat | — |
+| `cardBackground` | `#15192E` | Lapisan dasar surface kartu dan dialog | — |
+| `surfaceLighter` | `#232845` | Border pemisah sekunder, elevasi chip netral | — |
 | `textMuted` | `#B8BAC8` | Teks sekunder, metadata tanggal, keterangan label kecil (Slate Mist) | > 6.2:1 (Lolos WCAG AA) |
 | `neonCyan` | `#00E5FF` | Mana kustomisasi, status offline lokal, atribut kecerdasan (INT), link avatar | 12.8:1 |
-| `neonPurple` | `#D500F9` | Indikator progres Arcane EXP bar, aura mistis | 4.8:1 |
+| `neonPurple` | `#D500F9` | Indikator progres Arcane EXP bar, aura nebula mistis | 4.8:1 |
 | `healthGreen` | `#69F0AE` | Indikator status selesai (Quest Clear), badge aman, kontrak tuntas | 13.5:1 |
 
 ---
@@ -57,20 +57,31 @@ Quest Kalender menggunakan palet gelap bertema **Guild Petualang Malam (Midnight
 
 ---
 
-## 5. Claymorphism RPG Styling (3D Tactile Theme)
+## 5. Dark Arcane Glassmorphism System (Frosted Crystal UX)
 
-Antarmuka Quest Kalender mengusung sentuhan **Claymorphism RPG**: elemen antarmuka terasa seperti token fisik atau pelat guild 3D yang empuk, tebal (*chunky*), dan taktil saat disentuh, tanpa mengorbankan keterbacaan gelap (*dark mode*) atau aturan kontras WCAG AA.
+Antarmuka Quest Kalender mengusung sentuhan **Dark Arcane Glassmorphism**: permukaan antarmuka membiaskan cahaya latar belakang seperti pelat kaca kristal buram magis (*frosted glass*), dipadukan dengan border kilau tipis (*specular border highlights*) dan pendaran aura RPG tembus pandang.
 
-### A. Anatomi Visual Kartu & Tombol Clay
-1. **Chunky Rounded Geometry:** Sudut kurva tebal beradius `16–22px` pada kartu, dan `12–16px` pada tombol/chip, memberikan kesan fisik material *clay* padat.
-2. **Lighting Gradient 3D:** Setiap permukaan diberi gradasi linear halus dari sudut kiri-atas (sumber cahaya imajiner yang sedikit lebih cerah) ke sudut kanan-bawah (sisi bayangan dasar).
-3. **Dual Shadow Formula:**
-   - **Grounding Drop Shadow:** `Offset(0, 7)`, blur `16`, hitam pekat `black.withAlpha(140)` untuk mengangkat elemen di atas latar belakang malam.
-   - **Top-Left Highlight Rim:** `Offset(-2, -2)`, blur `6`, putih transparan `white.withAlpha(28)` yang merefleksikan pantulan tepi material clay.
-   - **Ambient Accent Rim:** Aksen warna dinamis (Gold, Cyan, Crimson, Green) yang berpendar lembut di sekitar perbatasan elemen.
-4. **Recessed Groove (Permukaan Cekung):** Digunakan untuk kotak pencarian, track progress bar, dan info pod (`clayRecessedDecoration`) dengan bayangan dalam gelap di sisi atas dan pantulan halus di sisi bawah, menciptakan kedalaman relief.
+### A. Anatomi Visual Kaca Kristal (Frosted Glass Panel)
+1. **Backdrop Filter Refraction:**
+   - Setiap panel kartu utama, kalender, dialog, navbar, dan header dibungkus oleh `BackdropFilter(filter: ImageFilter.blur(sigmaX: 10-18, sigmaY: 10-18))` dalam wadah `ClipRRect`.
+   - Mengaburkan pendaran cahaya dari bola energi magis di latar belakang kanvas (`GuildBackdrop`), menghasilkan ilusi optik kedalaman lapisan 3D.
+2. **Translucent Multi-stop Body:**
+   - Gradasi translusen dari warna obsidian bersemprotan cahaya atas `Color(0xFF1E223D).withAlpha(165)` hingga dasar yang lebih gelap `Color(0xFF101326).withAlpha(195)`.
+3. **Specular Gradient Borders (Kilauan Tepi):**
+   - Garis batas halus (*hairline border*) berketebalan 1–1.2px dengan gradasi pantulan cahaya: sisi atas menerima kilauan kristal putih `Colors.white.withAlpha(55)`, sedangkan sisi bawah meluruh ke bayangan kaca `Colors.white.withAlpha(14)`.
+   - Pada kartu beraksen (Gold, Cyan, Crimson, Violet), tepi kaca memancarkan glow neon halus (`accentColor.withAlpha(120)`).
+4. **Recessed Glass Track (`glassRecessedDecoration`):**
+   - Digunakan untuk wadah pencarian, slot metrik, limit EXP, dan rel indikator kalender. Menggunakan isian kaca gelap tembus pandang dengan batas tipis yang memberi efek terpasang rapi ke dalam panel.
+5. **Glass Pills & Tokens (`glassPillDecoration`):**
+   - Digunakan pada filter chip, indikator streak petualang, dan badge hadiah quest. Menghadirkan wujud seperti kancing kristal mini.
+6. **Luminous Glass Buttons (`glassButtonDecoration`):**
+   - Tombol utama CTA dan pilihan kalender aktif dengan gradasi emas kristal bercahaya dan bayangan pendar emas lembut (`primaryGold.withAlpha(80)`).
 
-### B. Dinamika Fisik Sentuhan (Tactile Physics)
-- **Micro-Dip & Scale Compression:** Saat ditekan, tombol dan kartu memicu animasi `AnimatedPressScale` yang mengecilkan skala ke `0.94` sekaligus memberikan pergeseran vertikal halus ke bawah `Offset(0, 0.02)` (2px micro-dip).
-- **Elastic Release:** Saat dilepas, kurva `easeOutBack` mengembalikan elemen ke posisi semula dengan pegas mikro alami, memberikan sensasi memencet tombol arcade/token fisik.
-- **Sliding Indicator:** Navigasi mode kalender (Bulan, Minggu, Hari) menggunakan kapsul emas clay yang meluncur mulus (`AnimatedAlign` kurva `easeOutCubic`) di dalam lintasan rel cekung (*recessed track*).
+### B. Refraksi Latar Belakang Magis (Guild Backdrop Orbs)
+Di balik kaca buram, latar belakang kanvas memancarkan 4 bola energi magis bergradasi radial:
+- **Arcane Gold Orb:** Memancar di sudut kanan atas kalender.
+- **Mystic Neon Cyan Orb:** Memancar di area tengah bawah papan quest.
+- **Violet Nebula Orb:** Memancar di sisi kiri tengah dekat status petualang.
+- **Emerald Vitality Orb:** Memancar di sudut kanan bawah guild board.
+
+Saat pengguna menggulir atau beralih tab, pergerakan konten di atas bola-bola cahaya ini menciptakan refraksi cahaya dinamis yang hidup dan bernyawa.

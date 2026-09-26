@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
 
@@ -89,44 +90,27 @@ class AnimatedMenuChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? activeColor.withAlpha(65) : AppTheme.surfaceLighter,
-          borderRadius: BorderRadius.circular(14),
-          gradient: selected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    activeColor.withAlpha(90),
-                    activeColor.withAlpha(45),
-                  ],
-                )
-              : null,
-          border: Border.all(
-            color: selected ? activeColor : Colors.white.withAlpha(24),
-            width: selected ? 1.5 : 1.0,
-          ),
-          boxShadow: selected
-              ? [
+        decoration: selected
+            ? AppTheme.glassPillDecoration(
+                color: activeColor,
+                radius: 14,
+                selected: true,
+              )
+            : BoxDecoration(
+                color: AppTheme.surfaceLighter.withAlpha(90),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: Colors.white.withAlpha(22),
+                  width: 1.0,
+                ),
+                boxShadow: [
                   BoxShadow(
-                    color: activeColor.withAlpha(90),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withAlpha(50),
-                    blurRadius: 3,
-                    offset: const Offset(0, -1),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(60),
+                    color: Colors.black.withAlpha(50),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
                 ],
-        ),
+              ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -169,7 +153,7 @@ class AnimatedNavItem {
   const AnimatedNavItem({required this.icon, required this.label});
 }
 
-/// Bottom Navigation Bar RPG dengan animasi pilih menu yang halus namun sangat ringan.
+/// Bottom Navigation Bar RPG dengan efek frosted glass blur dan animasi pilih menu halus.
 class AnimatedRpgBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -184,78 +168,52 @@ class AnimatedRpgBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        border: Border(
-          top: BorderSide(color: Colors.white.withAlpha(25), width: 1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(120),
-            blurRadius: 18,
-            offset: const Offset(0, -4),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F1225).withAlpha(205),
+            border: Border(
+              top: BorderSide(color: Colors.white.withAlpha(28), width: 1.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(120),
+                blurRadius: 18,
+                offset: const Offset(0, -4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            children: List.generate(items.length, (index) {
-              final item = items[index];
-              final isSelected = currentIndex == index;
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Row(
+                children: List.generate(items.length, (index) {
+                  final item = items[index];
+                  final isSelected = currentIndex == index;
 
-              return Expanded(
-                child: AnimatedPressScale(
-                  isSelected: false,
-                  pressedScale: 0.93,
-                  onTap: () => onTap(index),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOutCubic,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppTheme.primaryGold.withAlpha(45)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: isSelected
-                          ? LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                AppTheme.primaryGold.withAlpha(60),
-                                AppTheme.primaryGold.withAlpha(25),
-                              ],
-                            )
-                          : null,
-                      border: Border.all(
-                        color: isSelected
-                            ? AppTheme.primaryGold.withAlpha(120)
-                            : Colors.transparent,
-                        width: 1.5,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: AppTheme.primaryGold.withAlpha(60),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withAlpha(50),
-                                blurRadius: 3,
-                                offset: const Offset(0, -1),
-                              ),
-                            ]
-                          : null,
-                    ),
+                  return Expanded(
+                    child: AnimatedPressScale(
+                      isSelected: false,
+                      pressedScale: 0.93,
+                      onTap: () => onTap(index),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOutCubic,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
+                        decoration: isSelected
+                            ? AppTheme.glassPillDecoration(
+                                color: AppTheme.primaryGold,
+                                radius: 16,
+                                selected: true,
+                              )
+                            : null,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -309,6 +267,8 @@ class AnimatedRpgBottomNav extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }

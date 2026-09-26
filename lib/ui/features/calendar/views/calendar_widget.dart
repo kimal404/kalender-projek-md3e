@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
@@ -11,14 +13,18 @@ class CalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: AppTheme.clayCardDecoration(radius: 20),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          // Baris Navigasi Bulan & Mode Tampilan
-          _buildHeader(context),
-          const SizedBox(height: 10),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Container(
+          decoration: AppTheme.glassCardDecoration(radius: 20),
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              // Baris Navigasi Bulan & Mode Tampilan
+              _buildHeader(context),
+              const SizedBox(height: 10),
 
           // Tampilan Berdasarkan Mode dengan transisi tinggi & slide-fade halus
           AnimatedSize(
@@ -53,7 +59,9 @@ class CalendarWidget extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -288,26 +296,26 @@ class CalendarWidget extends StatelessWidget {
             curve: Curves.easeOutCubic,
             margin: const EdgeInsets.all(2),
             decoration: isSelected
-                ? AppTheme.clayButtonDecoration(
+                ? AppTheme.glassButtonDecoration(
                     primaryColor: AppTheme.primaryGold,
                     radius: 12,
                   )
                 : BoxDecoration(
                     color: isToday
-                        ? AppTheme.surfaceLighter
+                        ? AppTheme.primaryGold.withAlpha(22)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                     border: isToday && !isSelected
                         ? Border.all(
-                            color: AppTheme.primaryGold.withAlpha(160),
+                            color: AppTheme.primaryGold.withAlpha(180),
                             width: 1.5,
                           )
                         : null,
                     boxShadow: isToday && !isSelected
                         ? [
                             BoxShadow(
-                              color: AppTheme.primaryGold.withAlpha(40),
-                              blurRadius: 4,
+                              color: AppTheme.primaryGold.withAlpha(50),
+                              blurRadius: 6,
                               offset: const Offset(0, 1),
                             ),
                           ]
@@ -413,26 +421,26 @@ class CalendarWidget extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: isSelected
-                  ? AppTheme.clayButtonDecoration(
+                  ? AppTheme.glassButtonDecoration(
                       primaryColor: AppTheme.primaryGold,
                       radius: 12,
                     )
                   : BoxDecoration(
                       color: isToday
-                          ? AppTheme.surfaceLighter
+                          ? AppTheme.primaryGold.withAlpha(22)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(10),
                       border: isToday && !isSelected
                           ? Border.all(
-                              color: AppTheme.primaryGold.withAlpha(160),
+                              color: AppTheme.primaryGold.withAlpha(180),
                               width: 1.5,
                             )
                           : null,
                       boxShadow: isToday && !isSelected
                           ? [
                               BoxShadow(
-                                color: AppTheme.primaryGold.withAlpha(40),
-                                blurRadius: 4,
+                                color: AppTheme.primaryGold.withAlpha(50),
+                                blurRadius: 6,
                                 offset: const Offset(0, 1),
                               ),
                             ]
@@ -502,9 +510,10 @@ class CalendarWidget extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceLighter.withAlpha(128),
-        borderRadius: BorderRadius.circular(12),
+      decoration: AppTheme.glassPillDecoration(
+        color: AppTheme.surfaceLighter.withAlpha(70),
+        borderColor: Colors.white.withAlpha(25),
+        radius: 12,
       ),
       child: Row(
         children: [
@@ -522,9 +531,10 @@ class CalendarWidget extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryGold.withAlpha(30),
-              borderRadius: BorderRadius.circular(8),
+            decoration: AppTheme.glassPillDecoration(
+              color: AppTheme.primaryGold.withAlpha(28),
+              borderColor: AppTheme.primaryGold.withAlpha(90),
+              radius: 8,
             ),
             child: Text(
               '$completedCount/${quests.length} Quest Selesai',
@@ -582,22 +592,7 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final selector = Container(
       height: 40,
-      decoration: BoxDecoration(
-        color: const Color(0xFF131628),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withAlpha(20),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(100),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-            spreadRadius: -1,
-          ),
-        ],
-      ),
+      decoration: AppTheme.glassRecessedDecoration(radius: 12),
       padding: const EdgeInsets.all(3.5),
       child: Stack(
         children: [
@@ -610,7 +605,7 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
               widthFactor: 1.0 / 3.0,
               heightFactor: 1.0,
               child: Container(
-                decoration: AppTheme.clayButtonDecoration(
+                decoration: AppTheme.glassButtonDecoration(
                   primaryColor: AppTheme.primaryGold,
                   radius: 9,
                 ),

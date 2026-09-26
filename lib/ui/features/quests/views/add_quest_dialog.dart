@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -198,11 +200,15 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Container(
-        decoration: AppTheme.clayCardDecoration(
-          radius: 22,
-          accentColor: AppTheme.primaryGold,
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            decoration: AppTheme.glassCardDecoration(
+              radius: 22,
+              accentColor: AppTheme.primaryGold,
+            ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500, maxHeight: 680),
           child: Padding(
@@ -448,9 +454,8 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                         horizontal: 14,
                         vertical: 12,
                       ),
-                      decoration: AppTheme.clayRecessedDecoration(
+                      decoration: AppTheme.glassRecessedDecoration(
                         radius: 14,
-                        color: const Color(0xFF131628),
                         borderColor: isQuotaFull
                             ? Colors.redAccent.withAlpha(140)
                             : AppTheme.neonPurple.withAlpha(90),
@@ -583,7 +588,7 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
                                   color: AppTheme.surfaceLighter,
                                   borderRadius: BorderRadius.circular(14),
                                 )
-                              : AppTheme.clayButtonDecoration(
+                              : AppTheme.glassButtonDecoration(
                                   primaryColor: AppTheme.primaryGold,
                                   radius: 14,
                                 ),
@@ -612,6 +617,8 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
