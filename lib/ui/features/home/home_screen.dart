@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -175,19 +173,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTopRpgHeader(UserProfile profile) {
     final expPercent = (profile.currentExp / profile.maxExp).clamp(0.0, 1.0);
 
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                const Color(0xFF1A1730).withAlpha(195),
-                AppTheme.darkBackground.withAlpha(165),
-              ],
-            ),
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFF1E1A38).withAlpha(235),
+              const Color(0xFF101222).withAlpha(220),
+            ],
+          ),
             border: Border(
               bottom: BorderSide(
                 color: Colors.white.withAlpha(28),
@@ -340,8 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   // TAB 1: Kalender & Quest
@@ -407,12 +402,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: quests.isEmpty
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(18),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(28),
-                        decoration: AppTheme.glassCardDecoration(radius: 18),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(28),
+                      decoration: AppTheme.glassCardDecoration(radius: 18),
                         child: Column(
                           children: [
                             Icon(
@@ -472,7 +465,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                    ),
                   )
                 : Column(
                     children: quests.asMap().entries.map((entry) {
@@ -572,9 +564,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
+      child: Container(
           padding: const EdgeInsets.all(16),
           decoration: AppTheme.glassCardDecoration(
             radius: 20,
@@ -699,7 +689,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -817,9 +806,7 @@ class _HomeScreenState extends State<HomeScreen> {
           delayMs: 0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-              child: Container(
+            child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: AppTheme.glassCardDecoration(
                   radius: 20,
@@ -936,7 +923,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -1042,9 +1028,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
+      child: Container(
           padding: const EdgeInsets.all(14),
           decoration: AppTheme.glassCardDecoration(
             radius: 16,
@@ -1103,7 +1087,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -1142,9 +1125,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Ringkasan Papan Misi
         ClipRRect(
           borderRadius: BorderRadius.circular(18),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
+          child: Container(
               padding: const EdgeInsets.all(18),
               decoration: AppTheme.glassCardDecoration(
                 radius: 18,
@@ -1196,16 +1177,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-          ),
         ),
         const SizedBox(height: 16),
 
         // Statistik Berdasarkan Tingkat Kesulitan Rank
         ClipRRect(
           borderRadius: BorderRadius.circular(18),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
+          child: Container(
               padding: const EdgeInsets.all(18),
               decoration: AppTheme.glassCardDecoration(radius: 18),
               child: Column(
@@ -1274,7 +1252,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-          ),
         ),
         const SizedBox(height: 16),
 
@@ -1284,9 +1261,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Penyimpanan Offline Lokal Aktif (Hive Database)
         ClipRRect(
           borderRadius: BorderRadius.circular(18),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
+          child: Container(
               padding: const EdgeInsets.all(18),
               decoration: AppTheme.glassCardDecoration(
                 radius: 18,
@@ -1374,7 +1349,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-          ),
         ),
       ],
     );
@@ -1387,9 +1361,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
+      child: Container(
           padding: const EdgeInsets.all(18),
           decoration: AppTheme.glassCardDecoration(
             radius: 18,
@@ -1513,7 +1485,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 

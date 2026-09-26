@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quest_kalender/domain/models/quest_model.dart';
@@ -85,9 +84,7 @@ class _QuestCardState extends State<QuestCard>
           padding: const EdgeInsets.only(bottom: 12),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(18),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: AnimatedContainer(
+            child: AnimatedContainer(
                 duration: const Duration(milliseconds: 380),
                 curve: Curves.easeOutCubic,
                 decoration: isDone
@@ -366,7 +363,6 @@ class _QuestCardState extends State<QuestCard>
       ),
     ),
   ),
-),
 );
   }
 }

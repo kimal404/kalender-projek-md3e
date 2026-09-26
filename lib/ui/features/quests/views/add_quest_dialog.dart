@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -202,12 +200,11 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
+        child: Container(
             decoration: AppTheme.glassCardDecoration(
               radius: 22,
               accentColor: AppTheme.primaryGold,
+              opacity: 0.88,
             ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500, maxHeight: 680),
@@ -618,7 +615,6 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
         ),
       ),
     ),
-  ),
-);
+  );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:quest_kalender/domain/models/user_profile_model.dart';
@@ -137,9 +136,7 @@ class _LevelUpDialogState extends State<LevelUpDialog>
               // ── Kartu Utama ──
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                  child: Container(
+                child: Container(
                     constraints: const BoxConstraints(maxWidth: 360),
                     padding: const EdgeInsets.all(24),
                     decoration: AppTheme.glassCardDecoration(
@@ -356,7 +353,6 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                       ],
                     ),
                   ),
-                ),
               ),
 
               // ── Confetti Particles Overlay ──

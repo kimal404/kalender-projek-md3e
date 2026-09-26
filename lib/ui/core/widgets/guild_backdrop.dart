@@ -29,7 +29,11 @@ class GuildBackdrop extends StatelessWidget {
             ),
           ),
         ),
-        const Positioned.fill(child: CustomPaint(painter: _StarfieldPainter())),
+        const Positioned.fill(
+          child: RepaintBoundary(
+            child: CustomPaint(painter: _StarfieldPainter()),
+          ),
+        ),
         child,
       ],
     );

@@ -23,7 +23,7 @@ class GlassContainer extends StatelessWidget {
     super.key,
     required this.child,
     this.radius = 18,
-    this.blur = 12,
+    this.blur = 0,
     this.opacity = 0.60,
     this.color,
     this.accentColor,

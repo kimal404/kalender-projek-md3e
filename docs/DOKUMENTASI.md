@@ -9,7 +9,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Item | Nilai |
 | --- | --- |
 | Nama paket Dart | `quest_kalender` |
-| Versi | `1.1.0+2` |
+| Versi | `1.1.1+3` |
 | SDK Dart | `^3.13.4` |
 | Application ID Android | `com.example.quest_kalender` |
 | Label Android | `quest_kalender` |
@@ -18,7 +18,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Penyimpanan | Lokal, `SharedPreferences` |
 | Remote Git | https://github.com/senji830/kalender-projek |
 | Branch | `master` |
-| Rilis Terkini | `v1.1.0` |
+| Rilis Terkini | `v1.1.1` |
 
 ### Riwayat Rilis
 
@@ -26,6 +26,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | --- | --- | --- | --- |
 | [`v1.0.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.0.0) | `1.0.0+1` | Sep 2026 | Rilis perdana: Sistem RPG, limit 500 EXP/hari, tugas 1x pakai, tema Claymorphism 3D |
 | [`v1.1.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.0) | `1.1.0+2` | Sep 2026 | Pembaruan besar UI/UX: Tema Dark Arcane Glassmorphism, multi-orb glow, kalender kristal |
+| [`v1.1.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.1) | `1.1.1+3` | Sep 2026 | Optimalisasi Performa & Zero-Lag: Eliminasi overhead BackdropFilter berulang, raster cache RepaintBoundary, 60/120fps scrolling halus |
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 
@@ -151,13 +152,13 @@ Saat naik level, `CharacterViewModel.onLevelUp` memicu `LevelUpDialog` yang mena
 Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
 `guardian` (Penjaga), `mage` (Penyihir), `scout` (Pengintai), `knight` (Ksatria), `scholar` (Cendekia), `ranger` (Pemanah), dan `healer` (Penyembuh). Pengguna juga dapat memilih foto dari Galeri atau Kamera yang disalin ke direktori dokumen aplikasi sebagai `user_avatar.jpg`.
 
-## 6. Desain Dark Arcane Glassmorphism & Kalender Responsif
+## 6. Desain Dark Arcane Glassmorphism & Optimalisasi Performa Zero-Lag
 
-### Sistem Desain Dark Arcane Glassmorphism (`AppTheme` & `GuildBackdrop`)
+### Sistem Desain Dark Arcane Glassmorphism Ringan (`AppTheme` & `GuildBackdrop`)
 
-- **Frosted Glass Containers**: Mengombinasikan `BackdropFilter(filter: ImageFilter.blur(...))` dengan `AppTheme.glassCardDecoration`, `glassButtonDecoration`, `glassPillDecoration`, dan `glassRecessedDecoration`.
-- **Specular Gradients & Border Kontras**: Gradien putih semi-transparan `white.withAlpha(55)` ke `white.withAlpha(12)` dengan ketebalan 1.2px memberikan kesan pantulan kaca kristal RPG.
-- **Multi-Orb Radiant Glow**: `GuildBackdrop` memancarkan 4 ambient radial glow beranimasi (*Arcane Gold*, *Mystic Cyan*, *Violet Nebula*, dan *Emerald Shimmer*) yang dibiaskan secara dinamis di balik elemen kaca.
+- **High-Performance Translucent Glass**: Menggunakan `AppTheme.glassCardDecoration`, `glassButtonDecoration`, `glassPillDecoration`, dan `glassRecessedDecoration` tanpa ketergantungan `BackdropFilter` pada daftar bergulir (*scrollable views*). Hal ini mengeliminasi *saveLayer GPU bottleneck* dan menjaga scrolling mulus pada `60fps / 120fps`.
+- **Specular Gradients & Border Kontras**: Gradien putih semi-transparan `white.withAlpha(55)` ke `white.withAlpha(12)` dengan ketebalan 1.2px memberikan pantulan cahaya kristal RPG yang tajam.
+- **Multi-Orb Ambient Glow & Raster Caching**: `GuildBackdrop` memancarkan 4 ambient radial glow (*Arcane Gold*, *Mystic Cyan*, *Violet Nebula*, dan *Emerald Shimmer*) yang dibungkus dengan `RepaintBoundary` agar di-cache dalam memori GPU sekali saja, menghemat daya baterai dan mencegah *thermal throttling*.
 - **Aksesibilitas Kontras Tinggi**: Seluruh teks judul dan label mempertahankan rasio kontras > 6.0:1 (melebihi standar WCAG AA).
 
 ### Kalender Responsif (`CalendarWidget`)

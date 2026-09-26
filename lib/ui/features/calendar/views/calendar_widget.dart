@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
@@ -15,10 +13,8 @@ class CalendarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          decoration: AppTheme.glassCardDecoration(radius: 20),
+      child: Container(
+        decoration: AppTheme.glassCardDecoration(radius: 20),
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
@@ -60,7 +56,6 @@ class CalendarWidget extends StatelessWidget {
         ],
       ),
     ),
-  ),
 );
   }
 

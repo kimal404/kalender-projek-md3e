@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -78,10 +77,8 @@ class AvatarPickerSheet extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: AppTheme.glassCardDecoration(radius: 24),
+      child: Container(
+        decoration: AppTheme.glassCardDecoration(radius: 24, opacity: 0.92),
           child: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
@@ -167,7 +164,6 @@ class AvatarPickerSheet extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

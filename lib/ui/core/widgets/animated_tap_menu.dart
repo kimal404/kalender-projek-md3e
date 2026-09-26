@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
 
@@ -168,23 +167,21 @@ class AnimatedRpgBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1225).withAlpha(205),
-            border: Border(
-              top: BorderSide(color: Colors.white.withAlpha(28), width: 1.2),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(120),
-                blurRadius: 18,
-                offset: const Offset(0, -4),
-              ),
-            ],
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F1225).withAlpha(235),
+          border: Border(
+            top: BorderSide(color: Colors.white.withAlpha(28), width: 1.2),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(120),
+              blurRadius: 18,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
           child: SafeArea(
             top: false,
             child: Padding(
@@ -268,7 +265,6 @@ class AnimatedRpgBottomNav extends StatelessWidget {
         ),
       ),
     ),
-  ),
-);
+  );
   }
 }
