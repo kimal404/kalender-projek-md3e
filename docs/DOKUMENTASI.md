@@ -9,7 +9,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Item | Nilai |
 | --- | --- |
 | Nama paket Dart | `quest_kalender` |
-| Versi | `1.0.0+1` |
+| Versi | `1.1.0+2` |
 | SDK Dart | `^3.13.4` |
 | Application ID Android | `com.example.quest_kalender` |
 | Label Android | `quest_kalender` |

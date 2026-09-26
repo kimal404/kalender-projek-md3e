@@ -2,7 +2,7 @@
 
 Kalender tugas harian bergaya RPG. Setiap quest yang diselesaikan memberikan **EXP**, meningkatkan **Atribut Karakter (STR / INT / DIS / VIT)**, menaikkan **Level & Gelar**, serta menjaga **Streak Harian**. Seluruh data tersimpan secara lokal di perangkat dalam bahasa Indonesia.
 
-Versi `1.0.0+1` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
+Versi `1.1.0+2` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
 
 ## Fitur Utama
 
