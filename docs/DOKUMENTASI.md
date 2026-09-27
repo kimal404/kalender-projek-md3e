@@ -165,8 +165,8 @@ Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
 
 ### Animasi Halus Bertahap (*Progressive Animations*)
 
-- **Progressive Count-Up Numbers**: Bar EXP dan angka poin atribut RPG (`STR`, `INT`, `DIS`, `VIT`) menggunakan `TweenAnimationBuilder<int>` dan `TweenAnimationBuilder<double>` (`Curves.easeOutCubic`, 600ms) sehingga nilai bertambah bertahap dan halus saat pengguna membuka tab atau menaikkan level.
-- **Cross-Fade Tab Navigation**: Pergantian antar tab di `HomeScreen` menggunakan `AnimatedOpacity` (200ms `Curves.easeOutCubic`) di dalam `IndexedStack`, memberikan transisi lintas-layar yang mulus tanpa mereset posisi scroll atau merusak state widget.
+- **Directional Slide & Cross-Fade Dashboard Transition**: Pergantian antar dashboard (*Kalender & Quest*, *Profil Saya*, *Papan Guild*) menggunakan `_AnimatedDashboardStack` dengan animasi luncur horizontal terarah (*directional slide* `Offset(±0.07, 0)`) dan *cross-fade* lembut (`Curves.easeOutCubic`, 260ms). Menggunakan `Offstage(maintainState: true)` sehingga posisi scroll dan state setiap dashboard tersimpan utuh 100%.
+- **Progressive Count-Up Numbers**: Bar EXP, angka poin atribut RPG (`STR`, `INT`, `DIS`, `VIT`), metrik ringkasan misi di Papan Guild, dan distribusi bar rank menggunakan `TweenAnimationBuilder` (`Curves.easeOutCubic`, 600ms) sehingga nilai meluncur naik secara bertahap saat dashboard dibuka.
 - **Spring Physics Checkbox**: Checkbox quest (`_SpringCheckbox`) dilengkapi animasi elastis pegas (*bouncy spring physics*, `Curves.elasticOut` / `Curves.easeOutBack`) dengan transisi visual flat gold solid saat tuntas.
 - **`AnimatedPressScale` & `AnimatedMenuChip`**: Interaksi mikro sentuhan responsif menggunakan transform GPU hardware (`0.94x`, 160ms) dengan tampilan pill datar minimalis.
 - **`AnimatedRpgBottomNav`**: Bar navigasi bawah flat obsidian dengan sliding capsule pill indikator aktif (200ms) dan transisi ikon yang bersih.

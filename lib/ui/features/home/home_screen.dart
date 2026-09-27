@@ -108,33 +108,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ? const Center(
                 child: CircularProgressIndicator(color: AppTheme.primaryGold),
               )
-            : IndexedStack(
-                index: _currentTabIndex,
+            : _AnimatedDashboardStack(
+                activeIndex: _currentTabIndex,
                 children: [
-                  RepaintBoundary(
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic,
-                      opacity: _currentTabIndex == 0 ? 1.0 : 0.0,
-                      child: _buildQuestCalendarTab(questVM),
-                    ),
-                  ),
-                  RepaintBoundary(
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic,
-                      opacity: _currentTabIndex == 1 ? 1.0 : 0.0,
-                      child: _buildCharacterSheetTab(charVM),
-                    ),
-                  ),
-                  RepaintBoundary(
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic,
-                      opacity: _currentTabIndex == 2 ? 1.0 : 0.0,
-                      child: _buildGuildBoardTab(questVM, charVM),
-                    ),
-                  ),
+                  _buildQuestCalendarTab(questVM),
+                  _buildCharacterSheetTab(charVM),
+                  _buildGuildBoardTab(questVM, charVM),
                 ],
               ),
       ),
@@ -990,7 +969,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildStatPill(String label, String value, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: AppTheme.glassRecessedDecoration(
+      decoration: AppTheme.flatRecessedDecoration(
         radius: 12,
         borderColor: Colors.white.withAlpha(20),
       ),
@@ -998,12 +977,16 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Icon(icon, size: 20, color: AppTheme.primaryGold),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: Text(
+              value,
+              key: ValueKey<String>(value),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
           Text(
@@ -1225,20 +1208,30 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Container(
                               height: 7,
-                              decoration: AppTheme.glassRecessedDecoration(
+                              decoration: AppTheme.flatRecessedDecoration(
                                 radius: 4,
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: allQuests.isEmpty
-                                      ? 0.0
-                                      : count / allQuests.length,
-                                  minHeight: 7,
-                                  backgroundColor: Colors.transparent,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    rank.color,
+                                child: TweenAnimationBuilder<double>(
+                                  tween: Tween<double>(
+                                    begin: 0.0,
+                                    end: allQuests.isEmpty
+                                        ? 0.0
+                                        : count / allQuests.length,
                                   ),
+                                  duration: const Duration(milliseconds: 600),
+                                  curve: Curves.easeOutCubic,
+                                  builder: (context, animatedVal, _) {
+                                    return LinearProgressIndicator(
+                                      value: animatedVal,
+                                      minHeight: 7,
+                                      backgroundColor: Colors.transparent,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        rank.color,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -1495,23 +1488,42 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBoardMetric(String label, String value, Color color) {
+    final intVal = int.tryParse(value);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       margin: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: AppTheme.glassRecessedDecoration(
+      decoration: AppTheme.flatRecessedDecoration(
         radius: 12,
         borderColor: color.withAlpha(50),
       ),
       child: Column(
         children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
+          if (intVal != null)
+            TweenAnimationBuilder<int>(
+              tween: IntTween(begin: 0, end: intVal),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedVal, child) {
+                return Text(
+                  '$animatedVal',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                );
+              },
+            )
+          else
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
           const SizedBox(height: 2),
           Text(
             label,
@@ -1755,3 +1767,141 @@ class _StaggerFadeSlideState extends State<_StaggerFadeSlide>
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────
+// Widget: Animated Dashboard Transition Stack
+// Memastikan setiap pergantian dashboard (Kalender, Profil, Guild)
+// memiliki animasi directional slide + fade yang sangat mulus
+// dan tetap mempertahankan scroll position serta state setiap dashboard.
+// ─────────────────────────────────────────────────────────────
+class _AnimatedDashboardStack extends StatefulWidget {
+  final int activeIndex;
+  final List<Widget> children;
+
+  const _AnimatedDashboardStack({
+    required this.activeIndex,
+    required this.children,
+  });
+
+  @override
+  State<_AnimatedDashboardStack> createState() =>
+      _AnimatedDashboardStackState();
+}
+
+class _AnimatedDashboardStackState extends State<_AnimatedDashboardStack>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+  int _previousIndex = 0;
+  int _currentIndex = 0;
+  double _direction = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.activeIndex;
+    _previousIndex = widget.activeIndex;
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        setState(() {
+          _previousIndex = _currentIndex;
+        });
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedDashboardStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.activeIndex != _currentIndex) {
+      _previousIndex = _currentIndex;
+      _currentIndex = widget.activeIndex;
+      _direction = _currentIndex >= _previousIndex ? 1.0 : -1.0;
+      _controller.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isTransitioning =
+        _controller.isAnimating || (_previousIndex != _currentIndex);
+
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, _) {
+        final progress = _animation.value;
+        final screenWidth = MediaQuery.sizeOf(context).width;
+
+        return Stack(
+          fit: StackFit.expand,
+          children: List.generate(widget.children.length, (index) {
+            final child = widget.children[index];
+
+            if (isTransitioning) {
+              if (index == _currentIndex) {
+                // Dashboard Baru (Meluncur masuk dari samping + Fade in)
+                final slideX =
+                    (1.0 - progress) * 0.07 * _direction * screenWidth;
+                return RepaintBoundary(
+                  child: Transform.translate(
+                    offset: Offset(slideX, 0),
+                    child: Opacity(
+                      opacity: progress.clamp(0.0, 1.0),
+                      child: child,
+                    ),
+                  ),
+                );
+              } else if (index == _previousIndex) {
+                // Dashboard Lama (Meluncur keluar ke samping + Fade out)
+                final slideX = -progress * 0.07 * _direction * screenWidth;
+                return RepaintBoundary(
+                  child: IgnorePointer(
+                    ignoring: true,
+                    child: Transform.translate(
+                      offset: Offset(slideX, 0),
+                      child: Opacity(
+                        opacity: (1.0 - progress).clamp(0.0, 1.0),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                // Dashboard lain yang tidak aktif (tersimpan di memori via Offstage)
+                return Offstage(
+                  offstage: true,
+                  child: RepaintBoundary(child: child),
+                );
+              }
+            } else {
+              // Kondisi stabil (idle): hanya dashboard aktif yang di-render
+              if (index == _currentIndex) {
+                return RepaintBoundary(child: child);
+              } else {
+                return Offstage(
+                  offstage: true,
+                  child: RepaintBoundary(child: child),
+                );
+              }
+            }
+          }),
+        );
+      },
+    );
+  }
+}
+

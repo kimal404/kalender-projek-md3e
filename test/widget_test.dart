@@ -135,4 +135,69 @@ void main() {
 
     expect(find.text('Pendaftaran Guild'), findsNothing);
   });
+
+  testWidgets('Dashboard switching animates smoothly between Kalender, Profil, and Papan Guild', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final storageService = StorageService();
+    final questRepository = QuestRepository(storageService: storageService);
+    final charVM = CharacterViewModel(storageService: storageService);
+    final questVM = QuestViewModel(
+      repository: questRepository,
+      characterViewModel: charVM,
+    );
+
+    await charVM.init();
+    await charVM.updateName('Tester');
+    await questVM.init();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<StorageService>.value(value: storageService),
+          Provider<QuestRepository>.value(value: questRepository),
+          ChangeNotifierProvider<CharacterViewModel>.value(value: charVM),
+          ChangeNotifierProvider<QuestViewModel>.value(value: questVM),
+        ],
+        child: const QuestKalenderApp(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Pastikan dashboard awal adalah Kalender & Quest
+    expect(find.text('Quest Baru'), findsOneWidget);
+    expect(find.text('KONTRAK HARIAN GUILD'), findsOneWidget);
+
+    // Ganti ke Dashboard Profil Saya
+    await tester.tap(find.text('Profil Saya'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100)); // animasi transisi berjalan
+    await tester.pumpAndSettle();
+
+    // Pastikan Dashboard Profil Saya aktif
+    expect(find.text('Atribut Karakter (Stat RPG)'), findsOneWidget);
+    expect(find.text('Quest Tuntas'), findsOneWidget);
+    expect(find.text('Quest Baru'), findsNothing); // FAB tidak ada di tab profil
+
+    // Ganti ke Dashboard Papan Guild
+    await tester.tap(find.text('Papan Guild'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100)); // animasi transisi berjalan
+    await tester.pumpAndSettle();
+
+    // Pastikan Dashboard Papan Guild aktif
+    expect(find.text('Ringkasan Guild Misi'), findsOneWidget);
+    expect(find.text('Suara Pengingat'), findsOneWidget);
+
+    // Ganti kembali ke Dashboard Kalender & Quest
+    await tester.tap(find.text('Kalender & Quest'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100)); // animasi transisi berjalan
+    await tester.pumpAndSettle();
+
+    // Pastikan kembali ke Dashboard Kalender & Quest dengan FAB aktif
+    expect(find.text('Quest Baru'), findsOneWidget);
+    expect(find.text('KONTRAK HARIAN GUILD'), findsOneWidget);
+  });
 }
+
