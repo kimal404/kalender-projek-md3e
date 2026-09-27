@@ -42,7 +42,7 @@ class _QuestCardState extends State<QuestCard>
     super.initState();
     _entranceController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 450),
+      duration: const Duration(milliseconds: 320),
     );
 
     _fadeAnim = CurvedAnimation(
@@ -50,7 +50,7 @@ class _QuestCardState extends State<QuestCard>
       curve: Curves.easeOutCubic,
     );
 
-    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero)
+    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
         .animate(
           CurvedAnimation(
             parent: _entranceController,
@@ -58,11 +58,15 @@ class _QuestCardState extends State<QuestCard>
           ),
         );
 
-    // Stagger delay berdasarkan index kartu
-    final delay = Duration(milliseconds: 40 + widget.index * 55);
-    Future.delayed(delay, () {
-      if (mounted) _entranceController.forward();
-    });
+    // Stagger delay berdasarkan index kartu (dioptimalkan agar instan & halus)
+    final delay = Duration(milliseconds: (widget.index * 25).clamp(0, 100));
+    if (widget.index == 0) {
+      _entranceController.forward();
+    } else {
+      Future.delayed(delay, () {
+        if (mounted) _entranceController.forward();
+      });
+    }
   }
 
   @override
@@ -108,37 +112,17 @@ class _QuestCardState extends State<QuestCard>
                     splashColor: rankColor.withAlpha(25),
                     highlightColor: rankColor.withAlpha(10),
                     onTap: widget.onEdit,
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 380),
-                      width: 6,
-                      decoration: BoxDecoration(
-                        color: isDone
-                            ? AppTheme.textMuted.withAlpha(90)
-                            : rankColor,
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(16),
-                        ),
-                        boxShadow: isDone
-                            ? null
-                            : [
-                                BoxShadow(
-                                  color: rankColor.withAlpha(120),
-                                  blurRadius: 8,
-                                ),
-                              ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // ─── Checkbox dengan spring-bounce physics ───
+              child: Stack(
+                children: [
+                  // Konten detail quest
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ─── Checkbox dengan spring-bounce physics ───
                             Padding(
                               padding: const EdgeInsets.only(top: 2, right: 12),
                               child: _SpringCheckbox(
@@ -354,8 +338,33 @@ class _QuestCardState extends State<QuestCard>
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  // Indikator garis rank di sisi kiri kartu
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 6,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 380),
+                      decoration: BoxDecoration(
+                        color: isDone
+                            ? AppTheme.textMuted.withAlpha(90)
+                            : rankColor,
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(16),
+                        ),
+                        boxShadow: isDone
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: rankColor.withAlpha(120),
+                                  blurRadius: 6,
+                                ),
+                              ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

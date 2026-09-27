@@ -108,30 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ? const Center(
                 child: CircularProgressIndicator(color: AppTheme.primaryGold),
               )
-            : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 210),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.015),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                child: KeyedSubtree(
-                  key: ValueKey<int>(_currentTabIndex),
-                  child: [
-                    _buildQuestCalendarTab(questVM),
-                    _buildCharacterSheetTab(charVM),
-                    _buildGuildBoardTab(questVM, charVM),
-                  ][_currentTabIndex],
-                ),
+            : IndexedStack(
+                index: _currentTabIndex,
+                children: [
+                  RepaintBoundary(child: _buildQuestCalendarTab(questVM)),
+                  RepaintBoundary(child: _buildCharacterSheetTab(charVM)),
+                  RepaintBoundary(
+                    child: _buildGuildBoardTab(questVM, charVM),
+                  ),
+                ],
               ),
       ),
       bottomNavigationBar: AnimatedRpgBottomNav(
@@ -346,6 +331,9 @@ class _HomeScreenState extends State<HomeScreen> {
         .format(questVM.selectedDate);
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.all(16),
       children: [
         _buildDailyContract(questVM),
@@ -799,6 +787,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final profile = charVM.profile;
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.all(16),
       children: [
         // Kartu Profil Utama – entrance fade+slide
@@ -1120,6 +1111,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final pending = allQuests.length - completed;
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.all(16),
       children: [
         // Ringkasan Papan Misi
@@ -1718,17 +1712,21 @@ class _StaggerFadeSlideState extends State<_StaggerFadeSlide>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 420),
+      duration: const Duration(milliseconds: 320),
     );
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
     _slide = Tween<Offset>(
-      begin: const Offset(0, 0.10),
+      begin: const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-    Future.delayed(Duration(milliseconds: widget.delayMs), () {
-      if (mounted) _controller.forward();
-    });
+    if (widget.delayMs == 0) {
+      _controller.forward();
+    } else {
+      Future.delayed(Duration(milliseconds: widget.delayMs.clamp(0, 150)), () {
+        if (mounted) _controller.forward();
+      });
+    }
   }
 
   @override

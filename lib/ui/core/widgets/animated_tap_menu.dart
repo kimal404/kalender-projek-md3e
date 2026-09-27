@@ -176,9 +176,9 @@ class AnimatedRpgBottomNav extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(120),
-              blurRadius: 18,
-              offset: const Offset(0, -4),
+              color: Colors.black.withAlpha(100),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
             ),
           ],
         ),

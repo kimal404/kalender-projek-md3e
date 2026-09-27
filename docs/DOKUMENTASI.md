@@ -9,7 +9,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Item | Nilai |
 | --- | --- |
 | Nama paket Dart | `quest_kalender` |
-| Versi | `1.1.1+3` |
+| Versi | `1.1.2+4` |
 | SDK Dart | `^3.13.4` |
 | Application ID Android | `com.example.quest_kalender` |
 | Label Android | `quest_kalender` |
@@ -18,7 +18,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Penyimpanan | Lokal, `SharedPreferences` |
 | Remote Git | https://github.com/senji830/kalender-projek |
 | Branch | `master` |
-| Rilis Terkini | `v1.1.1` |
+| Rilis Terkini | `v1.1.2` |
 
 ### Riwayat Rilis
 
@@ -26,7 +26,8 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | --- | --- | --- | --- |
 | [`v1.0.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.0.0) | `1.0.0+1` | Sep 2026 | Rilis perdana: Sistem RPG, limit 500 EXP/hari, tugas 1x pakai, tema Claymorphism 3D |
 | [`v1.1.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.0) | `1.1.0+2` | Sep 2026 | Pembaruan besar UI/UX: Tema Dark Arcane Glassmorphism, multi-orb glow, kalender kristal |
-| [`v1.1.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.1) | `1.1.1+3` | Sep 2026 | Optimalisasi Performa & Zero-Lag: Eliminasi overhead BackdropFilter berulang, raster cache RepaintBoundary, 60/120fps scrolling halus |
+| [`v1.1.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.1) | `1.1.1+3` | Sep 2026 | Optimalisasi Performa: Eliminasi overhead BackdropFilter berulang, isolasi raster RepaintBoundary |
+| [`v1.1.2`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.2) | `1.1.2+4` | Sep 2026 | Buttery-Smooth Experience: Retensi state IndexedStack (scroll offset tersimpan), eliminasi IntrinsicHeight via Stack, tuning radius blur shadow rendah overhead GPU, bouncing physics |
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 

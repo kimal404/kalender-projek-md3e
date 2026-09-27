@@ -46,19 +46,19 @@ class AppTheme {
         width: 1.2,
       ),
       boxShadow: [
-        // 1. Soft diffused ambient glass shadow
+        // 1. Crisp diffused ambient glass shadow (optimized GPU fill-rate)
         BoxShadow(
-          color: Colors.black.withAlpha(isPressed ? 85 : 125),
-          blurRadius: isPressed ? 10 : 22,
-          offset: const Offset(0, 8),
-          spreadRadius: -2,
+          color: Colors.black.withAlpha(isPressed ? 75 : 105),
+          blurRadius: isPressed ? 6 : 12,
+          offset: const Offset(0, 4),
+          spreadRadius: -1,
         ),
         // 2. Ambient aura glow saat accentColor aktif
         if (accentColor != null)
           BoxShadow(
-            color: accentColor.withAlpha(isPressed ? 35 : 24),
-            blurRadius: isPressed ? 8 : 16,
-            offset: const Offset(0, 2),
+            color: accentColor.withAlpha(isPressed ? 30 : 20),
+            blurRadius: isPressed ? 5 : 8,
+            offset: const Offset(0, 1),
             spreadRadius: -1,
           ),
       ],
@@ -92,14 +92,14 @@ class AppTheme {
       ),
       boxShadow: [
         BoxShadow(
-          color: primaryColor.withAlpha(isPressed ? 70 : 110),
-          blurRadius: isPressed ? 6 : 14,
-          offset: isPressed ? const Offset(0, 2) : const Offset(0, 4),
+          color: primaryColor.withAlpha(isPressed ? 70 : 100),
+          blurRadius: isPressed ? 4 : 8,
+          offset: isPressed ? const Offset(0, 1) : const Offset(0, 3),
           spreadRadius: 0,
         ),
         BoxShadow(
-          color: Colors.white.withAlpha(isPressed ? 40 : 70),
-          blurRadius: 4,
+          color: Colors.white.withAlpha(isPressed ? 30 : 60),
+          blurRadius: 3,
           offset: const Offset(0, -1),
         ),
       ],
@@ -133,8 +133,8 @@ class AppTheme {
       boxShadow: selected
           ? [
               BoxShadow(
-                color: color.withAlpha(70),
-                blurRadius: 8,
+                color: color.withAlpha(60),
+                blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
             ]

@@ -11,10 +11,11 @@ class CalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        decoration: AppTheme.glassCardDecoration(radius: 20),
+    return RepaintBoundary(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: AppTheme.glassCardDecoration(radius: 20),
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
@@ -22,41 +23,42 @@ class CalendarWidget extends StatelessWidget {
               _buildHeader(context),
               const SizedBox(height: 10),
 
-          // Tampilan Berdasarkan Mode dengan transisi tinggi & slide-fade halus
-          AnimatedSize(
-            duration: const Duration(milliseconds: 260),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 240),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.025),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
+              // Tampilan Berdasarkan Mode dengan transisi tinggi & slide-fade halus
+              AnimatedSize(
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 240),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.025),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: KeyedSubtree(
+                    key: ValueKey<String>(viewModel.calendarViewMode),
+                    child: viewModel.calendarViewMode == 'month'
+                        ? _buildMonthGrid(context)
+                        : viewModel.calendarViewMode == 'week'
+                        ? _buildWeekStrip(context)
+                        : _buildDayHeader(context),
                   ),
-                );
-              },
-              child: KeyedSubtree(
-                key: ValueKey<String>(viewModel.calendarViewMode),
-                child: viewModel.calendarViewMode == 'month'
-                    ? _buildMonthGrid(context)
-                    : viewModel.calendarViewMode == 'week'
-                    ? _buildWeekStrip(context)
-                    : _buildDayHeader(context),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
-    ),
-);
+    );
   }
 
   Widget _buildHeader(BuildContext context) {
