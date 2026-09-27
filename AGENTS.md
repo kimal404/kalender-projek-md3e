@@ -10,7 +10,7 @@ Data tersimpan lokal di perangkat. Bahasa antarmuka: Indonesia.
 
 Remote: https://github.com/senji830/kalender-projek
 Branch kerja: `master`
-Tag Rilis Terkini: `v1.2.1` (Riwayat rilis: `v1.0.0`, `v1.1.0`, `v1.1.1`, `v1.1.2`, `v1.2.0`, `v1.2.1`)
+Tag Rilis Terkini: `v1.2.2` (Riwayat rilis: `v1.0.0`, `v1.1.0`, `v1.1.1`, `v1.1.2`, `v1.2.0`, `v1.2.1`, `v1.2.2`)
 
 ## Batasan & Aturan Penting
 
@@ -54,13 +54,13 @@ flutter build apk --release
 
 Hasil build APK berada di:
 - `build/app/outputs/flutter-apk/app-release.apk`
-- `build/app/outputs/flutter-apk/quest-kalender-v1.2.1.apk`
+- `build/app/outputs/flutter-apk/quest-kalender-v1.2.2.apk`
 
 Untuk membuat tag rilis baru dan mengunggah ke GitHub:
 ```powershell
-git tag -a v1.2.1 -m "Release v1.2.1: Animated Dashboard Transitions & Progressive Metrics"
-git push origin v1.2.1
-gh release create v1.2.1 build/app/outputs/flutter-apk/quest-kalender-v1.2.1.apk --title "Quest Kalender v1.2.1 - Animated Dashboard Transitions & Progressive Metrics" --notes-file RELEASE_NOTES_v1.2.1.md
+git tag -a v1.2.2 -m "Release v1.2.2: Fix Dashboard Transition Flickering & Double Animation"
+git push origin v1.2.2
+gh release create v1.2.2 build/app/outputs/flutter-apk/quest-kalender-v1.2.2.apk --title "Quest Kalender v1.2.2 - Fix Dashboard Transition Flickering & Double Animation" --notes-file RELEASE_NOTES_v1.2.2.md
 ```
 
 <!-- antislop:start -->

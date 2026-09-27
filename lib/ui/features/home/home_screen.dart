@@ -776,10 +776,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       padding: const EdgeInsets.all(16),
       children: [
-        // Kartu Profil Utama – entrance fade+slide
-        _StaggerFadeSlide(
-          delayMs: 0,
-          child: ClipRRect(
+        // Kartu Profil Utama
+        ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Container(
                 padding: const EdgeInsets.all(20),
@@ -899,68 +897,52 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
           ),
-        ),
         const SizedBox(height: 20),
 
-        // Label seksi
-        _StaggerFadeSlide(
-          delayMs: 80,
-          child: const Text(
-            'Atribut Karakter (Stat RPG)',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        // Label
+        const Text(
+          'Atribut Karakter (Stat RPG)',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 12),
 
-        // Attribute cards dengan stagger delay
-        _StaggerFadeSlide(
-          delayMs: 140,
-          child: _buildAttributeCard(
-            title: 'Kekuatan (STR)',
-            description: 'Meningkat dari latihan fisik, workout, dan olahraga.',
-            value: profile.strength,
-            color: const Color(0xFFEF5350),
-            icon: Icons.fitness_center,
-          ),
+        // Attribute cards
+        _buildAttributeCard(
+          title: 'Kekuatan (STR)',
+          description: 'Meningkat dari latihan fisik, workout, dan olahraga.',
+          value: profile.strength,
+          color: const Color(0xFFEF5350),
+          icon: Icons.fitness_center,
         ),
         const SizedBox(height: 10),
-        _StaggerFadeSlide(
-          delayMs: 210,
-          child: _buildAttributeCard(
-            title: 'Kecerdasan (INT)',
-            description: 'Meningkat dari belajar, membaca buku, dan riset.',
-            value: profile.intellect,
-            color: const Color(0xFF42A5F5),
-            icon: Icons.psychology,
-          ),
+        _buildAttributeCard(
+          title: 'Kecerdasan (INT)',
+          description: 'Meningkat dari belajar, membaca buku, dan riset.',
+          value: profile.intellect,
+          color: const Color(0xFF42A5F5),
+          icon: Icons.psychology,
         ),
         const SizedBox(height: 10),
-        _StaggerFadeSlide(
-          delayMs: 280,
-          child: _buildAttributeCard(
-            title: 'Disiplin (DIS)',
-            description:
-                'Meningkat dari penyelesaian tugas kerja dan rutinitas.',
-            value: profile.discipline,
-            color: const Color(0xFFAB47BC),
-            icon: Icons.task_alt,
-          ),
+        _buildAttributeCard(
+          title: 'Disiplin (DIS)',
+          description:
+              'Meningkat dari penyelesaian tugas kerja dan rutinitas.',
+          value: profile.discipline,
+          color: const Color(0xFFAB47BC),
+          icon: Icons.task_alt,
         ),
         const SizedBox(height: 10),
-        _StaggerFadeSlide(
-          delayMs: 350,
-          child: _buildAttributeCard(
-            title: 'Kebugaran (VIT)',
-            description:
-                'Meningkat dari hidrasi cukup, istirahat, dan meditasi.',
-            value: profile.vitality,
-            color: const Color(0xFF66BB6A),
-            icon: Icons.favorite,
-          ),
+        _buildAttributeCard(
+          title: 'Kebugaran (VIT)',
+          description:
+              'Meningkat dari hidrasi cukup, istirahat, dan meditasi.',
+          value: profile.vitality,
+          color: const Color(0xFF66BB6A),
+          icon: Icons.favorite,
         ),
       ],
     );
@@ -1712,61 +1694,6 @@ class _WelcomeRegistrationDialogState
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Widget helper: stagger fade + slide-up entrance dengan delay
-// ─────────────────────────────────────────────────────────────
-class _StaggerFadeSlide extends StatefulWidget {
-  final Widget child;
-  final int delayMs;
-
-  const _StaggerFadeSlide({required this.child, this.delayMs = 0});
-
-  @override
-  State<_StaggerFadeSlide> createState() => _StaggerFadeSlideState();
-}
-
-class _StaggerFadeSlideState extends State<_StaggerFadeSlide>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fade;
-  late Animation<Offset> _slide;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 320),
-    );
-    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-
-    if (widget.delayMs == 0) {
-      _controller.forward();
-    } else {
-      Future.delayed(Duration(milliseconds: widget.delayMs.clamp(0, 150)), () {
-        if (mounted) _controller.forward();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fade,
-      child: SlideTransition(position: _slide, child: widget.child),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────
 // Widget: Animated Dashboard Transition Stack
@@ -1803,7 +1730,7 @@ class _AnimatedDashboardStackState extends State<_AnimatedDashboardStack>
     _previousIndex = widget.activeIndex;
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 240),
     );
     _animation = CurvedAnimation(
       parent: _controller,
@@ -1837,70 +1764,68 @@ class _AnimatedDashboardStackState extends State<_AnimatedDashboardStack>
 
   @override
   Widget build(BuildContext context) {
-    final isTransitioning =
+    final bool isTransitioning =
         _controller.isAnimating || (_previousIndex != _currentIndex);
 
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, _) {
-        final progress = _animation.value;
-        final screenWidth = MediaQuery.sizeOf(context).width;
+    return Stack(
+      fit: StackFit.expand,
+      children: List.generate(widget.children.length, (index) {
+        final child = widget.children[index];
+        final bool isCurrent = index == _currentIndex;
+        final bool isPrevious = index == _previousIndex;
+        final bool isVisible = isCurrent || (isTransitioning && isPrevious);
 
-        return Stack(
-          fit: StackFit.expand,
-          children: List.generate(widget.children.length, (index) {
-            final child = widget.children[index];
+        return Offstage(
+          offstage: !isVisible,
+          child: TickerMode(
+            enabled: isVisible,
+            child: IgnorePointer(
+              ignoring: !isCurrent,
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (context, staticChild) {
+                  final double progress = _animation.value;
+                  final double slideOffset;
+                  final double opacity;
 
-            if (isTransitioning) {
-              if (index == _currentIndex) {
-                // Dashboard Baru (Meluncur masuk dari samping + Fade in)
-                final slideX =
-                    (1.0 - progress) * 0.07 * _direction * screenWidth;
-                return RepaintBoundary(
-                  child: Transform.translate(
-                    offset: Offset(slideX, 0),
+                  if (isTransitioning) {
+                    if (isCurrent) {
+                      // Masuk lembut dari arah pergeseran (0.05 -> 0.0) dan fade in (0.0 -> 1.0)
+                      slideOffset = (1.0 - progress) * 0.05 * _direction;
+                      opacity = progress.clamp(0.0, 1.0);
+                    } else if (isPrevious) {
+                      // Keluar ke arah berlawanan (0.0 -> -0.05) dan fade out (1.0 -> 0.0)
+                      slideOffset = -progress * 0.05 * _direction;
+                      opacity = (1.0 - progress).clamp(0.0, 1.0);
+                    } else {
+                      slideOffset = 0.0;
+                      opacity = 0.0;
+                    }
+                  } else {
+                    // Kondisi stabil (idle)
+                    slideOffset = 0.0;
+                    opacity = isCurrent ? 1.0 : 0.0;
+                  }
+
+                  return FractionalTranslation(
+                    translation: Offset(slideOffset, 0.0),
                     child: Opacity(
-                      opacity: progress.clamp(0.0, 1.0),
-                      child: child,
+                      opacity: opacity,
+                      child: staticChild,
                     ),
+                  );
+                },
+                child: RepaintBoundary(
+                  child: KeyedSubtree(
+                    key: PageStorageKey<int>(index),
+                    child: child,
                   ),
-                );
-              } else if (index == _previousIndex) {
-                // Dashboard Lama (Meluncur keluar ke samping + Fade out)
-                final slideX = -progress * 0.07 * _direction * screenWidth;
-                return RepaintBoundary(
-                  child: IgnorePointer(
-                    ignoring: true,
-                    child: Transform.translate(
-                      offset: Offset(slideX, 0),
-                      child: Opacity(
-                        opacity: (1.0 - progress).clamp(0.0, 1.0),
-                        child: child,
-                      ),
-                    ),
-                  ),
-                );
-              } else {
-                // Dashboard lain yang tidak aktif (tersimpan di memori via Offstage)
-                return Offstage(
-                  offstage: true,
-                  child: RepaintBoundary(child: child),
-                );
-              }
-            } else {
-              // Kondisi stabil (idle): hanya dashboard aktif yang di-render
-              if (index == _currentIndex) {
-                return RepaintBoundary(child: child);
-              } else {
-                return Offstage(
-                  offstage: true,
-                  child: RepaintBoundary(child: child),
-                );
-              }
-            }
-          }),
+                ),
+              ),
+            ),
+          ),
         );
-      },
+      }),
     );
   }
 }
