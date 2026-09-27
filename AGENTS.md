@@ -10,14 +10,14 @@ Data tersimpan lokal di perangkat. Bahasa antarmuka: Indonesia.
 
 Remote: https://github.com/senji830/kalender-projek
 Branch kerja: `master`
-Tag Rilis Terkini: `v1.2.0` (Riwayat rilis: `v1.0.0`, `v1.1.0`, `v1.1.1`, `v1.1.2`, `v1.2.0`)
+Tag Rilis Terkini: `v1.2.1` (Riwayat rilis: `v1.0.0`, `v1.1.0`, `v1.1.1`, `v1.1.2`, `v1.2.0`, `v1.2.1`)
 
 ## Batasan & Aturan Penting
 
 - **Tema Desain (Modern Flat Minimalist)**: Pertahankan konsistensi antarmuka flat minimalis dengan hairline border (1px) dan permukaan slate solid. Gunakan `AppTheme.flatCardDecoration`, `flatButtonDecoration`, `flatPillDecoration`, `flatRecessedDecoration`. Hindari penambahan `BoxShadow` Gaussian blur berat agar beban fragment shader GPU tetap mendekati 0%.
 - **Animasi Halus & Bertahap (Progressive Animations)**:
-  - Gunakan `TweenAnimationBuilder` untuk perubahan angka progresif (EXP, poin atribut RPG).
-  - Pertahankan `IndexedStack` berpadu `AnimatedOpacity` untuk transisi tab lintas-layar yang mulus tanpa mereset scroll offset dan state widget tree.
+  - Gunakan `TweenAnimationBuilder` untuk perubahan angka progresif (EXP, poin atribut RPG, metrik guild board, dan rank bars).
+  - Pertahankan `_AnimatedDashboardStack` untuk transisi luncur horizontal terarah (*directional slide* + *cross-fade*) antar dashboard tanpa mereset scroll offset dan state widget tree.
   - Gunakan animasi elastis pegas (*bouncy spring physics*) pada interaksi mikro seperti checkbox quest dan tombol sentuh.
 - **Performa & Smooth Experience (Zero-Lag 60/120 FPS)**:
   - Hindari `IntrinsicHeight` pada item scrollable (`QuestCard`). Gunakan layout `Stack` dengan `Positioned`.
@@ -54,13 +54,13 @@ flutter build apk --release
 
 Hasil build APK berada di:
 - `build/app/outputs/flutter-apk/app-release.apk`
-- `build/app/outputs/flutter-apk/quest-kalender-v1.2.0.apk`
+- `build/app/outputs/flutter-apk/quest-kalender-v1.2.1.apk`
 
 Untuk membuat tag rilis baru dan mengunggah ke GitHub:
 ```powershell
-git tag -a v1.2.0 -m "Release v1.2.0: Modern Flat Minimalist UI/UX Overhaul & Progressive Animations"
-git push origin v1.2.0
-gh release create v1.2.0 build/app/outputs/flutter-apk/quest-kalender-v1.2.0.apk --title "Quest Kalender v1.2.0 - Modern Flat Minimalist & Progressive Animations" --notes-file RELEASE_NOTES_v1.2.0.md
+git tag -a v1.2.1 -m "Release v1.2.1: Animated Dashboard Transitions & Progressive Metrics"
+git push origin v1.2.1
+gh release create v1.2.1 build/app/outputs/flutter-apk/quest-kalender-v1.2.1.apk --title "Quest Kalender v1.2.1 - Animated Dashboard Transitions & Progressive Metrics" --notes-file RELEASE_NOTES_v1.2.1.md
 ```
 
 <!-- antislop:start -->

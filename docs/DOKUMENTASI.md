@@ -9,7 +9,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Item | Nilai |
 | --- | --- |
 | Nama paket Dart | `quest_kalender` |
-| Versi | `1.2.0+5` |
+| Versi | `1.2.1+6` |
 | SDK Dart | `^3.13.4` |
 | Application ID Android | `com.example.quest_kalender` |
 | Label Android | `quest_kalender` |
@@ -18,7 +18,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Penyimpanan | Lokal, `SharedPreferences` |
 | Remote Git | https://github.com/senji830/kalender-projek |
 | Branch | `master` |
-| Rilis Terkini | `v1.2.0` |
+| Rilis Terkini | `v1.2.1` |
 
 ### Riwayat Rilis
 
@@ -29,6 +29,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | [`v1.1.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.1) | `1.1.1+3` | Sep 2026 | Optimalisasi Performa: Eliminasi overhead BackdropFilter berulang, isolasi raster RepaintBoundary |
 | [`v1.1.2`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.2) | `1.1.2+4` | Sep 2026 | Buttery-Smooth Experience: Retensi state IndexedStack (scroll offset tersimpan), eliminasi IntrinsicHeight via Stack, tuning radius blur shadow rendah overhead GPU, bouncing physics |
 | [`v1.2.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.2.0) | `1.2.0+5` | Sep 2026 | Overhaul Modern Flat Minimalist & Progressive Animations: Eliminasi total blur bayangan berat untuk 120 FPS, hairline border 1px, kanvas obsidian dot-grid statis, animasi bertahap (count-up EXP/atribut, cross-fade tab, spring physics) |
+| [`v1.2.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.2.1) | `1.2.1+6` | Sep 2026 | Animasi Pergantian Dashboard & Metrik Progresif: Transisi slide horizontal terarah (_AnimatedDashboardStack) + cross-fade antar dashboard, counter progresif metrik guild board & rank, serta AnimatedSwitcher stat pill profil |
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 
