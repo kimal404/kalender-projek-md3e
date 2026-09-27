@@ -2,7 +2,7 @@
 
 Kalender tugas harian bergaya RPG. Setiap quest yang diselesaikan memberikan **EXP**, meningkatkan **Atribut Karakter (STR / INT / DIS / VIT)**, menaikkan **Level & Gelar**, serta menjaga **Streak Harian**. Seluruh data tersimpan secara lokal di perangkat dalam bahasa Indonesia.
 
-Versi `1.1.2+4` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
+Versi `1.2.0+5` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
 
 ## Fitur Utama
 
@@ -12,7 +12,7 @@ Versi `1.1.2+4` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUME
 - **Kontrak Harian Guild**: Menampilkan progres ketuntasan misi harian serta pantauan **Limit EXP Harian (`X / 500 EXP Diklaim` & `Terjadwal`)**.
 - **Profil Petualang & Kustomisasi Avatar**: Nama, gelar otomatis berdasarkan level, bar EXP, level karakter, streak aktif, empat atribut RPG (`STR`, `INT`, `DIS`, `VIT`), 7 avatar SVG bawaan, serta dukungan unggah foto dari Galeri atau Kamera.
 - **Suara Pengingat Kustom (Native Audio & Notifikasi)**: Pengingat tepat pada jam mulai quest dengan 6 pilihan nada (`Default`, `Lonceng`, `Lonceng Angin`, `Terompet Guild`, `Denyut`, `Senyap`) yang dapat langsung diputar (*preview*) dari tab **Papan Guild**.
-- **Desain Dark Arcane Glassmorphism & Smooth Experience (`60/120 FPS`)**: Tampilan premium *Dark Arcane Glassmorphism* dengan translusen dinamis tanpa lag. Dioptimalkan dengan retensi state `IndexedStack` (perpindahan tab instan & offset scroll tersimpan), eliminasi `IntrinsicHeight` via layout `Stack`, radius blur shadow yang ringan bagi GPU Android, serta bouncing physics yang mulus.
+- **Desain Modern Flat Minimalist & Animasi Halus Bertahap (`60/120 FPS`)**: Desain datar minimalis (*flat minimalist*) dengan permukaan slate solid gelap, garis tepi tipis presisi (*hairline borders 1px*), dan eliminasi total blur bayangan berat untuk performa ultra-ringan di semua smartphone. Dilengkapi animasi bertahap (*progressive count-up* EXP & atribut, transisi *cross-fade* tab, dan *spring micro-interactions*).
 
 ## Cara Bermain & Aturan RPG
 

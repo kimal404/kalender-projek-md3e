@@ -111,10 +111,29 @@ class _HomeScreenState extends State<HomeScreen> {
             : IndexedStack(
                 index: _currentTabIndex,
                 children: [
-                  RepaintBoundary(child: _buildQuestCalendarTab(questVM)),
-                  RepaintBoundary(child: _buildCharacterSheetTab(charVM)),
                   RepaintBoundary(
-                    child: _buildGuildBoardTab(questVM, charVM),
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      opacity: _currentTabIndex == 0 ? 1.0 : 0.0,
+                      child: _buildQuestCalendarTab(questVM),
+                    ),
+                  ),
+                  RepaintBoundary(
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      opacity: _currentTabIndex == 1 ? 1.0 : 0.0,
+                      child: _buildCharacterSheetTab(charVM),
+                    ),
+                  ),
+                  RepaintBoundary(
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      opacity: _currentTabIndex == 2 ? 1.0 : 0.0,
+                      child: _buildGuildBoardTab(questVM, charVM),
+                    ),
                   ),
                 ],
               ),
@@ -160,29 +179,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return RepaintBoundary(
       child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              const Color(0xFF1E1A38).withAlpha(235),
-              const Color(0xFF101222).withAlpha(220),
-            ],
-          ),
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.white.withAlpha(28),
-                width: 1.0,
-              ),
+        decoration: const BoxDecoration(
+          color: Color(0xFF111422), // Solid Flat Slate Header
+          border: Border(
+            bottom: BorderSide(
+              color: AppTheme.borderSubtle,
+              width: 1.0,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(70),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
+        ),
           padding: EdgeInsets.only(
             top: MediaQuery.paddingOf(context).top + 8,
             left: 16,
@@ -554,8 +559,8 @@ class _HomeScreenState extends State<HomeScreen> {
       borderRadius: BorderRadius.circular(20),
       child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: AppTheme.glassCardDecoration(
-            radius: 20,
+          decoration: AppTheme.flatCardDecoration(
+            radius: 16,
             accentColor: accent,
           ),
           child: Column(
@@ -796,11 +801,11 @@ class _HomeScreenState extends State<HomeScreen> {
         _StaggerFadeSlide(
           delayMs: 0,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             child: Container(
                 padding: const EdgeInsets.all(20),
-                decoration: AppTheme.glassCardDecoration(
-                  radius: 20,
+                decoration: AppTheme.flatCardDecoration(
+                  radius: 16,
                   accentColor: AppTheme.primaryGold,
                 ),
                 child: Column(
@@ -829,9 +834,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             bottom: 0,
                             child: Container(
                               padding: const EdgeInsets.all(7),
-                              decoration: AppTheme.glassButtonDecoration(
+                              decoration: AppTheme.flatButtonDecoration(
                                 primaryColor: AppTheme.primaryGold,
-                                radius: 16,
+                                radius: 14,
                               ),
                               child: const Icon(
                                 Icons.photo_camera,
@@ -1062,17 +1067,24 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: AppTheme.glassRecessedDecoration(
+                decoration: AppTheme.flatRecessedDecoration(
                   radius: 10,
                   borderColor: color.withAlpha(70),
                 ),
-                child: Text(
-                  '$value Pts',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                child: TweenAnimationBuilder<int>(
+                  tween: IntTween(begin: 0, end: value),
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, animatedVal, child) {
+                    return Text(
+                      '$animatedVal Pts',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

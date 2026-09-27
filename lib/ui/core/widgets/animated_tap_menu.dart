@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quest_kalender/ui/core/themes/app_theme.dart';
 
 /// Widget pembungkus ringan (GPU transform only, 0 layout rebuild) yang
-/// memberikan efek tekan halus (press scale) dan pantulan ringan saat dipilih.
+/// memberikan efek tekan mikro halus (press scale) bergaya Flat Minimalist.
 class AnimatedPressScale extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
@@ -16,8 +16,8 @@ class AnimatedPressScale extends StatefulWidget {
     required this.child,
     this.onTap,
     this.isSelected = false,
-    this.pressedScale = 0.94,
-    this.selectedScale = 1.03,
+    this.pressedScale = 0.95,
+    this.selectedScale = 1.02,
     this.borderRadius,
   });
 
@@ -48,20 +48,15 @@ class _AnimatedPressScaleState extends State<AnimatedPressScale> {
       onTap: widget.onTap,
       child: AnimatedScale(
         scale: targetScale,
-        duration: const Duration(milliseconds: 160),
+        duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
-        child: AnimatedSlide(
-          offset: _pressed ? const Offset(0, 0.02) : Offset.zero,
-          duration: const Duration(milliseconds: 140),
-          curve: Curves.easeOutCubic,
-          child: widget.child,
-        ),
+        child: widget.child,
       ),
     );
   }
 }
 
-/// Chip menu pilihan dengan animasi warna, border, dan skala yang ringan (60fps+).
+/// Chip menu pilihan dengan gaya Flat Minimalist Modern dan transisi warna bertahap.
 class AnimatedMenuChip extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -82,46 +77,39 @@ class AnimatedMenuChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedPressScale(
       isSelected: selected,
-      selectedScale: 1.03,
-      pressedScale: 0.94,
+      selectedScale: 1.02,
+      pressedScale: 0.95,
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7.5),
         decoration: selected
-            ? AppTheme.glassPillDecoration(
+            ? AppTheme.flatPillDecoration(
                 color: activeColor,
-                radius: 14,
+                radius: 10,
                 selected: true,
               )
             : BoxDecoration(
-                color: AppTheme.surfaceLighter.withAlpha(90),
-                borderRadius: BorderRadius.circular(14),
+                color: AppTheme.surfaceSubtle,
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Colors.white.withAlpha(22),
+                  color: AppTheme.borderSubtle,
                   width: 1.0,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(50),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
               AnimatedScale(
-                scale: selected ? 1.12 : 1.0,
+                scale: selected ? 1.08 : 1.0,
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
                 child: Icon(
                   icon,
                   size: 14,
-                  color: selected ? activeColor : activeColor.withAlpha(200),
+                  color: selected ? activeColor : AppTheme.textMuted,
                 ),
               ),
               const SizedBox(width: 6),
@@ -133,7 +121,7 @@ class AnimatedMenuChip extends StatelessWidget {
                 fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
                 fontSize: 12,
                 fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                color: selected ? activeColor : Colors.white70,
+                color: selected ? activeColor : AppTheme.textMuted,
               ),
               child: Text(label),
             ),
@@ -144,7 +132,7 @@ class AnimatedMenuChip extends StatelessWidget {
   }
 }
 
-/// Item data untuk Bottom Navigation Bar beranimasi ringan.
+/// Item data untuk Bottom Navigation Bar beranimasi halus.
 class AnimatedNavItem {
   final IconData icon;
   final String label;
@@ -152,7 +140,7 @@ class AnimatedNavItem {
   const AnimatedNavItem({required this.icon, required this.label});
 }
 
-/// Bottom Navigation Bar RPG dengan efek frosted glass blur dan animasi pilih menu halus.
+/// Bottom Navigation Bar dengan gaya Flat Minimalist Modern & transisi seleksi bertahap.
 class AnimatedRpgBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -169,102 +157,98 @@ class AnimatedRpgBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F1225).withAlpha(235),
+        decoration: const BoxDecoration(
+          color: Color(0xFF111422), // Solid Flat Dark Slate
           border: Border(
-            top: BorderSide(color: Colors.white.withAlpha(28), width: 1.2),
+            top: BorderSide(color: AppTheme.borderSubtle, width: 1.0),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(100),
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
         ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              child: Row(
-                children: List.generate(items.length, (index) {
-                  final item = items[index];
-                  final isSelected = currentIndex == index;
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: List.generate(items.length, (index) {
+                final item = items[index];
+                final isSelected = currentIndex == index;
 
-                  return Expanded(
-                    child: AnimatedPressScale(
-                      isSelected: false,
-                      pressedScale: 0.93,
-                      onTap: () => onTap(index),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOutCubic,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 6,
-                        ),
-                        decoration: isSelected
-                            ? AppTheme.glassPillDecoration(
-                                color: AppTheme.primaryGold,
-                                radius: 16,
-                                selected: true,
-                              )
-                            : null,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AnimatedSlide(
-                          offset: isSelected
-                              ? const Offset(0, -0.05)
-                              : Offset.zero,
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeOutCubic,
-                          child: AnimatedScale(
-                            scale: isSelected ? 1.14 : 1.0,
+                return Expanded(
+                  child: AnimatedPressScale(
+                    isSelected: false,
+                    pressedScale: 0.94,
+                    onTap: () => onTap(index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 7,
+                        horizontal: 8,
+                      ),
+                      decoration: isSelected
+                          ? AppTheme.flatPillDecoration(
+                              color: AppTheme.primaryGold,
+                              radius: 12,
+                              selected: true,
+                            )
+                          : BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedSlide(
+                            offset: isSelected
+                                ? const Offset(0, -0.04)
+                                : Offset.zero,
                             duration: const Duration(milliseconds: 200),
                             curve: Curves.easeOutCubic,
-                            child: Icon(
-                              item.icon,
-                              size: 22,
+                            child: AnimatedScale(
+                              scale: isSelected ? 1.10 : 1.0,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeOutCubic,
+                              child: Icon(
+                                item.icon,
+                                size: 21,
+                                color: isSelected
+                                    ? AppTheme.primaryGold
+                                    : AppTheme.textMuted,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOutCubic,
+                            style: TextStyle(
+                              fontFamily: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.fontFamily,
+                              fontSize: 11,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                               color: isSelected
                                   ? AppTheme.primaryGold
                                   : AppTheme.textMuted,
                             ),
+                            child: Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 3),
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeOutCubic,
-                          style: TextStyle(
-                            fontFamily: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.fontFamily,
-                            fontSize: 11,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.w500,
-                            color: isSelected
-                                ? AppTheme.primaryGold
-                                : AppTheme.textMuted,
-                          ),
-                          child: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 }

@@ -29,16 +29,9 @@ class AvatarView extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: AppTheme.surfaceLighter,
-        boxShadow: [
-          BoxShadow(
-            color: avatar.color.withAlpha(70),
-            blurRadius: 10,
-            spreadRadius: 0.5,
-          ),
-        ],
       ),
       child: Stack(
         alignment: Alignment.center,

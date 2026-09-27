@@ -78,7 +78,7 @@ class AvatarPickerSheet extends StatelessWidget {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       child: Container(
-        decoration: AppTheme.glassCardDecoration(radius: 24, opacity: 0.92),
+        decoration: AppTheme.flatCardDecoration(radius: 20),
           child: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),

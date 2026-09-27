@@ -156,23 +156,11 @@ class _LevelUpDialogState extends State<LevelUpDialog>
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppTheme.primaryGold.withAlpha(35),
+                                  color: AppTheme.primaryGold.withAlpha((25 + _breatheAnim.value * 30).round()),
                                   border: Border.all(
                                     color: AppTheme.primaryGold,
-                                    width: 2,
+                                    width: 2.5,
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppTheme.primaryGold.withAlpha(130),
-                                      blurRadius: _glowAnim.value,
-                                      spreadRadius: _glowAnim.value * 0.2,
-                                    ),
-                                    BoxShadow(
-                                      color: AppTheme.accentAmber.withAlpha(60),
-                                      blurRadius: _glowAnim.value * 2,
-                                      spreadRadius: 1,
-                                    ),
-                                  ],
                                 ),
                                 child: const Icon(
                                   Icons.military_tech,

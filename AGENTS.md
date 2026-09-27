@@ -5,22 +5,24 @@ Dokumentasi produk lengkap ada di [docs/DOKUMENTASI.md](docs/DOKUMENTASI.md).
 
 ## Proyek
 
-Aplikasi Flutter kalender tugas bergaya RPG dengan tema **Dark Arcane Glassmorphism**. Pengguna membuat quest, menyelesaikannya (1 kali pakai per tugas), lalu mendapat **EXP** (dengan batas maksimal **500 EXP/hari**), kenaikan **Atribut (`STR`, `INT`, `DIS`, `VIT`)**, **Level**, **Gelar**, dan **Streak Harian**.
+Aplikasi Flutter kalender tugas bergaya RPG dengan tema **Modern Flat Minimalist** dan animasi halus bertahap. Pengguna membuat quest, menyelesaikannya (1 kali pakai per tugas), lalu mendapat **EXP** (dengan batas maksimal **500 EXP/hari**), kenaikan **Atribut (`STR`, `INT`, `DIS`, `VIT`)**, **Level**, **Gelar**, dan **Streak Harian**.
 Data tersimpan lokal di perangkat. Bahasa antarmuka: Indonesia.
 
 Remote: https://github.com/senji830/kalender-projek
 Branch kerja: `master`
-Tag Rilis Terkini: `v1.1.2` (Riwayat rilis: `v1.0.0`, `v1.1.0`, `v1.1.1`, `v1.1.2`)
+Tag Rilis Terkini: `v1.2.0` (Riwayat rilis: `v1.0.0`, `v1.1.0`, `v1.1.1`, `v1.1.2`, `v1.2.0`)
 
 ## Batasan & Aturan Penting
 
-- **Tema Desain (Dark Arcane Glassmorphism)**: Pertahankan konsistensi antarmuka kaca buram (*frosted glass*). Gunakan `AppTheme.glassCardDecoration`, `glassButtonDecoration`, `glassPillDecoration`, `glassRecessedDecoration`. Hindari membungkus banyak kartu scrollable dengan `BackdropFilter` secara terpisah untuk menjaga frame rate 60/120 FPS.
-- **Performa & Smooth Experience**:
-  - Pertahankan `IndexedStack` untuk tab di `HomeScreen` agar state, scroll offset, dan widget tree tidak dihancurkan saat berganti tab.
-  - Hindari `IntrinsicHeight` pada item daftar scrollable (`QuestCard`). Gunakan layout `Stack` dengan `Positioned` untuk garis sisi kartu guna menghindari double speculative layout pass.
-  - Pertahankan radius blur shadow yang ringan (<= 12px) di `AppTheme` untuk mencegah GPU fill-rate exhaustion pada perangkat Android mid/low-end.
-  - Gunakan `RepaintBoundary` untuk mengisolasi area dinamis seperti `CalendarWidget` dan tab.
-- **Aksesibilitas & Kontras**: Teks judul, label, lencana, dan tombol aksi wajib mempertahankan rasio kontras tinggi **WCAG AA (> 6.0:1)** di atas latar belakang kaca gelap.
+- **Tema Desain (Modern Flat Minimalist)**: Pertahankan konsistensi antarmuka flat minimalis dengan hairline border (1px) dan permukaan slate solid. Gunakan `AppTheme.flatCardDecoration`, `flatButtonDecoration`, `flatPillDecoration`, `flatRecessedDecoration`. Hindari penambahan `BoxShadow` Gaussian blur berat agar beban fragment shader GPU tetap mendekati 0%.
+- **Animasi Halus & Bertahap (Progressive Animations)**:
+  - Gunakan `TweenAnimationBuilder` untuk perubahan angka progresif (EXP, poin atribut RPG).
+  - Pertahankan `IndexedStack` berpadu `AnimatedOpacity` untuk transisi tab lintas-layar yang mulus tanpa mereset scroll offset dan state widget tree.
+  - Gunakan animasi elastis pegas (*bouncy spring physics*) pada interaksi mikro seperti checkbox quest dan tombol sentuh.
+- **Performa & Smooth Experience (Zero-Lag 60/120 FPS)**:
+  - Hindari `IntrinsicHeight` pada item scrollable (`QuestCard`). Gunakan layout `Stack` dengan `Positioned`.
+  - Gunakan `RepaintBoundary` untuk mengisolasi area dinamis seperti `CalendarWidget`, header, dan tab.
+- **Aksesibilitas & Kontras**: Teks judul, label, lencana, dan tombol aksi wajib mempertahankan rasio kontras tinggi **WCAG AA (> 6.0:1)** di atas latar belakang slate/obsidian gelap.
 - Jangan mengubah ikon launcher, favicon, atau splash native Flutter kecuali diminta.
 - Jangan menambahkan backend, Firebase, atau Supabase sungguhan. `AuthSyncService` masih stub lokal.
 - Sistem poin **Gold/Koin** sudah dihapus dari UI agar progres berfokus pada EXP, Level, Atribut RPG, dan Streak. Jangan menampilkan kembali indikator Gold/Koin di UI kecuali diminta.
@@ -52,13 +54,13 @@ flutter build apk --release
 
 Hasil build APK berada di:
 - `build/app/outputs/flutter-apk/app-release.apk`
-- `build/app/outputs/flutter-apk/quest-kalender-v1.1.0.apk`
+- `build/app/outputs/flutter-apk/quest-kalender-v1.2.0.apk`
 
 Untuk membuat tag rilis baru dan mengunggah ke GitHub:
 ```powershell
-git tag -a v1.1.0 -m "Release v1.1.0: Dark Arcane Glassmorphism UI/UX Overhaul"
-git push origin v1.1.0
-gh release create v1.1.0 build/app/outputs/flutter-apk/quest-kalender-v1.1.0.apk --title "Quest Kalender v1.1.0 - Dark Arcane Glassmorphism Release" --notes-file RELEASE_NOTES_v1.1.0.md
+git tag -a v1.2.0 -m "Release v1.2.0: Modern Flat Minimalist UI/UX Overhaul & Progressive Animations"
+git push origin v1.2.0
+gh release create v1.2.0 build/app/outputs/flutter-apk/quest-kalender-v1.2.0.apk --title "Quest Kalender v1.2.0 - Modern Flat Minimalist & Progressive Animations" --notes-file RELEASE_NOTES_v1.2.0.md
 ```
 
 <!-- antislop:start -->

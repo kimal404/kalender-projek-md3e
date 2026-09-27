@@ -15,7 +15,7 @@ class CalendarWidget extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          decoration: AppTheme.glassCardDecoration(radius: 20),
+          decoration: AppTheme.flatCardDecoration(radius: 16),
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
@@ -293,29 +293,20 @@ class CalendarWidget extends StatelessWidget {
             curve: Curves.easeOutCubic,
             margin: const EdgeInsets.all(2),
             decoration: isSelected
-                ? AppTheme.glassButtonDecoration(
+                ? AppTheme.flatButtonDecoration(
                     primaryColor: AppTheme.primaryGold,
-                    radius: 12,
+                    radius: 10,
                   )
                 : BoxDecoration(
                     color: isToday
-                        ? AppTheme.primaryGold.withAlpha(22)
+                        ? AppTheme.primaryGold.withAlpha(20)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                     border: isToday && !isSelected
                         ? Border.all(
-                            color: AppTheme.primaryGold.withAlpha(180),
-                            width: 1.5,
+                            color: AppTheme.primaryGold,
+                            width: 1.2,
                           )
-                        : null,
-                    boxShadow: isToday && !isSelected
-                        ? [
-                            BoxShadow(
-                              color: AppTheme.primaryGold.withAlpha(50),
-                              blurRadius: 6,
-                              offset: const Offset(0, 1),
-                            ),
-                          ]
                         : null,
                   ),
             child: Column(
@@ -418,29 +409,20 @@ class CalendarWidget extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: isSelected
-                  ? AppTheme.glassButtonDecoration(
+                  ? AppTheme.flatButtonDecoration(
                       primaryColor: AppTheme.primaryGold,
-                      radius: 12,
+                      radius: 10,
                     )
                   : BoxDecoration(
                       color: isToday
-                          ? AppTheme.primaryGold.withAlpha(22)
+                          ? AppTheme.primaryGold.withAlpha(20)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(10),
                       border: isToday && !isSelected
                           ? Border.all(
-                              color: AppTheme.primaryGold.withAlpha(180),
-                              width: 1.5,
+                              color: AppTheme.primaryGold,
+                              width: 1.2,
                             )
-                          : null,
-                      boxShadow: isToday && !isSelected
-                          ? [
-                              BoxShadow(
-                                color: AppTheme.primaryGold.withAlpha(50),
-                                blurRadius: 6,
-                                offset: const Offset(0, 1),
-                              ),
-                            ]
                           : null,
                     ),
               child: Column(
@@ -588,23 +570,23 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selector = Container(
-      height: 40,
-      decoration: AppTheme.glassRecessedDecoration(radius: 12),
-      padding: const EdgeInsets.all(3.5),
+      height: 38,
+      decoration: AppTheme.flatRecessedDecoration(radius: 10),
+      padding: const EdgeInsets.all(3.0),
       child: Stack(
         children: [
-          // Sliding indicator (pill kuning emas yang meluncur mulus antar opsi)
+          // Sliding indicator (flat gold pill yang meluncur mulus antar opsi)
           AnimatedAlign(
             alignment: Alignment(_alignmentX, 0.0),
-            duration: const Duration(milliseconds: 240),
+            duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
             child: FractionallySizedBox(
               widthFactor: 1.0 / 3.0,
               heightFactor: 1.0,
               child: Container(
-                decoration: AppTheme.glassButtonDecoration(
+                decoration: AppTheme.flatButtonDecoration(
                   primaryColor: AppTheme.primaryGold,
-                  radius: 9,
+                  radius: 8,
                 ),
               ),
             ),

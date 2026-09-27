@@ -68,18 +68,9 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Container(
                     width: 96,
                     height: 96,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [AppTheme.primaryGold, AppTheme.accentAmber],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryGold.withAlpha(90),
-                          blurRadius: 24,
-                          spreadRadius: 2,
-                        ),
-                      ],
+                      color: AppTheme.primaryGold,
                     ),
                     child: const Icon(
                       Icons.shield_moon,

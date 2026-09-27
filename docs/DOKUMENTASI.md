@@ -9,7 +9,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Item | Nilai |
 | --- | --- |
 | Nama paket Dart | `quest_kalender` |
-| Versi | `1.1.2+4` |
+| Versi | `1.2.0+5` |
 | SDK Dart | `^3.13.4` |
 | Application ID Android | `com.example.quest_kalender` |
 | Label Android | `quest_kalender` |
@@ -18,7 +18,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Penyimpanan | Lokal, `SharedPreferences` |
 | Remote Git | https://github.com/senji830/kalender-projek |
 | Branch | `master` |
-| Rilis Terkini | `v1.1.2` |
+| Rilis Terkini | `v1.2.0` |
 
 ### Riwayat Rilis
 
@@ -28,6 +28,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | [`v1.1.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.0) | `1.1.0+2` | Sep 2026 | Pembaruan besar UI/UX: Tema Dark Arcane Glassmorphism, multi-orb glow, kalender kristal |
 | [`v1.1.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.1) | `1.1.1+3` | Sep 2026 | Optimalisasi Performa: Eliminasi overhead BackdropFilter berulang, isolasi raster RepaintBoundary |
 | [`v1.1.2`](https://github.com/senji830/kalender-projek/releases/tag/v1.1.2) | `1.1.2+4` | Sep 2026 | Buttery-Smooth Experience: Retensi state IndexedStack (scroll offset tersimpan), eliminasi IntrinsicHeight via Stack, tuning radius blur shadow rendah overhead GPU, bouncing physics |
+| [`v1.2.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.2.0) | `1.2.0+5` | Sep 2026 | Overhaul Modern Flat Minimalist & Progressive Animations: Eliminasi total blur bayangan berat untuk 120 FPS, hairline border 1px, kanvas obsidian dot-grid statis, animasi bertahap (count-up EXP/atribut, cross-fade tab, spring physics) |
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 
@@ -153,26 +154,29 @@ Saat naik level, `CharacterViewModel.onLevelUp` memicu `LevelUpDialog` yang mena
 Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
 `guardian` (Penjaga), `mage` (Penyihir), `scout` (Pengintai), `knight` (Ksatria), `scholar` (Cendekia), `ranger` (Pemanah), dan `healer` (Penyembuh). Pengguna juga dapat memilih foto dari Galeri atau Kamera yang disalin ke direktori dokumen aplikasi sebagai `user_avatar.jpg`.
 
-## 6. Desain Dark Arcane Glassmorphism & Optimalisasi Performa Zero-Lag
+## 6. Desain Modern Flat Minimalist & Animasi Halus Bertahap (Zero-Lag 60/120 FPS)
 
-### Sistem Desain Dark Arcane Glassmorphism Ringan (`AppTheme` & `GuildBackdrop`)
+### Sistem Desain Modern Flat Minimalist (`AppTheme` & `GuildBackdrop`)
 
-- **High-Performance Translucent Glass**: Menggunakan `AppTheme.glassCardDecoration`, `glassButtonDecoration`, `glassPillDecoration`, dan `glassRecessedDecoration` tanpa ketergantungan `BackdropFilter` pada daftar bergulir (*scrollable views*). Hal ini mengeliminasi *saveLayer GPU bottleneck* dan menjaga scrolling mulus pada `60fps / 120fps`.
-- **Specular Gradients & Border Kontras**: Gradien putih semi-transparan `white.withAlpha(55)` ke `white.withAlpha(12)` dengan ketebalan 1.2px memberikan pantulan cahaya kristal RPG yang tajam.
-- **Multi-Orb Ambient Glow & Raster Caching**: `GuildBackdrop` memancarkan 4 ambient radial glow (*Arcane Gold*, *Mystic Cyan*, *Violet Nebula*, dan *Emerald Shimmer*) yang dibungkus dengan `RepaintBoundary` agar di-cache dalam memori GPU sekali saja, menghemat daya baterai dan mencegah *thermal throttling*.
+- **Modern Flat Surfaces & Hairline Borders**: Menggunakan `AppTheme.flatCardDecoration`, `flatButtonDecoration`, `flatPillDecoration`, dan `flatRecessedDecoration`. Menghilangkan seluruh `BoxShadow` Gaussian blur yang berat dan menggantikannya dengan garis batas tipis presisi (*hairline border 1px*, `borderSubtle: 0xFF2A2E42`) serta warna latar slate solid yang tenang (`bgSlate: 0xFF181B2A`, `cardSlate: 0xFF141724`).
+- **Kanvas Obsidian & Subtle Dot-Matrix Grid**: `GuildBackdrop` menggunakan kanvas obsidian pekat (`0xFF0B0D14`) dengan pola grid titik minimalis (`_MinimalGridPainter`, `shouldRepaint => false`) berjarak 28px dengan opacity 2.5%, menghemat beban komputasi shader GPU hingga 0%.
+- **Kompatibilitas Penuh**: Helper lama (`glassCardDecoration`, `glassButtonDecoration`, dll.) dialihkan (*forwarded*) secara otomatis ke dekorasi flat tanpa merusak struktur kode yang ada.
 - **Aksesibilitas Kontras Tinggi**: Seluruh teks judul dan label mempertahankan rasio kontras > 6.0:1 (melebihi standar WCAG AA).
+
+### Animasi Halus Bertahap (*Progressive Animations*)
+
+- **Progressive Count-Up Numbers**: Bar EXP dan angka poin atribut RPG (`STR`, `INT`, `DIS`, `VIT`) menggunakan `TweenAnimationBuilder<int>` dan `TweenAnimationBuilder<double>` (`Curves.easeOutCubic`, 600ms) sehingga nilai bertambah bertahap dan halus saat pengguna membuka tab atau menaikkan level.
+- **Cross-Fade Tab Navigation**: Pergantian antar tab di `HomeScreen` menggunakan `AnimatedOpacity` (200ms `Curves.easeOutCubic`) di dalam `IndexedStack`, memberikan transisi lintas-layar yang mulus tanpa mereset posisi scroll atau merusak state widget.
+- **Spring Physics Checkbox**: Checkbox quest (`_SpringCheckbox`) dilengkapi animasi elastis pegas (*bouncy spring physics*, `Curves.elasticOut` / `Curves.easeOutBack`) dengan transisi visual flat gold solid saat tuntas.
+- **`AnimatedPressScale` & `AnimatedMenuChip`**: Interaksi mikro sentuhan responsif menggunakan transform GPU hardware (`0.94x`, 160ms) dengan tampilan pill datar minimalis.
+- **`AnimatedRpgBottomNav`**: Bar navigasi bawah flat obsidian dengan sliding capsule pill indikator aktif (200ms) dan transisi ikon yang bersih.
 
 ### Kalender Responsif (`CalendarWidget`)
 
 - Menggunakan `LayoutBuilder` untuk mendeteksi lebar layar (`isCompact` saat `< 460px`).
-- Pada mode portrait, baris judul bulan + tombol `Hari Ini` + navigasi `<` `>` dipisahkan di baris atas, sedangkan tombol pemilih mode **`Bulan | Minggu | Hari`** direntangkan penuh (*full-width*) di baris kedua agar tidak terhalang di layar sempit.
+- Pada mode portrait, baris judul bulan + tombol `Hari Ini` + navigasi `<` `>` dipisahkan di baris atas, sedangkan tombol pemilih mode **`Bulan | Minggu | Hari`** direntangkan penuh (*full-width*) di baris kedua dengan track recessed flat dan sliding pill indikator yang mulus.
 - Nama bulan dan tahun (`MMMM yyyy`) dibungkus dengan `Flexible` + `FittedBox(fit: BoxFit.scaleDown)` sehingga setiap nama bulan (seperti *September 2026*) tampil utuh tanpa terpotong `...`.
-
-### Animasi Menu Mikro (`lib/ui/core/widgets/animated_tap_menu.dart`)
-
-- **`AnimatedPressScale`**: Memanfaatkan `AnimatedScale` berbasis GPU transform (`Curves.easeOutCubic`, `160ms`) yang mengecil halus (`0.94x`) saat disentuh dan memantul ringan saat dilepas tanpa memicu *layout pass*.
-- **`AnimatedMenuChip`**: Berbasis glass pill decoration pada seluruh filter kategori, filter rank, serta pemilih Rank dan Kategori di `AddQuestDialog`.
-- **`AnimatedRpgBottomNav`**: Navigasi bawah frosted glass khusus dengan kapsul indikator aktif yang bergeser halus (`200ms`) dan transisi konten antar tab menggunakan `FadeTransition` + `SlideTransition` mikro (`210ms`).
+- Sel tanggal kalender bulan dan hari-hari aktif menggunakan flat buttons dengan garis tepi tajam berwarna emas/cyan saat terpilih tanpa shadow blur.
 
 ## 7. Penyimpanan Lokal
 

@@ -201,10 +201,9 @@ class _AddQuestDialogState extends State<AddQuestDialog> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: Container(
-            decoration: AppTheme.glassCardDecoration(
-              radius: 22,
+            decoration: AppTheme.flatCardDecoration(
+              radius: 18,
               accentColor: AppTheme.primaryGold,
-              opacity: 0.88,
             ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500, maxHeight: 680),

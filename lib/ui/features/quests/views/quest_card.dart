@@ -93,17 +93,16 @@ class _QuestCardState extends State<QuestCard>
                 curve: Curves.easeOutCubic,
                 decoration: isDone
                     ? BoxDecoration(
-                        color: const Color(0xFF141933).withAlpha(120),
-                        borderRadius: BorderRadius.circular(18),
+                        color: AppTheme.surfaceSubtle,
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withAlpha(22),
+                          color: AppTheme.borderSubtle,
                           width: 1.0,
                         ),
                       )
-                    : AppTheme.glassCardDecoration(
+                    : AppTheme.flatCardDecoration(
                         accentColor: rankColor,
-                        radius: 18,
-                        opacity: 0.58,
+                        radius: 14,
                       ),
                 child: Material(
                   color: Colors.transparent,
@@ -345,22 +344,15 @@ class _QuestCardState extends State<QuestCard>
                     bottom: 0,
                     width: 6,
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 380),
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeOutCubic,
                       decoration: BoxDecoration(
                         color: isDone
-                            ? AppTheme.textMuted.withAlpha(90)
+                            ? AppTheme.textMuted.withAlpha(60)
                             : rankColor,
                         borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(16),
+                          left: Radius.circular(14),
                         ),
-                        boxShadow: isDone
-                            ? null
-                            : [
-                                BoxShadow(
-                                  color: rankColor.withAlpha(120),
-                                  blurRadius: 6,
-                                ),
-                              ],
                       ),
                     ),
                   ),
@@ -457,48 +449,14 @@ class _SpringCheckboxState extends State<_SpringCheckbox>
           decoration: BoxDecoration(
             color: widget.isDone
                 ? AppTheme.primaryGold
-                : const Color(0xFF141933).withAlpha(160),
-            borderRadius: BorderRadius.circular(10),
-            gradient: widget.isDone
-                ? const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFFFFD54F), AppTheme.primaryGold],
-                  )
-                : LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withAlpha(20),
-                      const Color(0xFF141933).withAlpha(160),
-                    ],
-                  ),
+                : AppTheme.surfaceSubtle,
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: widget.isDone
-                  ? Colors.white.withAlpha(200)
-                  : Colors.white.withAlpha(40),
-              width: 1.4,
+                  ? AppTheme.primaryGold
+                  : AppTheme.borderSubtle,
+              width: 1.5,
             ),
-            boxShadow: widget.isDone
-                ? [
-                    BoxShadow(
-                      color: AppTheme.primaryGold.withAlpha(130),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                    BoxShadow(
-                      color: Colors.white.withAlpha(90),
-                      blurRadius: 3,
-                      offset: const Offset(0, -1),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(60),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
           ),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 230),
@@ -547,9 +505,9 @@ class _RewardBadge extends StatelessWidget {
       opacity: isDone ? 0.4 : 1.0,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-        decoration: AppTheme.glassPillDecoration(
+        decoration: AppTheme.flatPillDecoration(
           color: color,
-          radius: 10,
+          radius: 8,
           selected: !isDone,
         ),
         child: Row(
