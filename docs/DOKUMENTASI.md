@@ -9,7 +9,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Item | Nilai |
 | --- | --- |
 | Nama paket Dart | `quest_kalender` |
-| Versi | `1.2.2+7` |
+| Versi | `1.3.0+8` |
 | SDK Dart | `^3.13.4` |
 | Application ID Android | `com.example.quest_kalender` |
 | Label Android | `quest_kalender` |
@@ -18,7 +18,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | Penyimpanan | Lokal, `SharedPreferences` |
 | Remote Git | https://github.com/senji830/kalender-projek |
 | Branch | `master` |
-| Rilis Terkini | `v1.2.2` |
+| Rilis Terkini | `v1.3.0` |
 
 ### Riwayat Rilis
 
@@ -31,6 +31,7 @@ Dokumen ini menjelaskan aplikasi, arsitektur, aturan permainan, penyimpanan data
 | [`v1.2.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.2.0) | `1.2.0+5` | Sep 2026 | Overhaul Modern Flat Minimalist & Progressive Animations: Eliminasi total blur bayangan berat untuk 120 FPS, hairline border 1px, kanvas obsidian dot-grid statis, animasi bertahap (count-up EXP/atribut, cross-fade tab, spring physics) |
 | [`v1.2.1`](https://github.com/senji830/kalender-projek/releases/tag/v1.2.1) | `1.2.1+6` | Sep 2026 | Animasi Pergantian Dashboard & Metrik Progresif: Transisi slide horizontal terarah (_AnimatedDashboardStack) + cross-fade antar dashboard, counter progresif metrik guild board & rank, serta AnimatedSwitcher stat pill profil |
 | [`v1.2.2`](https://github.com/senji830/kalender-projek/releases/tag/v1.2.2) | `1.2.2+7` | Sep 2026 | Perbaikan Transisi & Anti-Flicker: Eliminasi animasi berulang/berkedip saat ganti dashboard via struktur render-tree konstan (FractionalTranslation + Offstage + PageStorageKey) dan penghapusan staggered delay bertabrakan |
+| [`v1.3.0`](https://github.com/senji830/kalender-projek/releases/tag/v1.3.0) | `1.3.0+8` | Okt 2026 | Radar Poligon Gaya Hidup & Sistem Archetype: Visualisasi jaring 4-sumbu atribut RPG (STR, INT, DIS, VIT) dengan progressive spring expansion, klasifikasi kepribadian petualang, serta rekomendasi penyeimbang hidup |
 
 Aplikasi tidak diterbitkan ke pub.dev (`publish_to: none`).
 
@@ -233,13 +234,13 @@ flutter build apk --release
 
 ### Berkas Hasil Build APK Release
 - `build/app/outputs/flutter-apk/app-release.apk`
-- `build/app/outputs/flutter-apk/quest-kalender-v1.1.0.apk` (~54.4 MB)
+- `build/app/outputs/flutter-apk/quest-kalender-v1.3.0.apk`
 
 Rilis dan aset biner APK dapat diunduh melalui [GitHub Releases](https://github.com/senji830/kalender-projek/releases).
 
 ## 10. Pengujian Otomatis (`test/`)
 
-Aplikasi dilengkapi 12 skenario pengujian otomatis (100% lulus):
+Aplikasi dilengkapi 14 skenario pengujian otomatis (100% lulus):
 
 ### 1. `test/quest_rpg_test.dart` (9 Unit Tests):
 - **Hadiah EXP Bawaan Rank**: Memastikan Rank `E` sampai `S` memberikan nilai EXP dasar yang sesuai spesifikasi.
@@ -252,7 +253,9 @@ Aplikasi dilengkapi 12 skenario pengujian otomatis (100% lulus):
 - **Limit EXP Harian (`500 EXP/hari`)**: Menguji secara ketat bahwa akumulasi EXP dalam 1 hari tidak pernah dapat melebihi batas 500 EXP.
 - **Nama Petualang**: Memastikan nama default `"Petualang"` dapat diperbarui melalui `updateName`.
 
-### 2. `test/widget_test.dart` (3 Widget Tests):
+### 2. `test/widget_test.dart` (5 Widget Tests):
 - **Render Aplikasi Utama**: Memastikan `HomeScreen` dan seluruh tab bawah (`Kalender & Quest`, `Profil Saya`, `Papan Guild`) tampil tanpa error layout.
 - **Animasi Mode Kalender**: Memverifikasi transisi animasi dan indikator geser saat berpindah antara opsi **`Bulan`**, **`Minggu`**, dan **`Hari`**.
 - **Dialog Selamat Datang / Registrasi**: Memastikan modal onboarding pendaftaran awal muncul saat pertama kali aplikasi dibuka dan dapat ditutup setelah menyimpan nama petualang.
+- **Transisi Antar Dashboard**: Memverifikasi pergantian dashboard dengan mulus tanpa flicker dan menjaga posisi scroll.
+- **Radar Poligon & Archetype**: Memastikan `StatRadarCard` menggambar grafik poligon atribut, mini chips, dan analisis archetype secara akurat.

@@ -2,7 +2,7 @@
 
 Kalender tugas harian bergaya RPG. Setiap quest yang diselesaikan memberikan **EXP**, meningkatkan **Atribut Karakter (STR / INT / DIS / VIT)**, menaikkan **Level & Gelar**, serta menjaga **Streak Harian**. Seluruh data tersimpan secara lokal di perangkat dalam bahasa Indonesia.
 
-Versi `1.2.2+7` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
+Versi `1.3.0+8` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUMENTASI.md)
 
 ## Fitur Utama
 
@@ -10,7 +10,7 @@ Versi `1.2.2+7` · Flutter · Android & Web · [Dokumentasi Lengkap](docs/DOKUME
 - **Tugas 1 Kali Pakai (Terkunci Saat Selesai)**: Setiap quest yang sudah di-checklist otomatis terkunci (`Terkunci • 1x Pakai`) dan tidak dapat di-uncheck kembali untuk mencegah *farming* EXP berulang.
 - **Sistem Limit EXP Harian (`500 EXP / Hari`)**: Setiap tanggal memiliki kuota maksimal **500 EXP/hari**. Dialog tambah quest menampilkan sisa kuota EXP harian secara *real-time*, menyesuaikan hadiah EXP bila mendekati batas, dan mengunci penambahan quest baru jika kuota tanggal tersebut sudah penuh.
 - **Kontrak Harian Guild**: Menampilkan progres ketuntasan misi harian serta pantauan **Limit EXP Harian (`X / 500 EXP Diklaim` & `Terjadwal`)**.
-- **Profil Petualang & Kustomisasi Avatar**: Nama, gelar otomatis berdasarkan level, bar EXP, level karakter, streak aktif, empat atribut RPG (`STR`, `INT`, `DIS`, `VIT`), 7 avatar SVG bawaan, serta dukungan unggah foto dari Galeri atau Kamera.
+- **Profil Petualang & Radar Poligon Karakter**: Nama, gelar otomatis berdasarkan level, bar EXP, level karakter, streak aktif, visualisasi **Radar Poligon Gaya Hidup (`STR`, `INT`, `DIS`, `VIT`)** dengan klasifikasi *Archetype* dan saran penyeimbang hidup, empat kartu rincian atribut, 7 avatar SVG bawaan, serta dukungan unggah foto dari Galeri atau Kamera.
 - **Suara Pengingat Kustom (Native Audio & Notifikasi)**: Pengingat tepat pada jam mulai quest dengan 6 pilihan nada (`Default`, `Lonceng`, `Lonceng Angin`, `Terompet Guild`, `Denyut`, `Senyap`) yang dapat langsung diputar (*preview*) dari tab **Papan Guild**.
 - **Desain Modern Flat Minimalist & Animasi Halus Bertahap (`60/120 FPS`)**: Desain datar minimalis (*flat minimalist*) dengan permukaan slate solid gelap, garis tepi tipis presisi (*hairline borders 1px*), dan eliminasi total blur bayangan berat untuk performa ultra-ringan di semua smartphone. Dilengkapi animasi perpindahan dashboard terarah (*directional slide & cross-fade*), animasi progresif (*progressive count-up* EXP, atribut & metrik guild), dan *spring micro-interactions*.
 
