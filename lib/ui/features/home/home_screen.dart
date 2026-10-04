@@ -13,6 +13,7 @@ import 'package:quest_kalender/ui/features/character/view_models/character_view_
 import 'package:quest_kalender/ui/features/character/views/avatar_picker_sheet.dart';
 import 'package:quest_kalender/ui/features/character/views/avatar_view.dart';
 import 'package:quest_kalender/ui/features/character/views/level_up_dialog.dart';
+import 'package:quest_kalender/ui/features/character/views/stat_radar_card.dart';
 import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 import 'package:quest_kalender/ui/features/quests/views/add_quest_dialog.dart';
 import 'package:quest_kalender/ui/features/quests/views/quest_card.dart';
@@ -897,6 +898,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
           ),
+        const SizedBox(height: 18),
+
+        // Radar Poligon Keseimbangan Karakter
+        StatRadarCard(profile: profile),
+
         const SizedBox(height: 20),
 
         // Label

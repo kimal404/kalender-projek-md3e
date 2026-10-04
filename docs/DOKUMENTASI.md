@@ -48,7 +48,7 @@ Alur buka aplikasi:
 | Tab | Isi |
 | --- | --- |
 | **Kalender & Quest** | Kontrak harian (beserta status Limit EXP Harian), kalender responsif (`Bulan \| Minggu \| Hari`), chip filter kategori/rank, daftar quest pada tanggal terpilih, dan tombol `Quest Baru` |
-| **Profil Saya** | Dashboard karakter: avatar, nama, gelar, level karakter, quest tuntas, streak aktif, dan empat atribut RPG (`STR`, `INT`, `DIS`, `VIT`) |
+| **Profil Saya** | Dashboard karakter: avatar, nama, gelar, level karakter, quest tuntas, streak aktif, Radar Poligon Keseimbangan Gaya Hidup (`StatRadarCard` dengan analisis archetype), dan empat kartu atribut RPG (`STR`, `INT`, `DIS`, `VIT`) |
 | **Papan Guild** | Ringkasan total misi (Total, Terselesaikan, Menunggu), grafik sebaran quest per rank, pengaturan **Suara Pengingat** (dengan tombol *preview* langsung), dan status sinkronisasi lokal |
 
 Header atas menampilkan avatar, nama, gelar, badge streak harian dengan efek *pulse*, serta bilah progres EXP & Level.
@@ -155,6 +155,20 @@ Saat naik level, `CharacterViewModel.onLevelUp` memicu `LevelUpDialog` yang mena
 
 Tujuh avatar SVG bawaan tersedia di `assets/avatars/` dan `AvatarCatalog`:
 `guardian` (Penjaga), `mage` (Penyihir), `scout` (Pengintai), `knight` (Ksatria), `scholar` (Cendekia), `ranger` (Pemanah), dan `healer` (Penyembuh). Pengguna juga dapat memilih foto dari Galeri atau Kamera yang disalin ke direktori dokumen aplikasi sebagai `user_avatar.jpg`.
+
+### Radar Poligon Keseimbangan Atribut & Analisis Archetype
+
+Widget `StatRadarCard` (`lib/ui/features/character/views/stat_radar_card.dart`) menampilkan grafik jaring poligon 4-sumbu untuk mengevaluasi proporsi pengembangan diri pengguna:
+- **Sumbu 4-Arah**:
+  - ⬆️ **STR (Kekuatan)**: Merah (`#EF5350`)
+  - ➡️ **INT (Kecerdasan)**: Biru (`#42A5F5`)
+  - ⬇️ **DIS (Disiplin)**: Ungu (`#AB47BC`)
+  - ⬅️ **VIT (Kebugaran)**: Hijau (`#66BB6A`)
+- **Skala & Grid Konsentris**: Cincin pembagi persentase 25%, 50%, 75%, 100% dengan hairline stroke (`0.8px`) dan vertex titik berwarna di tiap sudut poligon.
+- **Animasi Bertahap (*Progressive Expansion*)**: Menggunakan `TweenAnimationBuilder` (650ms, `Curves.easeOutCubic`) dan `RepaintBoundary` untuk performa zero-lag (60/120 FPS).
+- **Analisis Pola Hidup & Saran Guild**:
+  - Mengklasifikasikan tipe gaya hidup (Harmoni Seimbang / Spesialis Fisik / Spesialis Intelek / Spesialis Eksekusi / Spesialis Kebugaran).
+  - Memberikan rekomendasi penyeimbang dinamis jika salah satu atribut tertinggal jauh.
 
 ## 6. Desain Modern Flat Minimalist & Animasi Halus Bertahap (Zero-Lag 60/120 FPS)
 
