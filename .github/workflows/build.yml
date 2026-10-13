@@ -1,0 +1,45 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ update-ui, master ]
+  workflow_dispatch:
+
+# Batalkan build lama jika ada push baru di branch yang sama
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build Debug APK (ARM64 Saja)
+        run: flutter build apk --debug --target-platform android-arm64
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk

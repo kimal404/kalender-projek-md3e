@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:quest_kalender/ui/core/themes/app_theme.dart';
 import 'package:quest_kalender/ui/core/widgets/animated_tap_menu.dart';
 import 'package:quest_kalender/ui/features/quests/view_models/quest_view_model.dart';
 
@@ -11,57 +10,47 @@ class CalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: AppTheme.flatCardDecoration(radius: 16),
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              // Baris Navigasi Bulan & Mode Tampilan
-              _buildHeader(context),
-              const SizedBox(height: 10),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-              // Tampilan Berdasarkan Mode dengan transisi tinggi & slide-fade halus
-              AnimatedSize(
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutCubic,
-                alignment: Alignment.topCenter,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 240),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0, 0.025),
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: KeyedSubtree(
-                    key: ValueKey<String>(viewModel.calendarViewMode),
-                    child: viewModel.calendarViewMode == 'month'
-                        ? _buildMonthGrid(context)
-                        : viewModel.calendarViewMode == 'week'
-                        ? _buildWeekStrip(context)
-                        : _buildDayHeader(context),
-                  ),
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 12),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.fastOutSlowIn,
+              alignment: Alignment.topCenter,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                child: KeyedSubtree(
+                  key: ValueKey<String>(viewModel.calendarViewMode),
+                  child: viewModel.calendarViewMode == 'month'
+                      ? _buildMonthGrid(context)
+                      : viewModel.calendarViewMode == 'week'
+                          ? _buildWeekStrip(context)
+                          : _buildDayHeader(context),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final monthYearStr = DateFormat('MMMM yyyy').format(viewModel.currentMonth);
 
     return LayoutBuilder(
@@ -77,7 +66,6 @@ class CalendarWidget extends StatelessWidget {
                   Expanded(
                     child: Row(
                       children: [
-                        // Bulan & Tahun tampil lengkap penuh tanpa "..."
                         Flexible(
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
@@ -85,70 +73,45 @@ class CalendarWidget extends StatelessWidget {
                             child: Text(
                               monthYearStr,
                               maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
-
-                        // Tombol Kembali ke Hari Ini
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
+                        FilledButton.tonal(
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            backgroundColor: AppTheme.primaryGold.withAlpha(25),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           onPressed: () => viewModel.selectDate(DateTime.now()),
                           child: const Text(
                             'Hari Ini',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.primaryGold,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  // Tombol Prev & Next Bulan
                   IconButton(
-                    icon: const Icon(Icons.chevron_left, size: 20),
+                    icon: const Icon(Icons.chevron_left_rounded, size: 22),
                     visualDensity: VisualDensity.compact,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                    padding: EdgeInsets.zero,
                     onPressed: viewModel.previousMonth,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right, size: 20),
+                    icon: const Icon(Icons.chevron_right_rounded, size: 22),
                     visualDensity: VisualDensity.compact,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                    padding: EdgeInsets.zero,
                     onPressed: viewModel.nextMonth,
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-
-              // Pilihan Mode (Bulan, Minggu, Hari) Full Width dengan sliding pill animation
+              const SizedBox(height: 10),
               _CalendarModeSlidingSelector(
                 currentMode: viewModel.calendarViewMode,
                 onModeChanged: viewModel.setCalendarViewMode,
@@ -157,59 +120,44 @@ class CalendarWidget extends StatelessWidget {
           );
         }
 
-        // Tampilan Landscape / Layar Lebar
         return Row(
           children: [
-            // Bulan & Tahun
             Text(
               monthYearStr,
-              style: const TextStyle(
-                fontSize: 16,
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(width: 6),
-
-            // Tombol Kembali ke Hari Ini
-            TextButton(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            const SizedBox(width: 8),
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              onPressed: () => viewModel.selectDate(DateTime.now()),
-              child: const Text(
-                'Hari Ini',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.primaryGold,
-                  fontWeight: FontWeight.bold,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
+              onPressed: () => viewModel.selectDate(DateTime.now()),
+              child: const Text('Hari Ini', style: TextStyle(fontSize: 12)),
             ),
-
             const Spacer(),
-
-            // Tombol Prev & Next Bulan
             IconButton(
-              icon: const Icon(Icons.chevron_left, size: 20),
+              icon: const Icon(Icons.chevron_left_rounded, size: 22),
               visualDensity: VisualDensity.compact,
               onPressed: viewModel.previousMonth,
             ),
             IconButton(
-              icon: const Icon(Icons.chevron_right, size: 20),
+              icon: const Icon(Icons.chevron_right_rounded, size: 22),
               visualDensity: VisualDensity.compact,
               onPressed: viewModel.nextMonth,
             ),
-
-            const SizedBox(width: 4),
-
-            // Pilihan Mode (Bulan, Minggu, Hari) dengan sliding pill animation
+            const SizedBox(width: 6),
             _CalendarModeSlidingSelector(
               currentMode: viewModel.calendarViewMode,
               onModeChanged: viewModel.setCalendarViewMode,
-              width: 216,
+              width: 220,
             ),
           ],
         );
@@ -218,22 +166,19 @@ class CalendarWidget extends StatelessWidget {
   }
 
   Widget _buildMonthGrid(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final curMonth = viewModel.currentMonth;
 
-    // Hari pertama bulan ini
     final firstDayOfMonth = DateTime(curMonth.year, curMonth.month, 1);
-    // Senin = 1, Minggu = 7. Sesuaikan agar Senin = kolom 0
-    final int startingWeekday = firstDayOfMonth.weekday; // 1 (Mon) to 7 (Sun)
+    final int startingWeekday = firstDayOfMonth.weekday;
     final int leadingEmptyDays = startingWeekday - 1;
-
-    // Total hari dalam bulan ini
     final daysInMonth = DateTime(curMonth.year, curMonth.month + 1, 0).day;
 
     final List<Widget> dayWidgets = [];
 
-    // Header Nama Hari (Sen s/d Min)
     const weekDays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
     final headerRow = Row(
       children: weekDays
@@ -242,10 +187,9 @@ class CalendarWidget extends StatelessWidget {
               child: Center(
                 child: Text(
                   d,
-                  style: const TextStyle(
-                    fontSize: 11,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textMuted,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -254,7 +198,6 @@ class CalendarWidget extends StatelessWidget {
           .toList(),
     );
 
-    // Padding tanggal bulan sebelumnya
     final prevMonthLastDay = DateTime(curMonth.year, curMonth.month, 0).day;
     for (int i = 0; i < leadingEmptyDays; i++) {
       final dayNum = prevMonthLastDay - leadingEmptyDays + 1 + i;
@@ -262,13 +205,15 @@ class CalendarWidget extends StatelessWidget {
         Center(
           child: Text(
             '$dayNum',
-            style: TextStyle(fontSize: 12, color: Colors.white.withAlpha(40)),
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.onSurface.withValues(alpha: 0.2),
+            ),
           ),
         ),
       );
     }
 
-    // Tanggal bulan berjalan
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(curMonth.year, curMonth.month, day);
       final isSelected =
@@ -286,29 +231,21 @@ class CalendarWidget extends StatelessWidget {
         AnimatedPressScale(
           isSelected: isSelected,
           selectedScale: 1.04,
-          pressedScale: 0.91,
+          pressedScale: 0.92,
           onTap: () => viewModel.selectDate(date),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
             margin: const EdgeInsets.all(2),
-            decoration: isSelected
-                ? AppTheme.flatButtonDecoration(
-                    primaryColor: AppTheme.primaryGold,
-                    radius: 10,
-                  )
-                : BoxDecoration(
-                    color: isToday
-                        ? AppTheme.primaryGold.withAlpha(20)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(10),
-                    border: isToday && !isSelected
-                        ? Border.all(
-                            color: AppTheme.primaryGold,
-                            width: 1.2,
-                          )
-                        : null,
-                  ),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? colorScheme.primary
+                  : (isToday ? colorScheme.primaryContainer.withValues(alpha: 0.4) : Colors.transparent),
+              borderRadius: BorderRadius.circular(14),
+              border: isToday && !isSelected
+                  ? Border.all(color: colorScheme.primary, width: 1.2)
+                  : null,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -316,15 +253,13 @@ class CalendarWidget extends StatelessWidget {
                   '$day',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: isSelected || isToday
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.w500,
                     color: isSelected
-                        ? Colors.black
-                        : (isToday ? AppTheme.primaryGold : Colors.white),
+                        ? colorScheme.onPrimary
+                        : (isToday ? colorScheme.primary : colorScheme.onSurface),
                   ),
                 ),
-                // Dot indikator Quest
+                const SizedBox(height: 2),
                 if (questsOnDay.isNotEmpty)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -336,10 +271,10 @@ class CalendarWidget extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: isSelected
-                              ? Colors.black87
+                              ? colorScheme.onPrimary
                               : (q.isCompleted
-                                    ? AppTheme.textMuted
-                                    : q.rank.color),
+                                  ? colorScheme.outlineVariant
+                                  : colorScheme.primary),
                         ),
                       );
                     }).toList(),
@@ -353,15 +288,12 @@ class CalendarWidget extends StatelessWidget {
       );
     }
 
-    // Gridview builder untuk kalender bulanan dengan transisi cross-fade
     return Column(
       children: [
         headerRow,
         const SizedBox(height: 6),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeInCubic,
           child: GridView.count(
             key: ValueKey<String>('${curMonth.year}-${curMonth.month}'),
             shrinkWrap: true,
@@ -376,11 +308,12 @@ class CalendarWidget extends StatelessWidget {
   }
 
   Widget _buildWeekStrip(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final selected = viewModel.selectedDate;
 
-    // Hitung awal minggu (Senin)
     final startOfWeek = selected.subtract(Duration(days: selected.weekday - 1));
 
     return Row(
@@ -408,23 +341,15 @@ class CalendarWidget extends StatelessWidget {
               curve: Curves.easeOutCubic,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: isSelected
-                  ? AppTheme.flatButtonDecoration(
-                      primaryColor: AppTheme.primaryGold,
-                      radius: 10,
-                    )
-                  : BoxDecoration(
-                      color: isToday
-                          ? AppTheme.primaryGold.withAlpha(20)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
-                      border: isToday && !isSelected
-                          ? Border.all(
-                              color: AppTheme.primaryGold,
-                              width: 1.2,
-                            )
-                          : null,
-                    ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? colorScheme.primary
+                    : (isToday ? colorScheme.primaryContainer.withValues(alpha: 0.4) : Colors.transparent),
+                borderRadius: BorderRadius.circular(14),
+                border: isToday && !isSelected
+                    ? Border.all(color: colorScheme.primary, width: 1.2)
+                    : null,
+              ),
               child: Column(
                 children: [
                   Text(
@@ -432,7 +357,9 @@ class CalendarWidget extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.black87 : AppTheme.textMuted,
+                      color: isSelected
+                          ? colorScheme.onPrimary.withValues(alpha: 0.8)
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -442,21 +369,18 @@ class CalendarWidget extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: isSelected
-                          ? Colors.black
-                          : (isToday ? AppTheme.primaryGold : Colors.white),
+                          ? colorScheme.onPrimary
+                          : (isToday ? colorScheme.primary : colorScheme.onSurface),
                     ),
                   ),
                   const SizedBox(height: 4),
                   if (quests.isNotEmpty)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 1,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.black87
-                            : AppTheme.surfaceLighter,
+                            ? colorScheme.onPrimary.withValues(alpha: 0.2)
+                            : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -464,9 +388,7 @@ class CalendarWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? AppTheme.primaryGold
-                              : Colors.white70,
+                          color: isSelected ? colorScheme.onPrimary : colorScheme.primary,
                         ),
                       ),
                     )
@@ -482,45 +404,44 @@ class CalendarWidget extends StatelessWidget {
   }
 
   Widget _buildDayHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final selected = viewModel.selectedDate;
     final formatted = DateFormat('EEEE, dd MMMM yyyy').format(selected);
     final quests = viewModel.getQuestsForDate(selected);
     final completedCount = quests.where((q) => q.isCompleted).length;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: AppTheme.glassPillDecoration(
-        color: AppTheme.surfaceLighter.withAlpha(70),
-        borderColor: Colors.white.withAlpha(25),
-        radius: 12,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          const Icon(Icons.event_note, color: AppTheme.neonCyan, size: 20),
-          const SizedBox(width: 8),
+          Icon(Icons.calendar_today_rounded, color: colorScheme.primary, size: 18),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               formatted,
-              style: const TextStyle(
-                fontSize: 13,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: colorScheme.onSurface,
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: AppTheme.glassPillDecoration(
-              color: AppTheme.primaryGold.withAlpha(28),
-              borderColor: AppTheme.primaryGold.withAlpha(90),
-              radius: 8,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              '$completedCount/${quests.length} Quest Selesai',
-              style: const TextStyle(
+              '$completedCount/${quests.length} Selesai',
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryGold,
+                color: colorScheme.onSecondaryContainer,
               ),
             ),
           ),
@@ -530,10 +451,8 @@ class CalendarWidget extends StatelessWidget {
   }
 }
 
-/// Komponen pemilih mode tampilan kalender (Bulan, Minggu, Hari)
-/// dengan indikator pil kuning emas (sliding pill) yang meluncur mulus
 class _CalendarModeSlidingSelector extends StatelessWidget {
-  final String currentMode; // 'month', 'week', 'day'
+  final String currentMode;
   final ValueChanged<String> onModeChanged;
   final double? width;
 
@@ -569,41 +488,45 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final selector = Container(
       height: 38,
-      decoration: AppTheme.flatRecessedDecoration(radius: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(12),
+      ),
       padding: const EdgeInsets.all(3.0),
       child: Stack(
         children: [
-          // Sliding indicator (flat gold pill yang meluncur mulus antar opsi)
           AnimatedAlign(
             alignment: Alignment(_alignmentX, 0.0),
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutCubic,
             child: FractionallySizedBox(
               widthFactor: 1.0 / 3.0,
               heightFactor: 1.0,
               child: Container(
-                decoration: AppTheme.flatButtonDecoration(
-                  primaryColor: AppTheme.primaryGold,
-                  radius: 8,
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-
-          // Label teks untuk setiap opsi
           Row(
             children: [
-              Expanded(
-                child: _buildItem('month', 'Bulan', 0),
-              ),
-              Expanded(
-                child: _buildItem('week', 'Minggu', 1),
-              ),
-              Expanded(
-                child: _buildItem('day', 'Hari', 2),
-              ),
+              Expanded(child: _buildItem(context, 'month', 'Bulan', 0)),
+              Expanded(child: _buildItem(context, 'week', 'Minggu', 1)),
+              Expanded(child: _buildItem(context, 'day', 'Hari', 2)),
             ],
           ),
         ],
@@ -616,7 +539,8 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
     return selector;
   }
 
-  Widget _buildItem(String mode, String label, int index) {
+  Widget _buildItem(BuildContext context, String mode, String label, int index) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isSelected = _selectedIndex == index;
 
     return AnimatedPressScale(
@@ -625,18 +549,14 @@ class _CalendarModeSlidingSelector extends StatelessWidget {
       onTap: () => onModeChanged(mode),
       child: Center(
         child: AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           style: TextStyle(
             fontSize: 12.5,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.black : Colors.white70,
-            letterSpacing: 0.2,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-          ),
+          child: Text(label, textAlign: TextAlign.center),
         ),
       ),
     );
